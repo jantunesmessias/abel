@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/evidence/scenario-lab-supplemental-artifact-provenance",
+  "title": "ScenarioLabSupplementalArtifactProvenance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "artifactDigest",
+    "size",
+    "mediaType",
+    "classification",
+    "sourceId",
+    "importPolicyId"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "kind": { "const": "ScenarioLabSupplementalArtifactProvenance" },
+    "artifactDigest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "size": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 33554432
+    },
+    "mediaType": {
+      "enum": [
+        "image/png",
+        "application/json"
+      ]
+    },
+    "classification": {
+      "enum": ["public", "internal", "sensitive"]
+    },
+    "sourceId": {
+      "type": "string",
+      "maxLength": 256,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"
+    },
+    "importPolicyId": {
+      "type": "string",
+      "maxLength": 256,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"
+    }
+  }
+}

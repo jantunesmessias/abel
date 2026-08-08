@@ -1,0 +1,13 @@
+schemaVersion: 2
+kind: ScenarioComparisonBinding
+metadata:
+  id: dashboard-ready-baseline-candidate
+spec:
+  scenarioId: dashboard-ready
+  requiredEvidenceId: dashboard-ready-visual
+  baseline:
+    kind: artifact
+    artifactId: dashboard-ready-synthetic-baseline
+  candidate:
+    kind: requiredEvidence
+    requiredEvidenceId: dashboard-ready-visual

@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "control-plane.name" . }}
+  labels:
+    {{- include "control-plane.labels" . | nindent 4 }}
+data:
+  OIDC_ISSUER: {{ .Values.config.oidcIssuer | quote }}
+  OIDC_AUTHORIZATION_ENDPOINT: {{ .Values.config.oidcAuthorizationEndpoint | quote }}
+  OIDC_TOKEN_ENDPOINT: {{ .Values.config.oidcTokenEndpoint | quote }}
+  OIDC_JWKS_URI: {{ .Values.config.oidcJwksUri | quote }}
+  OIDC_CLIENT_ID: {{ .Values.config.oidcClientId | quote }}
+  OIDC_ALLOWED_ALGORITHMS: {{ .Values.config.oidcAllowedAlgorithms | quote }}
+  S3_ENDPOINT: {{ .Values.config.s3Endpoint | quote }}
+  S3_BUCKET: {{ .Values.config.s3Bucket | quote }}
+  S3_REGION: {{ .Values.config.s3Region | quote }}
+  STUDIO_ALLOWED_ORIGINS: {{ .Values.config.allowedStudioOrigins | quote }}
+  OTEL_EXPORTER_OTLP_ENDPOINT: {{ .Values.config.otelEndpoint | quote }}
+  CONTROL_PLANE_ENVIRONMENT: {{ .Values.config.deploymentEnvironment | quote }}
+  CONTROL_PLANE_SERVICE_VERSION: {{ .Chart.AppVersion | quote }}
+  REMOTE_EXECUTION_ENABLED: {{ .Values.remote.enabled | quote }}
+  {{- if .Values.remote.enabled }}
+  REMOTE_WEB_WORKER_IMAGE: {{ include "control-plane.remoteWebImage" . | quote }}
+  REMOTE_ANDROID_WORKER_IMAGE: {{ include "control-plane.remoteAndroidImage" . | quote }}
+  REMOTE_SIGNING_KEY_ID: {{ .Values.remote.signingKeyId | quote }}
+  REMOTE_SIGNING_ALGORITHM: {{ .Values.remote.signingAlgorithm | quote }}
+  REMOTE_SIGNING_JWK_FILE: /var/run/workspace-secrets/remote-signing.jwk
+  KUBERNETES_API_SERVER: {{ .Values.remote.kubernetesApiServer | quote }}
+  KUBERNETES_API_TOKEN_FILE: /var/run/workspace-kubernetes/token
+  CONTROL_PLANE_ORIGIN: {{ .Values.remote.controlPlaneOrigin | quote }}
+  GATEWAY_ORIGIN: {{ .Values.remote.gatewayOrigin | quote }}
+  REMOTE_ALLOWED_EGRESS_CIDRS: {{ join "," .Values.remote.allowedEgressCidrs | quote }}
+  REMOTE_WEB_CAPACITY: {{ .Values.remote.webCapacity | quote }}
+  REMOTE_ANDROID_CAPACITY: {{ .Values.remote.androidCapacity | quote }}
+  REMOTE_CHROMIUM_PATH: {{ .Values.remote.chromiumPath | quote }}
+  REMOTE_ANDROID_SDK_ROOT: {{ .Values.remote.androidSdkRoot | quote }}
+  REMOTE_ANDROID_AVD: {{ .Values.remote.androidAvd | quote }}
+  REMOTE_ANDROID_SCRCPY_SERVER_PATH: {{ .Values.remote.androidScrcpyServerPath | quote }}
+  REMOTE_ANDROID_SCRCPY_VERSION: {{ .Values.remote.androidScrcpyServerVersion | quote }}
+  REMOTE_ANDROID_SCRCPY_SERVER_DIGEST: {{ required "remote.androidScrcpyServerDigest is required" .Values.remote.androidScrcpyServerDigest | quote }}
+  REMOTE_GATEWAY_PORT: {{ .Values.remote.gatewayPort | quote }}
+  REMOTE_SESSION_GATEWAY_NAME: {{ .Values.remote.sessionGatewayName | quote }}
+  REMOTE_SESSION_GATEWAY_NAMESPACE: {{ .Values.remote.sessionGatewayNamespace | quote }}
+  REMOTE_ANDROID_IMAGE_ID: {{ .Values.remote.androidImage.id | quote }}
+  REMOTE_ANDROID_IMAGE_DIGEST: {{ required "remote.androidImage.digest is required" .Values.remote.androidImage.digest | quote }}
+  REMOTE_ANDROID_API_LEVEL: {{ .Values.remote.androidImage.apiLevel | quote }}
+  REMOTE_ANDROID_ABI: {{ .Values.remote.androidImage.abi | quote }}
+  REMOTE_ANDROID_RENDERER: {{ .Values.remote.androidImage.renderer | quote }}
+  {{- end }}

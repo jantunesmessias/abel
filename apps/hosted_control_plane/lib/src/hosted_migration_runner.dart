@@ -40,19 +40,19 @@ final class HostedMigrationRunner {
     return database.runTx(
       (session) async {
         await session.execute(
-          "SELECT pg_advisory_xact_lock(hashtextextended('devex-hosted-migrations-v1', 0))",
+          "SELECT pg_advisory_xact_lock(hashtextextended('control-plane-migrations-v1', 0))",
         );
         await session.execute(r'''
-          CREATE TABLE IF NOT EXISTS public.devex_schema_migrations (
+          CREATE TABLE IF NOT EXISTS public.control_plane_schema_migrations (
             migration_id text PRIMARY KEY,
             content_sha256 text NOT NULL,
             applied_at timestamptz NOT NULL DEFAULT clock_timestamp(),
-            CONSTRAINT devex_schema_migrations_digest_check
+            CONSTRAINT control_plane_schema_migrations_digest_check
               CHECK (content_sha256 ~ '^[0-9a-f]{64}$')
           )
         ''');
         final rows = await session.execute(
-          'SELECT migration_id, content_sha256 FROM public.devex_schema_migrations',
+          'SELECT migration_id, content_sha256 FROM public.control_plane_schema_migrations',
         );
         final known = <String, String>{
           for (final row in rows) row[0]! as String: row[1]! as String,
@@ -75,7 +75,7 @@ final class HostedMigrationRunner {
           await session.execute(sql, queryMode: QueryMode.simple);
           await session.execute(
             Sql.named('''
-              INSERT INTO public.devex_schema_migrations (
+              INSERT INTO public.control_plane_schema_migrations (
                 migration_id, content_sha256
               ) VALUES (@id:text, @digest:text)
             '''),

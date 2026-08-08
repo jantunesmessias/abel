@@ -1,0 +1,9 @@
+schemaVersion: 1
+kind: ScenarioExecutionBinding
+metadata:
+  id: dashboard-ready-lab-web
+spec:
+  scenarioId: dashboard-ready
+  targetId: sample-lab-web
+  launchProfileId: sample-lab-web
+  gatewayPresetId: showcase-offline

@@ -1,0 +1,10 @@
+schemaVersion: 2
+kind: AppAdapterCapability
+metadata:
+  id: sample.dashboard.ready-control
+spec:
+  version: 1
+  operations:
+    - read-enabled
+    - write-enabled
+    - reset-enabled

@@ -1,34 +1,165 @@
-name: devex_workspace
+name: experience_platform_workspace
 publish_to: none
 
 environment:
   sdk: ^3.12.0
 
 workspace:
-  - apps/backend_gateway
-  - apps/devex_cli
-  - apps/devex_host
-  - apps/devex_studio
+  - apps/gateway_sidecar
+  - apps/workspace_cli
+  - apps/workspace_host
+  - apps/studio
   - apps/hosted_control_plane
   - apps/remote_session_gateway
   - apps/remote_worker
   - examples/sample_api
   - examples/sample_flutter
-  - packages/devex_contracts
-  - packages/devex_engine
-  - packages/devex_flutter
-  - packages/devex_preview
-  - packages/devex_runtime
-  - packages/devex_testkit
-  - packages/devex_ui_system
-  - packages/devex_ux_system
-  - test/consumers/friction_flutter
+  - libs/experience_contracts
+  - libs/experience_engine
+  - libs/flutter_app_adapter
+  - libs/flutter_preview
+  - libs/execution_runtime
+  - libs/testing_support
+  - libs/studio_ui
+  - libs/interaction_model
+  - tests/consumers/friction_flutter
 
 dev_dependencies:
-  devex_contracts: ^0.1.0-dev
-  devex_engine: ^0.1.0-dev
-  devex_runtime: ^0.1.0-dev
+  analyzer: 12.1.0
+  execution_runtime: ^0.1.0-dev
+  experience_contracts: ^0.1.0-dev
+  experience_engine: ^0.1.0-dev
+  interaction_model: ^0.1.0-dev
   lints: ^6.0.0
+  melos: 8.3.0
   path: ^1.9.1
   postgres: ^3.5.12
   test: ^1.26.3
+
+melos:
+  scripts:
+    format:
+      description: Format every first-party Dart source.
+      run: dart format apps libs examples tests tools
+    format:check:
+      description: Verify first-party Dart formatting without writes.
+      run: dart format --output=none --set-exit-if-changed apps libs examples tests tools
+    analyze:
+      description: Analyze every workspace package with strict severity.
+      run: flutter analyze --fatal-infos --fatal-warnings
+    test:transversal:
+      description: Run root conformance and integration suites when present.
+      run: for suite in tests/conformance tests/integration tools/gates; do if find "$suite" -type f -name '*_test.dart' -print -quit 2>/dev/null | grep -q .; then dart test "$suite"; fi; done
+    test:
+      description: Run Dart, Flutter, and transversal tests deterministically.
+      run: >-
+        dart run melos exec -c 1 --no-flutter --dir-exists=test --ignore=execution_runtime -- dart test &&
+        dart test -j 1 libs/execution_runtime &&
+        dart run melos exec -c 1 --flutter --dir-exists=test -- flutter test &&
+        dart run melos run test:transversal
+    studio:build:
+      description: Build the release Jaspr Studio.
+      run: cd apps/studio && jaspr build
+    studio:browser:
+      description: Verify the Studio in a real browser.
+      run: ./tools/verify/verify_studio_vertical.sh
+    scenario-lab:
+      description: Verify Scenario Lab and Quality in a real browser.
+      run: ./tools/verify/verify_scenario_lab_vertical.sh
+    authoring-review:
+      description: Verify the Authoring and Review vertical.
+      run: ./tools/verify/verify_authoring_review_vertical.sh
+    motion-context:
+      description: Verify Motion and Context Builder.
+      run: ./tools/verify/verify_motion_context_vertical.sh
+    mcp-experience:
+      description: Verify the MCP Experience boundary.
+      run: ./tools/verify/verify_mcp_experience_vertical.sh
+    web:evidence:
+      description: Verify web evidence collection and publication.
+      run: ./tools/verify/verify_web_evidence_flow.sh
+    build:
+      description: Build the Studio and reference Target.
+      run: dart run melos run studio:build && dart run examples/tool/showcase.dart --build-target --check
+    reference:
+      description: Verify the external reference consumer.
+      run: ./tools/verify/verify_reference_consumer.sh
+    auto-preview:
+      description: Verify the AutoPreview vertical.
+      run: ./tools/verify/verify_auto_preview.sh
+    gateway:benchmark:
+      description: Verify Gateway latency and resource budgets.
+      run: ./tools/benchmarks/gateway_benchmark.sh
+    gateway:containment:
+      description: Verify Target and Gateway containment.
+      run: ./tools/verify/verify_target_containment.sh
+    distribution:
+      description: Verify standalone and modular distribution lifecycles.
+      run: ./tools/verify/verify_distribution_lifecycle.sh && ./tools/verify/verify_modular_distribution.sh
+    distribution:external:
+      description: Verify an isolated external consumer distribution.
+      run: ./tools/verify/verify_external_distribution_vertical.sh
+    web:wasm:
+      description: Verify Flutter web Wasm compilation.
+      run: ./tools/verify/verify_flutter_web_wasm.sh
+    schemas:
+      description: Verify schema and canonicalization standards.
+      run: ./tools/verify/verify_standards.sh
+    supply-chain:
+      description: Verify immutable dependencies and release provenance policy.
+      run: ./tools/verify/verify_supply_chain.sh
+    policy:
+      description: Verify canonical names, repository boundaries, schemas, links, and tracked files.
+      run: dart run tools/gates/repository_policy.dart
+    comments:
+      description: Reject non-essential comments in first-party source files.
+      run: dart run tools/gates/comment_policy.dart
+    kubernetes:
+      description: Verify Helm and Kubernetes manifests.
+      run: ./tools/verify/verify_kubernetes_manifests.sh
+    hosted:postgres:
+      description: Verify PostgreSQL tenant isolation and remote scheduling.
+      run: ./tools/hosted/verify_postgres_rls.sh && dart run tools/hosted/verify_remote_scheduler_postgres.dart
+    scale:
+      description: Verify scale, accessibility, and security budgets.
+      run: ./tools/verify/verify_scale_accessibility_security_vertical.sh
+    source-automation:
+      description: Verify source impact, bundles, plugins, and MCP automation.
+      run: ./tools/verify/verify_source_automation.sh
+    android:evidence:
+      description: Verify correlated Android-native evidence.
+      run: ./tools/verify/verify_android_native_evidence.sh
+    release:
+      description: Verify the stable distribution release.
+      run: ./tools/verify/verify_release.sh
+    check:
+      description: Run the portable workspace quality gate.
+      run: >-
+        dart run melos run format:check &&
+        dart run melos run analyze &&
+        dart run tools/gates/architecture_guard.dart &&
+        dart run melos run policy &&
+        dart run melos run comments &&
+        dart run melos run supply-chain &&
+        dart run melos run test &&
+        dart run melos run studio:build &&
+        dart run melos run gateway:containment &&
+        REFERENCE_SKIP_STUDIO_BUILD=1 dart run melos run reference
+    ci:
+      description: Run the complete portable CI verification matrix.
+      run: >-
+        dart run melos run schemas &&
+        dart run melos run kubernetes &&
+        dart run melos run check &&
+        STUDIO_SKIP_BUILD=1 dart run melos run studio:browser &&
+        SCENARIO_LAB_SKIP_BUILD=1 dart run melos run scenario-lab &&
+        dart run melos run authoring-review &&
+        dart run melos run motion-context &&
+        dart run melos run mcp-experience &&
+        dart run melos run web:evidence &&
+        dart run melos run web:wasm &&
+        dart run melos run gateway:benchmark &&
+        dart run melos run distribution &&
+        dart run melos run auto-preview &&
+        dart run melos run distribution:external &&
+        SCALE_SKIP_STUDIO_BUILD=1 dart run melos run scale

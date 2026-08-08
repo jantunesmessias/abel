@@ -1,0 +1,11 @@
+schemaVersion: 1
+kind: GatewayRoute
+metadata:
+  id: dashboard-failure
+spec:
+  scopeId: showcase-api
+  method: GET
+  pathTemplate: /v1/dashboard
+  appliesTo: [showcase-failure]
+  policy: localOnly
+  fixtureId: dashboard-failure-response

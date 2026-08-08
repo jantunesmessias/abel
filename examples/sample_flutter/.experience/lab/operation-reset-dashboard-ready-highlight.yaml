@@ -1,0 +1,8 @@
+schemaVersion: 2
+kind: ScenarioLabOperation
+metadata:
+  id: reset-dashboard-ready-highlight
+spec:
+  scenarioId: dashboard-ready
+  kind: resetControl
+  controlId: dashboard-ready-highlight-enabled

@@ -1,4 +1,4 @@
-SET search_path = devex_hosted, pg_catalog;
+SET search_path = control_plane, pg_catalog;
 
 -- Contract phase for v1. It is intentionally idempotent and is only promoted
 -- after every application instance writes the expanded shape.

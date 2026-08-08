@@ -1,0 +1,105 @@
+schemaVersion: 2
+
+content:
+  root: .experience
+
+workspace:
+  id: workspace-showcase
+  displayName: Abel complete showcase
+
+applications:
+  sample:
+    root: .
+    target: web
+    displayName: Delivery Lab Flutter
+
+launchProfiles:
+  sample-web:
+    applicationId: sample
+    platform: web
+    command: dart
+    arguments:
+      - run
+      - tool/target_server.dart
+      - --root=build/web
+      - --port=8080
+      - --frame-ancestor=http://127.0.0.1:7368
+    workingDirectory: .
+    overlay:
+      SAMPLE_MODE: full
+    bootstrapPolicy:
+      sample-api: production
+      gateway: overlay
+  sample-lab-web:
+    applicationId: sample
+    platform: web
+    command: dart
+    arguments:
+      - run
+      - tool/target_server.dart
+      - --root=build/web
+      - --port=0
+      - --frame-ancestor=http://127.0.0.1:7368
+    workingDirectory: .
+    overlay:
+      SAMPLE_MODE: scenario-lab
+    bootstrapPolicy:
+      sample-api: production
+      gateway: overlay
+
+kit:
+  profile: full-local
+  modules:
+    scenario.lab.local:
+      enabled: true
+      settings:
+        evidenceClassification: internal
+    quality.decisions.local:
+      enabled: true
+      settings:
+        authorityId: delivery-lab.local
+        accessPolicyId: delivery-lab.review-v1
+        principalId: delivery-lab.reviewer
+        role: reviewer
+        allowedRequirementIds:
+          - approve-dashboard-ready-visual
+        allowedDecisions:
+          - approved
+          - rejected
+        artifactClassifications:
+          - internal
+        grantTtlSeconds: 120
+    authoring.local:
+      enabled: true
+      settings:
+        authorityId: delivery-lab.authoring-local
+        accessPolicyId: delivery-lab.authoring-v1
+        principalId: delivery-lab.author
+        allowedOperations:
+          - openDraft
+          - abandonDraft
+          - moveNode
+          - undo
+          - redo
+          - reset
+          - appendFinding
+          - proposeConcept
+          - appendComment
+          - prepareReview
+          - evaluateAutomatedAcceptance
+          - decideReview
+          - promote
+        grantTtlSeconds: 120
+    evidence.auto-preview:
+      enabled: true
+      settings:
+        renderer: flutter-test
+        capturePolicy: static-v1
+        parallelism: 1
+  providerBindings:
+    - capability: {id: evidence.visual, version: 1}
+      providerModuleIds:
+        - evidence.auto-preview
+      selectionPolicy: orderedFirstAvailable
+      applicationId: sample
+  startupPolicy: fail-required-v1

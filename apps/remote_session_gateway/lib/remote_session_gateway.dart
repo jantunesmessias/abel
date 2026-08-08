@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:devex_contracts/devex_contracts.dart';
-import 'package:devex_engine/devex_engine.dart';
-import 'package:devex_runtime/devex_runtime.dart';
+import 'package:execution_runtime/execution_runtime.dart';
+import 'package:experience_contracts/experience_contracts.dart';
+import 'package:experience_engine/experience_engine.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf_web_socket/shelf_web_socket.dart';
@@ -470,8 +470,7 @@ final class _RemoteSessionPeer {
 
   final WebSocketChannel channel;
   final RemoteSessionEndpointRole role;
-  // The relay owns this subscription and cancels it through
-  // [cancelSubscription] on reject, disconnect, expiry, and shutdown.
+
   // ignore: cancel_subscriptions
   StreamSubscription<Object?>? subscription;
   Timer? authenticationTimer;

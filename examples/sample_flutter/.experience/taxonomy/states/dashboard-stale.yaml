@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: ScenarioState
+metadata:
+  id: dashboard.stale
+spec:
+  surfaceId: delivery-dashboard
+  displayName: Stale data

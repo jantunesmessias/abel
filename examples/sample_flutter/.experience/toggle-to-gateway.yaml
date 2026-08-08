@@ -1,0 +1,9 @@
+schemaVersion: 1
+kind: Transition
+metadata:
+  id: toggle-to-gateway
+spec:
+  journeyId: operate-delivery-workspace
+  from: toggle-delivery-task
+  to: inspect-gateway-traffic
+  label: Reviewer inspects the resulting Gateway traffic

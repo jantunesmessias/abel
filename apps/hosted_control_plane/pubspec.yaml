@@ -1,4 +1,4 @@
-name: devex_hosted_control_plane
+name: hosted_control_plane
 version: 0.1.0-dev
 publish_to: none
 resolution: workspace
@@ -8,9 +8,9 @@ environment:
 
 dependencies:
   crypto: ^3.0.6
-  devex_contracts: ^0.1.0-dev
-  devex_engine: ^0.1.0-dev
-  devex_runtime: ^0.1.0-dev
+  execution_runtime: ^0.1.0-dev
+  experience_contracts: ^0.1.0-dev
+  experience_engine: ^0.1.0-dev
   jose: ^0.3.5+2
   opentelemetry: ^0.18.11
   postgres: ^3.5.12

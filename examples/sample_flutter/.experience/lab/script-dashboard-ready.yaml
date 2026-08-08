@@ -1,0 +1,36 @@
+schemaVersion: 2
+kind: ScenarioScript
+metadata:
+  id: exercise-dashboard-ready-lab
+spec:
+  scenarioId: dashboard-ready
+  displayName: Exercise the synthetic ready dashboard Lab
+  # The opening step owns process launch, readiness and the browser relay Hello.
+  # Keep its budget above the Host's 30 s Hello bound without weakening later
+  # control and capture deadlines.
+  timeoutMs: 90000
+  timeoutOutcome: fail
+  cancellationPolicy: afterCurrentStep
+  steps:
+    - id: open-dashboard-ready
+      kind: executionBinding
+      bindingId: dashboard-ready-lab-web
+      timeoutMs: 45000
+      timeoutOutcome: cancel
+    - id: enable-ready-highlight
+      kind: operation
+      operationId: enable-dashboard-ready-highlight
+      timeoutMs: 2000
+      timeoutOutcome: fail
+    - id: collect-ready-visual
+      kind: operation
+      operationId: collect-dashboard-ready-visual
+      timeoutMs: 20000
+      timeoutOutcome: fail
+    - id: reset-ready-highlight
+      kind: operation
+      operationId: reset-dashboard-ready-highlight
+      # This final operation includes reset, its confirming read and the
+      # script's final control refresh over the browser relay.
+      timeoutMs: 10000
+      timeoutOutcome: fail

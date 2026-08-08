@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:devex_contracts/devex_contracts.dart';
-import 'package:devex_remote_worker/remote_worker.dart';
-import 'package:devex_runtime/devex_runtime.dart';
+import 'package:execution_runtime/execution_runtime.dart';
+import 'package:experience_contracts/experience_contracts.dart';
+import 'package:remote_worker/remote_worker.dart';
 import 'package:test/test.dart';
 
 void main() {
   test('worker transfers are scoped and heartbeat rotates its bearer token', () async {
-    final root = Directory.systemTemp.createTempSync('devex-worker-http-');
+    final root = Directory.systemTemp.createTempSync('workspace-worker-http-');
     final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
     final origin = Uri.parse('http://127.0.0.1:${server.port}');
     final inputBytes = <int>[1, 2, 3, 4];

@@ -1,14 +1,14 @@
-# DevExKit Architecture
+# Abel Architecture
 
 | Campo | Valor |
 |-------|-------|
-| Status | constituição v0.29 — **P0–V3 aprovados; V4–V5 implementados; MC0–MC6/AP0–AP4 implementados; único Studio Jaspr implementado na matriz local** |
-| Última atualização | 2026-08-11 |
+| Status | **plataforma local, Gateway, distribuição, Studio Jaspr e capacidades de experiência aprovados na matriz portátil; control plane e execução remota implementados com certificações externas explicitamente pendentes** |
+| Última atualização | 2026-08-17 |
 | Stack alvo | **Dart / Jaspr para o Studio / Flutter para adapters e consumers** |
 | Estado do projeto | **Studio Jaspr, Host e AutoPreview operacionais localmente; integrações hosted/device-farm aguardam certificação em infraestrutura real** |
 
 Este documento é a **constituição arquitetural e o índice normativo** do
-DevExKit. Ele contém o produto alvo, o baseline comportamental do gateway
+Abel. Ele contém o produto alvo, o baseline comportamental do gateway
 seletivo legado, os limites dos bounded contexts, decisões aceitas,
 alternativas rejeitadas, critérios de paridade e regras de distribuição.
 
@@ -59,7 +59,7 @@ quando uma decisão os torna parte explícita de um contrato.
 
 ## 1. Resumo executivo
 
-O DevExKit é uma plataforma local-first de DevEx mobile para transformar
+O Abel é uma plataforma local-first de desenvolvimento mobile para transformar
 jornadas de produto em experiências:
 
 - compreensíveis por Product, UX, engenharia e QA;
@@ -85,11 +85,11 @@ O produto possui duas macro-capabilities complementares:
 
 Elas são materializadas por quatro bounded contexts: `Catalog & Docs`,
 `Sessions`, `Backend Gateway` e `Evidence & Release`. `Source & Automation` é
-supporting capability transversal; `DevEx Host` é boundary de aplicação/deploy,
+supporting capability transversal; `Workspace Host` é boundary de aplicação/deploy,
 não domínio.
 
 ```text
-                        DevExKit Studio
+                        Abel Studio
              +---------------+---------------+
              |                               |
              v                               v
@@ -109,17 +109,17 @@ do consumidor e substitui apenas fronteiras externas declaradas.
 
 ### 1.1 Destino do produto
 
-**DevExKit é o nome técnico do projeto.** O repositório publicado usa o slug
-canônico `devex-kit`; o nome de um diretório de trabalho local não é contrato.
-`devex` é o namespace estável para schemas, kinds, packages, APIs, protocolo,
+**Abel é a identidade humana do produto.** O profile `full-local` compõe a
+superfície local completa; o nome de um diretório de trabalho não é contrato.
+`workspace` é o namespace estável para schemas, kinds, packages, APIs, protocolo,
 machine output, artifacts e media types. Nomes e diretórios humanos pertencem
 ao `ConsumerLayout` da distribuição.
 
-O mesmo núcleo `devex` pode gerar distribuições diferentes:
+O mesmo núcleo `workspace` pode gerar distribuições diferentes:
 
 ```text
-núcleo e contratos devex
-  +-- distribuição DevExKit
+núcleo e contratos workspace
+  +-- distribuição Abel
   +-- distribuição Helix
   +-- distribuição de terceiros
 ```
@@ -139,7 +139,7 @@ O gateway legado:
 
 Distribuições branded futuras permanecem Dart/Jaspr com adapters Flutter
 opcionais e usam os mesmos
-contratos `devex`.
+contratos `workspace`.
 
 ### 1.2 Baseline legado e tradução para o alvo
 
@@ -147,13 +147,13 @@ O gateway legado era um gateway local de mocks com console operacional. Ele fica
 entre um app real e backends não produtivos para preservar login/sessão reais
 enquanto controlava apenas o fluxo sob desenvolvimento.
 
-| Dimensão | gateway legado | DevExKit / distribuição exemplo |
+| Dimensão | gateway legado | Abel / distribuição exemplo |
 |----------|-------------|------------------------------|
 | Objeto central | request HTTP mockada ou proxied | Journey/Scenario/Evidence + Backend Gateway |
 | Runtime do app | app real; APIs apontadas ao gateway local | app real em ExecutionTarget |
 | Backend | preset mock + proxy do restante | Gateway Dart em `isolated` ou `hybrid` |
 | UI da ferramenta | console web operacional | Studio Jaspr Explore/Run/Review |
-| Instalação | scripts e reverse proxy do host | CLI `devex` + bootstrap opt-in |
+| Instalação | scripts e reverse proxy do host | CLI `workspace` + bootstrap opt-in |
 | Fidelidade | implícita | runtime fidelity e backend mode ortogonais |
 | Estado | arquivo local mutável | fontes autorais + GatewaySession + digests |
 
@@ -187,12 +187,12 @@ capaz de:
 5. capturar uma evidência identificada;
 6. explicar target, configuração e fidelidade usados.
 
-O Gateway entra incrementalmente:
+O Gateway é organizado por capacidades verificáveis:
 
-- dimensões `backendMode`/`networkContainment` e fingerprint no V0;
-- contratos e runtime Gateway isolated no V0.1;
-- modo hybrid no V0.2;
-- host-native e substituição operacional no V1.
+- dimensões `backendMode`/`networkContainment` e fingerprint no vertical local;
+- contratos e runtime Gateway isolated no isolamento do Gateway;
+- modo hybrid na contenção do Gateway;
+- host-native e substituição operacional na evidência web/Android.
 
 ---
 
@@ -289,7 +289,7 @@ Não fazem parte do núcleo inicial:
 - atuar como framework E2E universal.
 
 Push de teste, build de aplicativo e snapshots de flags podem surgir como
-plugins opcionais de distribuição. Eles não bloqueiam V0–V1 nem pertencem ao
+plugins opcionais de distribuição. Eles não bloqueiam web local e Android nem pertencem ao
 Backend Gateway.
 
 ---
@@ -300,38 +300,38 @@ Backend Gateway.
 
 **Decisão.**
 
-- `DevExKit` identifica projeto, repositório e distribuição de referência;
-- `devex` é o namespace técnico permanente dos contratos;
+- `Abel` identifica projeto, repositório e distribuição de referência;
+- `workspace` é o namespace técnico permanente dos contratos;
 - distribuições podem escolher nomes de configuração, diretórios e aliases
   humanos por `ConsumerLayout`;
-- schema kinds, URNs, protocolo e machine output continuam `devex`;
+- schema kinds, URNs, protocolo e machine output continuam `workspace`;
 - Studio e Review mode: Jaspr client-side com HTML/CSS próprios;
 - domínio, documentos e Application Services: pure Dart;
 - CLI, Gateway e infraestrutura local: Dart VM;
 - integração app-facing: package Flutter;
 - nenhum runtime PHP no produto novo.
 
-Defaults da distribuição DevExKit:
+Defaults da distribuição Abel:
 
 | Superfície | Nome técnico |
 |------------|-------------|
-| Projeto | `DevExKit` |
-| Repositório | `devex-kit` |
-| Configuração raiz | `devex.yaml` |
-| Conteúdo versionado | `.devex/` ou `content.root` |
-| Override local | `devex.local.yaml` |
-| Cache no workspace | `.dart_tool/devex/` |
-| Estado por usuário | `<state-dir>/devex/` |
-| Variável de descoberta | `DEVEX_CONFIG` |
-| CLI | `devex` |
-| Aplicação web Jaspr | `devex_studio` |
-| Sidecar | `backend_gateway` |
-| Packages iniciais | `devex_contracts`, `devex_engine`, `devex_runtime`, `devex_flutter` |
-| Schema namespace | `urn:devex:schema:*` |
+| Projeto | `Abel` |
+| Repositório | `full-local` |
+| Configuração raiz | `workspace.yaml` |
+| Conteúdo versionado | `.experience/` ou `content.root` |
+| Override local | `workspace.local.yaml` |
+| Cache no workspace | `.dart_tool/workspace/` |
+| Estado por usuário | `<state-dir>/workspace/` |
+| Variável de descoberta | `WORKSPACE_CONFIG` |
+| CLI | `workspace` |
+| Aplicação web Jaspr | `studio` |
+| Sidecar | `gateway_sidecar` |
+| Packages iniciais | `experience_contracts`, `experience_engine`, `execution_runtime`, `flutter_app_adapter` |
+| Schema namespace | `https://github.com/jantunesmessias/abel/schemas/<domain>` |
 
 Esses nomes descrevem a distribuição de referência. Outra distribuição pode
 usar, por exemplo, `helix.yaml`, `.helix/` e o alias `helix`, mas normaliza tudo para
-o mesmo modelo `devex`. Prefixos organizacionais exigidos por um registry ficam
+o mesmo modelo `workspace`. Prefixos organizacionais exigidos por um registry ficam
 na publicação, não nos kinds e tipos de domínio.
 
 ### 3.2 Uma implementação do produto consumidor
@@ -378,11 +378,11 @@ Capabilities ausentes limitam a claim; não invalidam o projeto inteiro.
 
 ### 3.7 Uma interpretação canônica
 
-Studio, CLI, CI e agentes usam o mesmo `DevExEngine` e os mesmos command/query
+Studio, CLI, CI e agentes usam o mesmo `ExperienceEngine` e os mesmos command/query
 handlers. Nenhuma superfície mantém uma interpretação paralela de Journey,
 Gateway ou Release.
 
-Operações locais mutáveis pertencem ao `DevEx Host`, um processo Dart VM sob a
+Operações locais mutáveis pertencem ao `Workspace Host`, um processo Dart VM sob a
 identidade do usuário. O Studio é cliente desse Host inclusive quando empacotado
 como desktop; ele não ganha uma segunda implementação de filesystem, processo,
 Gateway ou release. O CLI pode instanciar o mesmo engine in-process para uma
@@ -424,7 +424,7 @@ Contenção de rede do target é uma terceira dimensão:
 
 | Nível | Significado |
 |-------|-------------|
-| `unconstrained` | o DevExKit não controla todo o egress do app |
+| `unconstrained` | o Abel não controla todo o egress do app |
 | `gatewayOnly` | APIs redirecionadas ao Gateway estão contidas; outras conexões do app não são garantidas |
 | `targetEnforced` | adapter do target prova que todo egress está negado ou allowlisted pela policy |
 
@@ -609,8 +609,8 @@ Acrescenta:
 - CLI equivalente;
 - ferramentas de Gateway.
 
-Os modos projetam o mesmo modelo. `DevExKit Studio` é o nome da distribuição de
-referência e pode receber branding sem alterar rotas ou contratos `devex`.
+Os modos projetam o mesmo modelo. `Abel Studio` é o nome da distribuição de
+referência e pode receber branding sem alterar rotas ou contratos `workspace`.
 
 ### 4.3 Contextos de trabalho
 
@@ -737,7 +737,7 @@ revalida ambos — ocultar um botão não é controle de acesso.
                                 |
                                 v
      +---------------------------------------------------+
-     | DevEx Host / Application Services                 |
+     | Workspace Host / Application Services                 |
      | authz, commands, queries, supervision, unit of work|
      +--------------------------+------------------------+
                                 |
@@ -782,7 +782,7 @@ O Host é boundary de aplicação e deploy, não bounded context de negócio. O
 Gateway é bounded context e também sidecar de processo. Essas classificações
 não se confundem.
 
-### 5.2 DevEx Host
+### 5.2 Workspace Host
 
 Processo Dart VM local que:
 
@@ -908,7 +908,7 @@ Nenhum context altera storage de outro diretamente.
 
 ### 5.10 Hosted e remote planes
 
-V4/V5 não adicionam um segundo domínio local. Eles acrescentam composition
+hosted control plane/remote execution não adicionam um segundo domínio local. Eles acrescentam composition
 roots e adapters:
 
 ```text
@@ -974,7 +974,7 @@ strings com formato canônico. Digest de `Artifact` usa bytes brutos; digest de
 documento usa o modelo semântico canônico. Ambos declaram algoritmo.
 
 Schemas usam URNs técnicas estáveis, por exemplo
-`urn:devex:schema:journey:v1`. Nome de distribuição, hostname do
+`https://github.com/jantunesmessias/abel/schemas/journey`. Nome de distribuição, hostname do
 repositório e publisher nunca participam de `$schema`, `kind` ou digest.
 
 ### 6.2 Identidade
@@ -996,7 +996,7 @@ repositório e publisher nunca participam de `$schema`, `kind` ou digest.
 `DistributionDescriptor` não redefine domínio. Ele pode escolher superfícies
 humanas, mas deve preservar:
 
-- schemas `urn:devex:*`;
+- schemas `https://github.com/jantunesmessias/abel/schemas/<domain>`;
 - kinds e semântica;
 - CLI JSON e exit codes;
 - digests e conformance suite;
@@ -1008,7 +1008,7 @@ humanas, mas deve preservar:
 launcher/distribution defaults
   + config explícita do consumidor
   -> paths autorizados e normalizados
-  -> modelo canônico devex
+  -> modelo canônico workspace
 ```
 
 ### 6.4 Entidades de catálogo e experiência
@@ -1020,8 +1020,14 @@ launcher/distribution defaults
 | `Journey` | caminhos em torno de objetivo |
 | `Scenario` | estado semântico observável |
 | `Transition` | relação dirigida entre cenários |
-| `Projection` | subconjunto/lente do grafo |
-| `Layout` | geometria curada |
+| `Board` | agrupamento autoral de projections de uma Application |
+| `ExperienceProjection` | lens tipada do grafo (`journey`, `inventory`, `history`, `comparison` ou `changeset`) |
+| `NodeInstance` | occurrence visual estável de um Scenario em uma projection |
+| `EdgeInstance` | materialização visual de uma Transition entre NodeInstances compatíveis |
+| `ProjectionLayoutManifest` | geometria curada independente da topologia semântica |
+| `ScenarioFacetManifest` | taxonomia consumer-owned, fechada e ligada ao digest do Catalog |
+| `ScenarioLabManifest` | controls, scripts, critérios, Evidence requerida e comparação declarativos, ligados ao Catalog |
+| `ExperienceContentSet` | identidade atômica do WorkspaceSnapshot e manifests adjacentes presentes |
 | `Variant` | ambiente visual sem mudar significado |
 | `ReviewGuide` | narrativa humana curada |
 | `IntentReference` | referência versionada à intenção |
@@ -1029,13 +1035,40 @@ launcher/distribution defaults
 | `SourceBinding` | relação autoral com fonte executável |
 | `ScenarioExecutionBinding` | composição explícita de Scenario, target, checkpoint/launch e GatewayPreset opcional |
 
+`CatalogManifest` v1 permanece a autoridade semântica de
+Workspace/Application/Journey/Scenario/Transition. Topologia, layout e facets
+são documentos adjacentes com digests próprios; não adicionam campos ao wire
+v1. Quando `ScenarioFacetManifest` existe, ele cobre cada Scenario exatamente
+uma vez. Kind/surface/state/owner/tag/component/fixture/form factor são
+registries tipados fornecidos pelo consumer; lifecycle, render-source kind e
+frame kind são enums portáteis fechados. Ausência nunca autoriza inferência por
+ID, título, Source ou geometria.
+
+O Host compila esses documentos da mesma lista imutável de authoring e publica
+uma única geração. `experience.content.open` exige revision,
+`catalogDigest` e `contentSetDigest`, então concede WorkspaceSnapshot,
+ExperienceTopologyBundle e ScenarioFacetManifest presentes por handles
+imutáveis em lote. A revisão faz fencing; `contentSetDigest` identifica os
+digests de conteúdo e não muda apenas porque a mesma geração foi observada com
+outra revisão. Contratos e compatibilidade estão em ADR-0017 e ADR-0018.
+
+`ScenarioLabManifest` também é um documento adjacente e não altera o
+`CatalogManifest` v1. Ele permite um Lab apenas com script/binding e adiciona
+controls, operations, required Evidence, policies, baseline/candidate,
+supplemental artifacts e aprovação humana somente quando declarados. O
+compiler e os codecs estão ativos. O vertical Scenario Lab acrescenta publicação
+atômica pelo Host, planner/executor, relay App Adapter tipado, resultados
+duráveis e as superfícies Lab/Quality do Studio. O manifest continua sendo
+plano declarativo: run, Evidence, comparação, aceitação automatizada e decisão
+humana mantêm identidades e lifecycles próprios.
+
 ### 6.5 Entidades de execução
 
 | Entidade | Responsabilidade |
 |----------|------------------|
 | `ExecutionTarget` | launch/render/control/capture/reset de uma Application |
 | `LaunchProfile` | iniciar sem claim de estado reproduzível |
-| `ConsumerAppFactory` | factory consumer-owned reutilizada por produção e tooling, sem import devex |
+| `ConsumerAppFactory` | factory consumer-owned reutilizada por produção e tooling, sem import workspace |
 | `ApplicationBootstrapPolicy` | tratamento explícito de dependências antes do app ficar ready |
 | `RuntimeConfigurationOverlay` | overrides efêmeros e não secretos para tooling |
 | `NetworkContainmentDescriptor` | nível efetivo, enforcement adapter e policy de egress do target |
@@ -1158,7 +1191,7 @@ fonte autoral.
 - tipos de domínio e DTOs são imutáveis;
 - estados fechados usam `sealed class`/`enum` e switches exaustivos;
 - invariantes nascem em factories/constructors validados, não em widgets;
-- falhas esperadas atravessam boundaries como `DevExFailure` tipada com código,
+- falhas esperadas atravessam boundaries como `OperationFailure` tipada com código,
   contexto sanitizado e recoverability; exceptions representam defeito ou
   falha inesperada e são convertidas uma vez na borda;
 - APIs públicas usam tipos nomeados; records permanecem conveniência interna;
@@ -1183,12 +1216,12 @@ fixture de compatibilidade. Depois de 1.0:
 
 ### 6.14 Contratos hosted e remote
 
-V4 acrescenta `Organization`, `Principal`, `Membership`,
+hosted control plane acrescenta `Organization`, `Principal`, `Membership`,
 `HostedWorkspaceLink`, `WorkspaceRevision`, `WorkspaceChangeSet`,
 `WorkspaceConflict`, `CollaborationEvent`, `PresenceLease`, `CommentThread`,
 `AuditEvent`, `IdempotencyRecord` e `HostedBlobDescriptor`.
 
-V5 acrescenta `RemoteExecutionRequest`, `RemoteExecutionPlan`,
+remote execution acrescenta `RemoteExecutionRequest`, `RemoteExecutionPlan`,
 `RemoteWorkerDescriptor`, `RemoteLease`, `DeviceImageDescriptor`, `RemoteRun`,
 `RemoteArtifactManifest`, `RemoteContainmentReport`, `RemoteSessionTicket` e o
 framing de stream.
@@ -1211,12 +1244,12 @@ Invariantes comuns:
 
 ### 7.1 Estrutura de consumidor
 
-Defaults do DevExKit:
+Defaults do Abel:
 
 ```text
-devex.yaml                      # configuração versionada
-devex.local.yaml                # overrides locais; gitignored
-.devex/                         # content.root default e configurável
+workspace.yaml                      # configuração versionada
+workspace.local.yaml                # overrides locais; gitignored
+.experience/                         # content.root default e configurável
 ├── journeys/
 ├── scenarios/
 ├── guides/
@@ -1270,7 +1303,7 @@ schemaVersion: 1
 id: helix
 displayName: Helix
 extends:
-  distribution: devex-kit
+  distribution: full-local
 consumerLayout:
   configFile: helix.yaml
   configEnvironmentVariable: HELIX_CONFIG
@@ -1306,7 +1339,7 @@ fechada. Profile é overlay, não branch de código:
 
 ```yaml
 schemaVersion: 2
-content: {root: .devex}
+content: {root: .experience}
 workspace: {id: sample}
 applications:
   sample: {root: ., target: web}
@@ -1320,9 +1353,8 @@ kit:
   startupPolicy: fail-required-v1
 ```
 
-V1 permanece legível e é traduzida em memória para
-`legacy-full-local-v1`; migration v2 é explícita, preview-first, atômica e
-preserva backup recuperável.
+O arquivo principal usa exclusivamente `schemaVersion: 2`; versões anteriores
+ao contrato publicado são recusadas antes da resolução e de qualquer efeito.
 
 `content.root` é relativo ao arquivo de configuração por default e pode apontar
 para qualquer diretório autorizado dentro do workspace. Nenhuma regra presume
@@ -1331,9 +1363,9 @@ para qualquer diretório autorizado dentro do workspace. Nenhuma regra presume
 Estado e derivados:
 
 ```text
-.dart_tool/devex/<distribution-id>/ # cache e derivados reconstruíveis
+.dart_tool/workspace/<distribution-id>/ # cache e derivados reconstruíveis
 <distribution>.local.yaml           # aliases/paths locais, sem credenciais
-<state-dir>/devex/<distribution-id>/
+<state-dir>/workspace/<distribution-id>/
 ├── sessions/
 ├── traffic/
 └── cas/
@@ -1341,16 +1373,16 @@ Estado e derivados:
 
 `<state-dir>` segue a convenção da plataforma, como XDG state no Linux e
 Application Support no macOS. Tokens ficam em keychain/credential store ou
-memória com TTL; não em YAML ou JSON do projeto. `.helix/`, `.devex/` ou qualquer
+memória com TTL; não em YAML ou JSON do projeto. `.helix/`, `.experience/` ou qualquer
 outro content root contém somente fonte autoral versionável.
 
 ### 7.2 Descoberta e precedência
 
-Invocação canônica `devex`:
+Invocação canônica `workspace`:
 
 1. `--config <path>`;
-2. `DEVEX_CONFIG`;
-3. busca ascendente por `devex.yaml`.
+2. `WORKSPACE_CONFIG`;
+3. busca ascendente por `workspace.yaml`.
 
 Um launcher de distribuição conhece seu descriptor antes de carregar o
 catálogo. `helix`, por exemplo:
@@ -1358,13 +1390,13 @@ catálogo. `helix`, por exemplo:
 1. respeita `--config`;
 2. traduz `HELIX_CONFIG`, quando definido, para config explícita;
 3. usa o `configFile` default do descriptor (`helix.yaml`);
-4. mantém `DEVEX_CONFIG` e `devex.yaml` como fallbacks canônicos.
+4. mantém `WORKSPACE_CONFIG` e `workspace.yaml` como fallbacks canônicos.
 
 Logo:
 
 ```text
 helix validate
-  == devex --distribution tools/helix --config helix.yaml validate
+  == workspace --distribution tools/helix --config helix.yaml validate
 ```
 
 ```text
@@ -1433,7 +1465,7 @@ PostgreSQL é fonte transacional para organization/membership, revisions/heads,
 evidence/releases/findings/approvals, comments/presence/audit/outbox/idempotency
 e scheduler remoto. Toda tabela inclui `tenant_id` em PK/FK/índice, usa RLS
 forçada e é acessada pela role da aplicação `NOBYPASSRLS` em transação com
-`SET LOCAL devex.tenant_id`.
+`SET LOCAL control_plane.tenant_id`.
 
 O banco guarda somente metadata de blob: digest, tamanho, media type,
 classification, retention e object key derivada. Bytes vivem no object storage
@@ -1445,13 +1477,14 @@ contra cobertura RLS antes do deploy.
 
 ## 8. Studio e arquitetura de informação
 
-Status de implementação: V0 comprovou o produto mínimo; MC6 comprovou o seam de
-gating e AP4 a projeção tipada. O cutover Jaspr implementou a cadeia operacional
+Status de implementação: o vertical local comprovou o produto mínimo; a
+composição modular comprovou o seam de gating e o AutoPreview, a projeção
+tipada. O cutover Jaspr implementou a cadeia operacional
 local: entrypoint sem sample, Host autoritativo, bootstrap/RPC, resources,
 shell, Journey Map, Inspector, AutoPreview, Target/Gateway condicionais e viewer
 Remote fail-closed.
 O resultado executado está em
-`docs/architecture/devex-studio-reconstruction-results.md`; as subseções que
+`docs/architecture/studio-reconstruction-results.md`; as subseções que
 descrevem Review/Run/hosted além desse vertical continuam arquitetura-alvo e não
 são promovidas por SR.
 
@@ -1466,8 +1499,8 @@ Host permanece em outro origin loopback autorizado. Em checkout,
 `--studio-dev-origin` pode autorizar um servidor Jaspr externo para hot reload:
 o Host expõe bootstrap CORS somente àquele origin, enquanto WebSocket e handles
 preservam a mesma audience. A URL de bootstrap é pública; token e grants nunca
-entram em define/URL. SR3 implementa startup, bootstrap e shutdown em
-`devex dev`; `--plan-only` preserva a inspeção sem efeitos. O target Flutter web
+entram em define/URL. A supervisão do Studio implementa startup, bootstrap e shutdown em
+`workspace dev`; `--plan-only` preserva a inspeção sem efeitos. O target Flutter web
 full-page roda em terceiro origin dentro de iframe. Empacotamento desktop pode
 vir depois, mas reutiliza Views/ViewModels e Host RPC — não cria acesso direto a
 filesystem/processo. Review bundle estático reutiliza as rotas read-only sem
@@ -1485,6 +1518,10 @@ Rotas estáveis:
 /scenarios/{scenario}
 /run/{session}
 /review/{subject}
+/lab
+/lab/scenarios/{scenario}/scripts/{script}
+/quality
+/quality/scenarios/{scenario}/scripts/{script}?runId={run}
 ```
 
 URLs não carregam action grant.
@@ -1538,6 +1575,12 @@ Quatro regiões:
 
 Em viewport compacto, o runtime fica em foco e diagnostics viram sheets.
 
+No vertical Scenario Lab, a rota Lab seleciona Scenario, script e Variant, inicia um
+Target Host-owned em porta efêmera e monta exatamente um iframe vivo. Controls,
+reset, captura e leituras trafegam pelo relay com origin, nonce e geração
+fenced. Chamadas de dados passam pelo Gateway ligado ao run. Resultado
+terminal, cleanup, Evidence e comparação permanecem Host-authoritative.
+
 ### 8.6 Review
 
 Review mostra:
@@ -1551,6 +1594,14 @@ Review mostra:
 - decisão.
 
 Routing, tokens e controles mutáveis ficam fora do Review mode.
+
+A rota Quality abre um run terminal imutável por `runId`, resolve
+baseline, candidate, diff e supplemental artifacts por resource handles e
+projeta freshness/currentness sem reescrever o histórico. Aceitação
+automatizada não muda quando uma decisão humana é aprovada ou superseded por
+rejeição. A cadeia humana é append-only, atribuída e protegida por expected
+digests. Findings, concepts, edição de layout e review authoring amplo são
+tratados pela capacidade de autoria e review.
 
 ### 8.7 Acessibilidade
 
@@ -1567,6 +1618,13 @@ Target para chrome e documentos: WCAG 2.2 AA.
 
 Não transfere claim de acessibilidade ao app consumidor.
 
+O gate local de Scenario Lab e Quality de 2026-08-17 verificou, nas rotas exercitadas,
+HTML sem controles focáveis anônimos, navegação por teclado, modal nativo com
+foco/escape/retorno ao opener, reflow a 200%, reduced motion e ausência de
+overflow horizontal ou logs severos. Esse escopo automatizado não é auditoria
+WCAG, não cobre tecnologia assistiva ou contraste integral e não certifica o
+Studio nem o consumer.
+
 ### 8.8 Arquitetura interna do Studio Jaspr
 
 O Studio segue separação de responsabilidades e fluxo unidirecional:
@@ -1576,7 +1634,7 @@ O Studio segue separação de responsabilidades e fluxo unidirecional:
 | View | composição, layout, foco, animação e tradução de input | I/O, regra de negócio, parse |
 | ViewModel/Controller | estado imutável, commands, navegação e mensagens apresentáveis | acessar filesystem/processo/Gateway |
 | Host Client Repository | cache de projeções e contrato RPC tipado | reinterpretar domínio |
-| DevEx Host | Application Services e efeitos autorizados | renderizar UI |
+| Workspace Host | Application Services e efeitos autorizados | renderizar UI |
 | Engine | domínio, policies, commands/queries e ports | depender de Jaspr, Flutter ou transporte |
 
 Views recebem um view state fechado e callbacks/commands. Controllers não
@@ -1593,7 +1651,7 @@ um contrato do produto. Ela precisa provar:
 - override de dependências em teste sem global state;
 - selectors para evitar rebuild amplo;
 - suporte a deep link/restoration;
-- ausência de dependência no `devex_engine`.
+- ausência de dependência no `experience_engine`.
 
 Commands de UI expõem `idle`, `running`, `succeeded` e `failed`, impedem double
 submit por `operationId` e nunca escondem falha em lista vazia. Optimistic UI só
@@ -1608,7 +1666,7 @@ autoritativa.
   uma lista rígida de devices;
 - teclado, mouse, touch e assistive technology recebem caminhos equivalentes;
 - textos visíveis não são IDs, selectors ou códigos de erro;
-- strings são externalizadas desde V0; locale do Studio e `Variant.locale` do
+- strings são externalizadas desde plataforma local; locale do Studio e `Variant.locale` do
   consumidor são conceitos separados;
 - animação respeita reduced motion e nunca é necessária para compreender
   mudança de estado.
@@ -1735,7 +1793,7 @@ Regras:
 - `backendMode: isolated` sem adapter de contenção resulta no nível
   `gatewayOnly`, não em claim de egress total;
 - dependência não declarada nunca recebe egress por uma policy gerada pelo
-  DevExKit; em target não contido, aparece como risco não avaliado;
+  Abel; em target não contido, aparece como risco não avaliado;
 - policy, readiness e adapters efetivos entram no `ExecutionFingerprint`;
 - a sequência default é hybrid → controlar bootstrap → Gateway isolated →
   targetEnforced quando a claim exigir e o adapter puder provar;
@@ -1751,11 +1809,11 @@ tooling e desaparece no cleanup.
 | Estratégia | Uso |
 |------------|-----|
 | Target existente | menor impacto; launch/attach |
-| Flutter web target | Run interativo V0 |
+| Flutter web target | Run interativo plataforma local |
 | Embedded | componentes/superfícies compatíveis |
 | Sidecar local | processo externo controlado |
 | Host runner | Android emulator; outros hosts exigem ADR e gate próprios |
-| Remote runtime | web/Android V5 por request/plano assinado e Job efêmero |
+| Remote runtime | web/Android remote execution por request/plano assinado e Job efêmero |
 
 ### 9.7 Flutter App Adapter
 
@@ -1768,10 +1826,10 @@ tooling e desaparece no cleanup.
 
 O consumidor expõe uma factory/bootstrap neutra reutilizada pelo entrypoint de
 produção e pelo `ConsumerLayout.toolingEntrypoint`. Somente o entrypoint de
-tooling importa `devex_flutter`; duplicar a inicialização do app é proibido.
+tooling importa `flutter_app_adapter`; duplicar a inicialização do app é proibido.
 
-V0 usa Flutter web full-page em iframe de origin separado. Host-native entra no
-V1.
+plataforma local usa Flutter web full-page em iframe de origin separado. Host-native entra no
+web/Android.
 
 O App Adapter expõe apenas comandos semânticos e observações necessárias. Ele
 não oferece service locator, leitura arbitrária de provider/container, eval,
@@ -2088,8 +2146,8 @@ Quando habilitado apenas para tooling, o response pode expor:
 
 | Header | Uso |
 |--------|-----|
-| `X-Devex-Gateway` | `mock`, `passthrough` ou `denied` |
-| `X-Devex-Preset` | ID opaco do GatewayPreset ativo |
+| `X-Gateway-Mode` | `mock`, `passthrough` ou `denied` |
+| `X-Gateway-Preset` | ID opaco do GatewayPreset ativo |
 
 Esses headers são diagnóstico, não contrato do backend consumidor. Podem ser
 removidos por policy e nunca carregam URL, account, token ou payload.
@@ -2198,19 +2256,19 @@ Antes de habilitar hybrid, o contrato suportado deve ficar fechado:
 - redirects bloqueados ou revalidados contra a allowlist;
 - compressão tratada sem alterar silenciosamente a claim de verify.
 
-V0.2 não promete CONNECT/MITM TLS, WebSocket, gRPC ou proxy HTTP/2
+Gateway containment não promete CONNECT/MITM TLS, WebSocket, gRPC ou proxy HTTP/2
 end-to-end. Multipart e streaming prolongado exigem teste/limite próprios.
 Request fora do subconjunto falha de forma explícita.
 
 ### 10.16 Pareamento host
 
-V0.1 escuta em loopback/port explícito para web.
+Gateway isolado escuta em loopback/port explícito para web.
 
 Esse pareamento prova `networkContainment: gatewayOnly`. Ele não prova que o
 browser ou app não alcançou outros hosts. Claim `targetEnforced` requer adapter
 de contenção e teste negativo observando a fronteira de rede do target.
 
-V1 web/Android deve oferecer bootstrap host-native:
+A paridade web/Android deve oferecer bootstrap host-native:
 
 - Android: `adb reverse` quando compatível; `10.0.2.2` como fallback;
 - TLS local quando necessário;
@@ -2548,16 +2606,16 @@ explicar essa limitação.
 |------|--------|
 | Local | obrigatório; offline após deps |
 | Bundle estático | Review/fixtures compatíveis |
-| Hosted | opcional; colaboração V4 e runtime remoto V5 implementados, com promoção condicionada aos gates §27.6 |
+| Hosted | opcional; colaboração hosted control plane e runtime remoto remote execution implementados, com promoção condicionada aos gates §27.6 |
 
-### 13.7 Distribution v2 do Kit
+### 13.7 Distribution do Kit
 
 Release de produto e Distribution do Kit são contratos distintos.
-`DistributionReleaseManifestV2` registra `ModuleCatalog`, Modules, Profiles,
+`DistributionReleaseManifest` registra `ModuleCatalog`, Modules, Profiles,
 components, entrypoints e ownership de files. CLI é obrigatória; Host, Gateway
 e Studio são components condicionais às surfaces dos Modules do profile.
 
-O reader/installer aceita v1/v2. Bundle v2 só é ativado após validar JCS/digest,
+O único reader/installer só ativa o bundle após validar JCS/digest,
 paths, catálogo físico/semântico, Module ownership e correspondência entre
 profile/component/file. Bundles `full-local` e enxutos precisam de rebuild
 byte-idêntico, verify, install/update/rollback. Module solicitado mas não
@@ -2572,7 +2630,7 @@ empacotado falha antes de iniciar component.
 | Trilha | Mudança | Valor | Limite |
 |--------|---------|-------|--------|
 | Documentar | config + docs | Journey Map/sheets | sem runtime |
-| Pré-visualizar | `devex_preview` + factory real anotada | thumbnails estruturais no Journey Map | sem prova host-native |
+| Pré-visualizar | `flutter_preview` + factory real anotada | thumbnails estruturais no Journey Map | sem prova host-native |
 | Executar | LaunchProfile | Run manual | sem checkpoint |
 | Controlar app | App Adapter | checkpoint/eventos | capabilities declaradas |
 | Controlar backend | Gateway config | preset/verify/traffic | policy de rede |
@@ -2594,11 +2652,11 @@ Default:
 Documentar e Review precisam funcionar sem editar `pubspec.yaml`, workspace,
 lockfile ou código do app. Controle avançado usa preferencialmente um
 entrypoint de tooling definido pelo `ConsumerLayout`, como
-`tool/devex_main.dart` ou `tool/helix_main.dart`. Ele importa
-`devex_flutter` e uma `ConsumerAppFactory` pública e neutra. O entrypoint de
+`tool/target_main.dart` ou `tool/helix_main.dart`. Ele importa
+`flutter_app_adapter` e uma `ConsumerAppFactory` pública e neutra. O entrypoint de
 produção reutiliza a mesma factory, mas não conhece a plataforma.
 
-Pré-visualizar é opt-in e pode acrescentar `devex_preview` fora do grafo do
+Pré-visualizar é opt-in e pode acrescentar `flutter_preview` fora do grafo do
 entrypoint de produção. `AutoPreview` reutiliza a factory real e não autoriza
 uma implementação paralela da tela. O provider não exige App Adapter, Session,
 Gateway ou Android.
@@ -2667,20 +2725,20 @@ própria; nunca é inferida do grafo.
 O fluxo default do consumidor precisa caber nestas operações:
 
 ```text
-devex validate
-devex compile
-devex doctor --application primary
-devex dev --application primary
-devex session start <binding-ref>
-devex capture
-devex release build
+workspace validate
+workspace compile
+workspace doctor --application primary
+workspace dev --application primary
+workspace session start <binding-ref>
+workspace capture
+workspace release build
 ```
 
-Adoção V0.3 acrescenta, antes do fluxo:
+Adoção ciclo de distribuição acrescenta, antes do fluxo:
 
 ```text
-devex init --dry-run
-devex init --apply
+workspace init --dry-run
+workspace init --apply
 ```
 
 Uma distribuição pode projetar o mesmo fluxo:
@@ -2691,9 +2749,9 @@ helix dev --application primary
 ```
 
 Esses aliases invocam os mesmos Application Services e retornam os mesmos exit
-codes e JSON do CLI `devex`.
+codes e JSON do CLI `workspace`.
 
-`init` detecta estrutura e propõe `devex.yaml`; não altera código sem
+`init` detecta estrutura e propõe `workspace.yaml`; não altera código sem
 `--apply`. `dev` supervisiona Host, Studio, target, sidecars e cleanup como uma
 operação única, exibe URLs/ports efetivos e preserva logs correlacionados. Se
 algum processo já estiver saudável, ele é anexado ou reutilizado conforme
@@ -2715,7 +2773,7 @@ remota, arquivo de produção ou URL hard-coded por plataforma. Um
 3. adapter explícito para o mecanismo de configuração do consumidor.
 
 `doctor` explica estratégia, valor efetivo, origem e undo sem revelar secret.
-Android emulator e web são os adapters suportados ate V5; qualquer adapter iOS
+Android emulator e web são os adapters suportados ate remote execution; qualquer adapter iOS
 ou desktop exige nova ADR. Endereços especiais não vazam para documentos
 canônicos.
 
@@ -2748,7 +2806,7 @@ compartilhada; packages internos não podem ser alcançados por imports em
 `lib/src` de outro package.
 
 Separar package não cria bounded context. Cada BC mantém módulo, API interna e
-testes próprios dentro de `devex_engine`; extração futura exige necessidade de
+testes próprios dentro de `experience_engine`; extração futura exige necessidade de
 publicação, runtime incompatível ou owner/deploy independente.
 
 ### 15.2 Módulos lógicos
@@ -2777,27 +2835,27 @@ publicação, runtime incompatível ou owner/deploy independente.
 ├── analysis_options.yaml       # strict casts/raw types + lints estáveis
 ├── schemas/
 ├── apps/
-│   ├── devex_studio/           # SPA Jaspr client-side; branding por distribuição
-│   ├── devex_cli/              # CLI Dart; executável `devex`
-│   ├── devex_host/             # Host local Dart VM / supervisor
-│   ├── backend_gateway/        # sidecar executável Dart
-│   ├── hosted_control_plane/   # composition root V4
-│   ├── remote_worker/          # worker V5 sem acesso ao banco
+│   ├── studio/           # SPA Jaspr client-side; branding por distribuição
+│   ├── workspace_cli/              # CLI Dart; executável `workspace`
+│   ├── workspace_host/             # Host local Dart VM / supervisor
+│   ├── gateway_sidecar/        # sidecar executável Dart
+│   ├── hosted_control_plane/   # composition root hosted control plane
+│   ├── remote_worker/          # worker remote execution sem acesso ao banco
 │   └── remote_session_gateway/ # WSS/iframe/scrcpy por run
-├── packages/
-│   ├── devex_contracts/        # pure Dart: DTOs, codecs, protocol e refs
-│   ├── devex_engine/           # pure Dart: domain, policies e app services
-│   ├── devex_runtime/          # Dart VM: fs/process/http/Host/Gateway adapters
-│   ├── devex_ui_system/        # Jaspr/HTML/CSS; sem domínio ou Flutter
-│   ├── devex_ux_system/        # pure Dart: layout/interação/motion/windowing
-│   ├── devex_flutter/          # integração pública opt-in do consumidor
-│   ├── devex_preview/          # AutoPreview Flutter isolado
-│   └── devex_testkit/          # conformance/fakes; nunca dependência de produção
+├── libs/
+│   ├── experience_contracts/        # pure Dart: DTOs, codecs, protocol e refs
+│   ├── experience_engine/           # pure Dart: domain, policies e app services
+│   ├── execution_runtime/          # Dart VM: fs/process/http/Host/Gateway adapters
+│   ├── studio_ui/        # Jaspr/HTML/CSS; sem domínio ou Flutter
+│   ├── interaction_model/        # pure Dart: layout/interação/motion/windowing
+│   ├── flutter_app_adapter/          # integração pública opt-in do consumidor
+│   ├── flutter_preview/          # AutoPreview Flutter isolado
+│   └── testing_support/          # conformance/fakes; nunca dependência de produção
 ├── examples/
 │   └── sample_flutter/         # domínio hipotético
-├── deploy/helm/devex-hosted/   # deploy portátil e remote RBAC opt-in
+├── deploy/helm/control-plane/   # deploy portátil e remote RBAC opt-in
 ├── docs/security/              # threat models normativos
-└── test/
+└── tests/
     ├── conformance/
     └── consumers/
         └── friction_flutter/
@@ -2806,25 +2864,25 @@ publicação, runtime incompatível ou owner/deploy independente.
 Dependências permitidas:
 
 ```text
-devex_contracts <- devex_engine <- devex_runtime <- apps VM
+experience_contracts <- experience_engine <- execution_runtime <- apps VM
        ^               ^
-       |               +-------------- devex_studio Host client
-       +------------------------------ devex_flutter
+       |               +-------------- studio Host client
+       +------------------------------ flutter_app_adapter
 
-devex_testkit -> contracts/engine/runtime somente em dev/test
+testing_support -> contracts/engine/runtime somente em dev/test
 ```
 
-`devex_studio` depende do client protocol e de modelos de apresentação, não de
-`dart:io`. `devex_flutter` não depende do engine nem do runtime. Cycles de
+`studio` depende do client protocol e de modelos de apresentação, não de
+`dart:io`. `flutter_app_adapter` não depende do engine nem do runtime. Cycles de
 package são proibidos. API pública é exportada explicitamente; classes geradas
 ou internas não vazam em assinatura pública.
 
 ### 15.4 Gateway sidecar
 
-Contrato vive em `devex_contracts`/`devex_engine`; implementação em
-`devex_runtime`.
+Contrato vive em `experience_contracts`/`experience_engine`; implementação em
+`execution_runtime`.
 
-O executável `apps/backend_gateway` é sempre um processo Dart separado **por
+O executável `apps/gateway_sidecar` é sempre um processo Dart separado **por
 GatewaySession**, supervisionado pelo Host/Runner. Essa fronteira isola crash,
 sockets, credenciais e estado e permite diferentes distribuições sem acoplar o
 Studio. Um isolate pode ser usado internamente pelo sidecar, mas não substitui
@@ -2849,12 +2907,12 @@ o boundary de processo. PHP não é opção.
 
 Uma distribuição compatível é um **soft fork por composição**:
 
-- fixa versão/range do DevExKit;
+- fixa versão/range do Abel;
 - adiciona branding, policies, adapters, migrations e aliases;
 - escolhe `ConsumerLayout`;
-- não copia `devex_engine` ou `devex_runtime`;
+- não copia `experience_engine` ou `execution_runtime`;
 - executa a conformance suite upstream;
-- mantém schemas e machine contracts `devex`.
+- mantém schemas e machine contracts `workspace`.
 
 Ela pode viver no consumidor, como `tools/helix`, porque contém integração
 organizacional, não o motor inteiro.
@@ -2864,7 +2922,7 @@ Nesse caso:
 
 - o fork vive em repositório próprio;
 - recebe namespace e conformance próprios;
-- não afirma compatibilidade automática com DevExKit;
+- não afirma compatibilidade automática com Abel;
 - não é vendorizado silenciosamente dentro de `tools/`.
 
 Um diretório ocupado por implementação legada só é substituído após o gate de
@@ -2886,7 +2944,7 @@ distinguíveis; update nunca sobrescreve o legado in-place.
 - `Semantics.identifier` e contratos de teste ficam próximos da superfície
   pública, sem reutilizar texto traduzido;
 - code generation interna é permitida quando determinística, mas o consumidor
-  não precisa de annotation/build step para simplesmente integrar o DevExKit;
+  não precisa de annotation/build step para simplesmente integrar o Abel;
 - dependência nova declara owner, licença, função, alternativas, risco de
   supply chain e impacto VM/web antes de entrar no lockfile.
 
@@ -2907,7 +2965,7 @@ solicitam `privileged`. Cada namespace recebe ServiceAccount sem token,
 capability Secret imutável, trust ConfigMap imutável, emptyDir bounded e
 NetworkPolicy deny-default. O ClusterRole não possui list/watch/update, mas RBAC
 Kubernetes não restringe nomes em `create`; admission policy para
-`devex-run-*` é portanto gate obrigatório do cluster, não claim do chart.
+`workspace-run-*` é portanto gate obrigatório do cluster, não claim do chart.
 
 Imagens e RuntimeClass são configuração de deploy, nunca tipos do domínio.
 Todas as imagens OCI, system image Android e scrcpy server são pinados por
@@ -2919,47 +2977,47 @@ digest; tag mutável falha antes de materializar Job.
 
 ### 16.1 CLI conceitual
 
-V0:
+plataforma local:
 
 ```text
-devex validate
-devex explain
-devex compile
-devex doctor [--require <capability>]
-devex dev
-devex session start <binding-ref>
-devex capture
-devex release build
+workspace validate
+workspace explain
+workspace compile
+workspace doctor [--require <capability>]
+workspace dev
+workspace session start <binding-ref>
+workspace capture
+workspace release build
 ```
 
-V0.3 — adoção:
+ciclo de distribuição — adoção:
 
 ```text
-devex init [--dry-run|--apply]
-devex adoption-report
-devex detach --dry-run
+workspace init [--dry-run|--apply]
+workspace adoption-report
+workspace detach --dry-run
 ```
 
 Distribuição:
 
 ```text
-devex --distribution <path> --config <file> <command>
+workspace --distribution <path> --config <file> <command>
 <alias> [--config <file>] <command>
 ```
 
 Gateway:
 
 ```text
-devex gateway status
-devex gateway run
-devex gateway apply-preset <ref>
-devex gateway verify
-devex gateway traffic
-devex gateway sync
-devex gateway reset
-devex gateway doctor
-devex gateway bootstrap [--dry-run|--apply]
-devex gateway stop
+workspace gateway status
+workspace gateway run
+workspace gateway apply-preset <ref>
+workspace gateway verify
+workspace gateway traffic
+workspace gateway sync
+workspace gateway reset
+workspace gateway doctor
+workspace gateway bootstrap [--dry-run|--apply]
+workspace gateway stop
 ```
 
 Paridade de jobs de lifecycle:
@@ -2974,49 +3032,48 @@ Paridade de jobs de lifecycle:
 | provider status | `gateway status`/`doctor` com `missing`, `empty`, `incomplete`, `invalid` ou `ready` |
 | deactivate all/reset isolation | `gateway reset` |
 
-Pós-V0:
+Pós-plataforma local:
 
 ```text
-devex source inspect
-devex source diff
-devex plan
-devex context export
-devex gate
-devex release seal
-devex publish
-devex mcp serve
+workspace source inspect
+workspace source diff
+workspace plan
+workspace context export
+workspace gate
+workspace release seal
+workspace publish
+workspace mcp serve
 ```
 
 Composição e AutoPreview:
 
 ```text
-devex modules list
-devex modules explain --module <id>
-devex modules doctor
-devex config migrate --to 2 --dry-run|--apply
-devex evidence collect-previews --application <id> --profile <id>
-devex dev --profile <id>
+workspace modules list
+workspace modules explain --module <id>
+workspace modules doctor
+workspace evidence collect-previews --application <id> --profile <id>
+workspace dev --profile <id>
 ```
 
-`modules`, `config migrate`, version/init e operações de Distribution são
+`modules`, version/init e operações de Distribution são
 bootstrap commands. Os demais comandos/subcomandos são registrados somente se
 o plano habilitar o Module que contribui sua superfície.
 
-V4 hosted:
+hosted control plane hosted:
 
 ```text
-devex auth login|logout|status
-devex workspace link|push|pull
-devex publish
+workspace auth login|logout|status
+workspace workspace link|push|pull
+workspace publish
 ```
 
 Credentials ficam fora do workspace com permissão restrita. O hosted link
-contém apenas URL/tenant/workspace e nunca bearer token. V5 é acionado pelas
+contém apenas URL/tenant/workspace e nunca bearer token. remote execution é acionado pelas
 APIs/Studio sobre `RemoteExecutionRequest`; o CLI não expõe atalho que aceite
 source ou comando arbitrário.
 
-`devex` é a identidade técnica do CLI. Distribuições podem instalar aliases,
-mas scripts e saída JSON usam o contrato `devex`.
+`workspace` é a identidade técnica do CLI. Distribuições podem instalar aliases,
+mas scripts e saída JSON usam o contrato `workspace`.
 
 `compile` produz `CatalogManifest`; `release build` produz Release/Bundle.
 “Build do aplicativo consumidor” não é significado implícito de nenhum dos
@@ -3037,7 +3094,7 @@ como processo não confiável e registrado no fingerprint.
 - cancelamento;
 - nenhuma escrita em queries.
 
-Durante `dev`, o CLI supervisiona `devex_host` e pode anexar ao processo
+Durante `dev`, o CLI supervisiona `workspace_host` e pode anexar ao processo
 saudável do mesmo workspace/principal. Fora de `dev`, commands one-shot usam os
 mesmos handlers in-process. Paridade é provada comparando resultado semântico,
 exit code e machine output, não o transporte interno.
@@ -3053,7 +3110,15 @@ validate -> compile -> affected unit/widget/contract tests
 ```
 
 Cada fase omite gates de capability ainda inexistente; não os marca como pass.
-V0 executa seu pipeline completo sem hosted e sem IA.
+plataforma local executa seu pipeline completo sem hosted e sem IA.
+
+Após `melos run check` construir Studio e Target release do consumer de
+referência, o CI executa os verticais browser de Studio e Scenario Lab em
+sequência. O gate de Scenario Lab usa `SCENARIO_LAB_SKIP_BUILD=1` somente para reutilizar esses
+artefatos: serviços, Chrome, Target/Gateway, runs, Evidence, Quality,
+currentness, cancelamento e cleanup continuam sendo executados. O gate ainda
+reconstrói um Target alterado em diretório isolado e exige restauração byte a
+byte de fontes, builds e estado temporariamente substituídos.
 
 ### 16.4 Agent Interface
 
@@ -3086,7 +3151,7 @@ remota, token ou authorization no chat.
 
 ### 17.1 Escopo e premissas
 
-Local-first não significa input confiável. O DevExKit assume:
+Local-first não significa input confiável. O Abel assume:
 
 - a pessoa dona da conta do sistema operacional controla seus próprios
   arquivos, mas uma Journey, bundle, plugin ou repositório aberto pode ser
@@ -3110,7 +3175,7 @@ e conformance.
           |
           v  TB-1 parse, schema, path policy
  +----------------------+        TB-2 RPC        +----------------------+
- | Studio Jaspr         | <--------------------> | DevEx Host           |
+ | Studio Jaspr         | <--------------------> | Workspace Host           |
  | origin/UI não confiável| token/origin/schema  | principal + authz    |
  +----------+-----------+                        +---+---------+--------+
             | TB-3 postMessage                       |         |
@@ -3124,8 +3189,8 @@ e conformance.
  internet/upstream não produtivo <-----------------------------+
                                       allowlist/TLS/redaction
 
- DevEx Host -- TB-7 --> workspace/state/CAS/credential handles
- DevEx Host -- TB-8 --> agent/plugin/processo filho não confiável
+ Workspace Host -- TB-7 --> workspace/state/CAS/credential handles
+ Workspace Host -- TB-8 --> agent/plugin/processo filho não confiável
 ```
 
 Cada boundary declara autenticação, autorização, validação, limites,
@@ -3135,7 +3200,7 @@ observabilidade e cleanup. Boundary ausente é finding, não detalhe futuro.
 
 Assets protegidos:
 
-- código e arquivos do workspace fora do ownership do DevExKit;
+- código e arquivos do workspace fora do ownership do Abel;
 - tokens, cookies, sessão capturada, URLs privadas e credential handles;
 - integridade de schemas, plans, routing, artifacts, evidence e releases;
 - autoridade de pessoa, CI, agent, distribuição e Review;
@@ -3263,7 +3328,7 @@ environment não equivale a sandbox de filesystem/rede/memória: containment só
 
 ### 17.9 Plugins e agentes
 
-Plugin é código, não “configuração”. V0 não carrega plugin de terceiros
+Plugin é código, não “configuração”. plataforma local não carrega plugin de terceiros
 in-process. Adapter/distribuição trusted é pinado no build; extensão dinâmica
 futura roda em processo separado com manifest de capabilities, protocolo
 versionado, limits e grants.
@@ -3296,7 +3361,7 @@ antes da implementação. Revisão responde:
 3. qual controle reduz probabilidade/impacto?
 4. qual teste negativo prova o controle e qual risco residual permanece?
 
-P0 exige T-01…T-14 classificados; a fase que introduz um boundary exige seus
+validação fundacional exige T-01…T-14 classificados; a fase que introduz um boundary exige seus
 testes executáveis. Hosted/remote execution seguem HR-01…HR-24 no threat model
 independente. Finding cross-tenant, bypass de RLS, replay de capability ou
 escape de namespace bloqueia promoção.
@@ -3319,9 +3384,9 @@ escape de namespace bloqueia promoção.
 
 ---
 
-## 18. Roadmap e primeiro vertical
+## 18. Capacidades implementadas e evidência
 
-### 18.0 Gate P0 — arquitetura
+### 18.0 Validação fundacional da arquitetura
 
 Antes de código de produção:
 
@@ -3341,15 +3406,15 @@ Antes de código de produção:
 | S-04 Journey Map | grafo/outline satisfaz frame, teclado e Semantics budgets? | profile build + benchmark/a11y audit |
 
 S-01…S-04 foram promovidos conscientemente em 2026-08-09. Resultados, ambiente,
-comandos e budgets estão em `docs/architecture/p0-results.md`; decisões de
-toolchain, plataforma e protocolo estão em ADR-0001…ADR-0005. O Gateway V0.1
+comandos e budgets estão em `docs/architecture/foundation-validation-results.md`; decisões de
+toolchain, plataforma e protocolo estão em ADR-0001…ADR-0005. O Gateway isolado
 e a resolução de Q-06/Q-07 estão em ADR-0006. Gateway hybrid, provider,
 captura temporária e a resolução de Q-08/Q-09/Q-10 estão em ADR-0007 e
-`docs/architecture/v02-results.md`. Spikes futuros
+`docs/architecture/gateway-containment-results.md`. Spikes futuros
 vivem em área experimental e são removidos ou promovidos após registrar
 resultado. “Funcionou no spike” isoladamente não é evidência de produção.
 
-### 18.1 V0 — Experience vertical
+### 18.1 Vertical local de experiência
 
 Objetivo: provar **uma** tarefa humana ponta a ponta:
 
@@ -3357,9 +3422,9 @@ Objetivo: provar **uma** tarefa humana ponta a ponta:
 > Flutter web real, capturar evidence e abrir a Release local que explica o que
 > foi executado.
 
-V0 é um gate de aceitação por slices verticais, não um único lote.
+O vertical local é um gate de aceitação por capacidades, não um único lote.
 
-**V0-A — contratos headless**
+**Contratos headless**
 
 1. Pub Workspace Dart/Jaspr/Flutter-adapters e boundaries de packages;
 2. contracts mínimos: DistributionDescriptor, ConsumerLayout, Workspace,
@@ -3369,19 +3434,19 @@ V0 é um gate de aceitação por slices verticais, não um único lote.
 3. parser seguro, compiler e CatalogManifest determinístico;
 4. CLI `validate`, `explain` e `compile`;
 
-**V0-B — compreensão estática**
+**Compreensão estática**
 
 5. Studio Jaspr com Explore mínimo;
 6. Journey Map read-only + outline;
 7. sheets projetadas do mesmo manifest;
 
-**V0-C — execução**
+**Execução**
 
-8. DevEx Host local + target Flutter web por LaunchProfile;
+8. Workspace Host local + target Flutter web por LaunchProfile;
 9. App Adapter mínimo + Host RPC + JSON-RPC/postMessage seguro;
 10. uma capability simulada, lifecycle, cancellation e SessionTrace;
 
-**V0-D — evidence e release**
+**Evidence e release**
 
 11. captura PNG + fingerprint;
 12. release/bundle local mínimo;
@@ -3389,15 +3454,15 @@ V0 é um gate de aceitação por slices verticais, não um único lote.
 14. `sample_flutter` usando apenas APIs públicas e packages empacotados.
 
 Cada slice precisa ficar utilizável e testado antes do próximo. Gateway possui
-seu próprio vertical no V0.1 e não é requisito oculto de V0.
+seu próprio vertical no Gateway isolado e não é requisito oculto do vertical local.
 
-V0-A…V0-D possuem implementação e suites executadas em 2026-08-09. O consumer
+As quatro capacidades possuem implementação e suites executadas em 2026-08-09. O consumer
 `sample_flutter` compila o tooling target, renderiza em Chrome, produz PNG,
-Evidence e ReleaseBundle local verificável por `tool/verify_v0_flow.sh`.
+Evidence e ReleaseBundle local verificável por `tools/verify/verify_web_evidence_flow.sh`.
 Resultados e digests de referência estão em
-`docs/architecture/v0-results.md`. A entrega direta Session/App Adapter →
+`docs/architecture/local-platform-results.md`. A entrega direta Session/App Adapter →
 Artifact foi exercitada até o CAS, e a auditoria assistiva manual do Studio foi
-executada com Orca/AT-SPI em Chromium/Wayland; assim, o gate V0 está fechado.
+executada com Orca/AT-SPI em Chromium/Wayland; assim, o gate local está fechado.
 
 Não inclui:
 
@@ -3414,7 +3479,7 @@ Não inclui:
 - friction consumer;
 - garantia de egress total.
 
-### 18.2 V0.1 — Local Gateway
+### 18.2 Gateway isolado — Local Gateway
 
 Objetivo: provar mock local determinístico sem upstream. Inclui:
 
@@ -3430,10 +3495,10 @@ Objetivo: provar mock local determinístico sem upstream. Inclui:
 - Backend panel;
 - contract/security tests, inclusive T-05/T-08/T-09.
 
-V0.1 nunca afirma isolamento de toda a rede do app. Ele prova que o Gateway não
+Gateway isolado nunca afirma isolamento de toda a rede do app. Ele prova que o Gateway não
 faz passthrough e que tráfego roteado a ele é mock/deny.
 
-### 18.3 V0.2 — Hybrid Gateway
+### 18.3 Gateway containment — Hybrid Gateway
 
 Inclui:
 
@@ -3441,7 +3506,7 @@ Inclui:
 - UpstreamProfile;
 - RemoteConfigProvider adapter;
 - RuntimeConfigurationOverlay;
-- enforcement adapters para ApplicationBootstrapPolicy já declarada no V0;
+- enforcement adapters para ApplicationBootstrapPolicy já declarada no vertical local;
 - primeiro enforcement adapter capaz de reportar `targetEnforced`, ou
   degradação explícita quando o ambiente não permitir;
 - session capture;
@@ -3449,15 +3514,15 @@ Inclui:
 - backend mode `hybrid`, ortogonal à fidelidade;
 - sanitização/auditoria.
 
-Após V0.2, o núcleo cobre as capacidades centrais de gateway do legado, mas
+Após Gateway containment, o núcleo cobre as capacidades centrais de gateway do legado, mas
 ainda não sua integração host-native.
 
-V0.2 foi fechado em 2026-08-09 com passthrough allowlisted, provider generico,
+Gateway containment foi fechado em 2026-08-09 com passthrough allowlisted, provider generico,
 captura em memoria e containment web executado. `CompiledGatewayPlan` continua
 honestamente `gatewayOnly`; somente o report do adapter Linux em namespace pode
 elevar a execucao observada a `targetEnforced` (ADR-0007).
 
-### 18.4 V0.3 — adoção, distribuição e reuso de evidência
+### 18.4 ciclo de distribuição — adoção, distribuição e reuso de evidência
 
 Inclui:
 
@@ -3469,13 +3534,13 @@ Inclui:
 - upgrade/migration e rollback local;
 - budgets de adoção e cleanup medidos.
 
-V0.3 foi fechado em 2026-08-09: adoption ownership-aware, provider do reporter
+ciclo de distribuição foi fechado em 2026-08-09: adoption ownership-aware, provider do reporter
 Dart/Flutter, binarios AOT + Studio web, install/update/rollback/migration e
 conformance publica fora do workspace passaram o gate executado. A decisao e
 os hashes de referencia estao em ADR-0008 e
-`docs/architecture/v03-results.md`.
+`docs/architecture/distribution-lifecycle-results.md`.
 
-### 18.5 V1 web/Android — paridade operacional
+### 18.5 Paridade operacional web/Android
 
 Inclui:
 
@@ -3490,44 +3555,44 @@ Inclui:
 - critérios §19 E-01…E-20 completos.
 
 Somente uma distribuição que complete esses critérios pode afirmar substituição
-operacional do legado. Nenhum rename ou fork altera o contrato `devex`.
+operacional do legado. Nenhum rename ou fork altera o contrato `workspace`.
 
-V1 web/Android foi fechado em 2026-08-09. O gate integral executou web real,
+A paridade web/Android foi comprovada em 2026-08-09. O gate integral executou web real,
 Android Emulator API 35 gerenciado, App Adapter capture, Gateway, contenção,
 migração, retenção, consumidor externo e distribuição stable. O manifesto da
 distribuição final tem
 `sha256:dc662892982f2ff48bb03cee8a7486a2813bca0a1e92050a68c0cde5191cd0e1`.
 A decisão, a matriz E-01…E-20 e os resultados estão em ADR-0009,
-`docs/quality/e01-e20-v1.md` e `docs/architecture/v1-results.md`.
+`docs/quality/platform-evidence-matrix.md` e `docs/architecture/web-android-results.md`.
 
-### 18.6 V2–V5 — evolução implementada e promoção
+### 18.6 source automation, Android Evidence, hosted control plane e remote execution — evolução implementada e promoção
 
 | Fase | Escopo |
 |------|--------|
-| V2 | bundles compartilháveis ricos + source impact |
-| V3 | evidência nativa ampliada |
-| V4 | hosted collaboration |
-| V5 | remote runtime/device farm |
+| source automation | bundles compartilháveis ricos + source impact |
+| Android Evidence | evidência nativa ampliada |
+| hosted control plane | hosted collaboration |
+| remote execution | remote runtime/device farm |
 
 Cada fase entrega valor isolado.
 
-V2 foi fechado em 2026-08-09 com `.devexbundle` byte-reproduzível, verificação
+source automation foi fechado em 2026-08-09 com `.evidence.zip` byte-reproduzível, verificação
 offline, adapters filesystem/Git, impact conservador, ContextBundle sanitizado,
 plugins one-shot em sandbox e MCP stateless read-only. O corpus rotulado teve
 zero falso negativo e zero falso positivo em 14 decisões. Decisões e evidência
-estão em ADR-0010 e `docs/architecture/v2-results.md`.
+estão em ADR-0010 e `docs/architecture/source-automation-results.md`.
 
-V3 foi fechado em 2026-08-09 no Android Emulator API 35 gerenciado. Screenshot,
+Android Evidence foi fechado em 2026-08-09 no Android Emulator API 35 gerenciado. Screenshot,
 semântica e logcat sanitizados, screen recording e Perfetto foram correlacionados
 no mesmo `Evidence`/`ExecutionFingerprint`, comparados por policies versionadas,
-incluídos em Release e verificados em `.devexbundle`. O gate preservou
+incluídos em Release e verificados em `.evidence.zip`. O gate preservou
 `runtimeFidelity: hostNative`, `networkContainment: gatewayOnly`, nunca afirmou
 `deviceAttested` e removeu AVD, pareamento, TLS e processos. Decisão e evidência
-estão em ADR-0011 e `docs/architecture/v3-results.md`.
+estão em ADR-0011 e `docs/architecture/android-native-evidence-results.md`.
 
-### 18.7 V4 — SaaS multi-tenant e colaboração otimista
+### 18.7 hosted control plane — SaaS multi-tenant e colaboração otimista
 
-V4 foi implementado em 2026-08-09 com control plane Dart, PostgreSQL/RLS,
+hosted control plane foi implementado em 2026-08-09 com control plane Dart, PostgreSQL/RLS,
 object storage S3-compatible, OIDC/PKCE, role matrix, expected digest,
 idempotency, event/outbox, presence/comments/approvals, CLI hosted, Helm,
 OpenTelemetry e supply chain assinável.
@@ -3539,13 +3604,13 @@ versions, IdP/bucket e failover reais continuam gates externos e impedem a
 claim `production-certified`.
 
 Q-19 foi fechado pelo threat model independente HR-01…HR-24. Decisão, evidência
-e runbook estão em ADR-0004, `docs/architecture/v4-results.md`,
+e runbook estão em ADR-0004, `docs/architecture/hosted-control-plane-results.md`,
 `docs/security/hosted-remote-threat-model.md` e
 `docs/operations/hosted-recovery.md`.
 
-### 18.8 V5 — remote runtime e device farm web/Android
+### 18.8 remote execution — remote runtime e device farm web/Android
 
-V5 foi implementado em 2026-08-09 com scheduler persistente, quota/prioridade,
+remote execution foi implementado em 2026-08-09 com scheduler persistente, quota/prioridade,
 lease/generation, cancellation/retry, Job por tentativa, worker sem banco,
 plano/capability assinados, runtime web/Android, gateway de sessão, WebCodecs,
 scrcpy control, fallback read-only e cleanup durável.
@@ -3557,56 +3622,82 @@ HTTPRoute passou validação estrutural, não server-side.
 
 Cluster Linux/KVM real, CNI, admission, Gateway API, RuntimeClass/device plugin,
 E2E e node-loss permanecem gates externos e impedem a claim
-`device-farm-certified`. V5 não inclui source build, iOS nem dispositivo físico.
-Decisão e evidência estão em ADR-0005 e `docs/architecture/v5-results.md`.
+`device-farm-certified`. remote execution não inclui source build, iOS nem dispositivo físico.
+Decisão e evidência estão em ADR-0005 e `docs/architecture/remote-execution-results.md`.
 
-### 18.9 MC/AP — composição modular e AutoPreview
+### 18.9 Composição modular e AutoPreview
 
-MC0–MC6 foram implementados em 2026-08-10 para transformar a composição
+A composição modular foi implementada em 2026-08-10 para transformar a composição
 estática do Kit em Module/Capability/Provider/Profile sem criar novo bounded
-context nem redefinir Plugin. ADR-0012 fixa taxonomia, config v1→profile legado,
-`ResolvedKitPlan`, `EffectiveKitManifest`, lifecycle e Distribution v2.
+context nem redefinir Plugin. ADR-0012 fixa taxonomia, configuração modular
+canônica, `ResolvedKitPlan`, `EffectiveKitManifest`, lifecycle e Distribution
+modular.
 
 CLI, Host e Studio consomem o mesmo plano/manifest; módulos desabilitados não
 registram comandos, RPCs ou rotas e não iniciam recursos. Gateway, Android,
-test/source/plugins/MCP, hosted/remote e release foram catalogados como módulos
-built-in. Distribution v2 produz bundles `full-local` e enxutos por profile,
-mantendo reader/install/rollback v1.
+tests/source/plugins/MCP, hosted/remote e release foram catalogados como módulos
+built-in. A Distribution canônica produz bundles `full-local` e enxutos por
+profile com o mesmo reader/install/rollback.
 
-AP0–AP4 também foram implementados. `AutoPreview` é o primeiro
+O vertical AutoPreview também foi implementado. `AutoPreview` é o primeiro
 Module/EvidenceProvider novo: especializa Widget Preview para autoria, usa
 Analyzer e runner `flutter-test` isolado para PNG/Evidence estrutural e projeta
 Scenario × Variant no Journey Map sem exigir App Adapter, Gateway ou Android.
 Plano e evidências executadas estão em
 `docs/architecture/modular-kit-refactor-plan.md`,
 `docs/architecture/modular-composition-results.md` e
-`docs/architecture/auto-preview-results.md`. As claims P0–V5 não foram
+`docs/architecture/auto-preview-results.md`. As claims todas as capacidades históricas não foram
 reescritas.
 
-MC6 entrega o seam condicionado pelo `EffectiveKitManifest`; AP4 entrega
-contratos/projector. O cutover Jaspr posterior comprovou catálogo real Host →
+A composição entrega o seam condicionado pelo `EffectiveKitManifest`; o
+AutoPreview entrega contratos e projector. O cutover Jaspr posterior comprovou catálogo real Host →
 Studio, resource handles, shell, device frames, Inspector/provider selection,
 AutoPreview ponta a ponta e supervisão conjunta na matriz local.
 
-### 18.10 SR — reconstrução operacional do DevEx Studio
+### 18.10 Reconstrução operacional do Studio
 
-SR0–SR9 reconstrói o produto visual sobre MC/AP sem criar novo bounded context.
+A reconstrução operacional integra composição modular e AutoPreview sem criar
+novo bounded context.
 O Host torna-se autoridade de `WorkspaceSnapshot`, catálogo, variants, visual
 Evidence e resource handles; o Studio remove o sample de produção e passa a
 renderizar shell, Journey Map e inspector sobre essa projeção real.
 
 O rollout seguiu contracts → Host/resources → bootstrap/supervisão → shell →
 Journey Map → inspector/providers → AutoPreview operacional → matriz modular →
-conformance/promoção. SR0–SR9 e o cutover ADR-0016 estão concluídos na matriz
+conformance/promoção. A reconstrução e o cutover ADR-0016 estão concluídos na matriz
 local: o cliente Jaspr consome o snapshot real, device frames ficam fora dos
 PNGs, providers e Variants são explícitos e o E2E Google Chrome valida duas capturas, stale→fresh,
 execução sem provider, CSP e cleanup.
 
 Plano, decisão e resultado:
-`docs/architecture/devex-studio-reconstruction-plan.md`, ADR-0014 e
-`docs/architecture/devex-studio-reconstruction-results.md`. AutoPreview mantém
+`docs/architecture/studio-reconstruction-plan.md`, ADR-0014 e
+`docs/architecture/studio-reconstruction-results.md`. AutoPreview mantém
 fidelity `structural`; rede/memória continuam dependentes de sandbox comprovado
 pelo host.
+
+### 18.11 Plataforma de experiência agnóstica
+
+Topologia e layouts, o consumer de referência, Inventory, Scenario Lab,
+Quality, autoria/review, Motion/Context, MCP, distribuição externa e a matriz
+de escala foram executados na matriz portátil local até 2026-08-18. Journey e
+Inventory compartilham a mesma topologia; Lab → Run → Quality opera no mesmo
+Studio Jaspr e sobre os mesmos digests de conteúdo.
+
+O gate no-skip `tools/verify/verify_scenario_lab_vertical.sh` passou em Linux/Chrome
+release com Target Flutter e API/Gateway reais. Ele comprovou relay v2 fenced
+com 6/6 resultados reconhecidos, Evidence fresh, comparação visual,
+aprovação humana seguida de rejeição superseding, persistência após reinício,
+cancelamento e cleanup. Uma mutação temporária do layout autoral e da cor do
+Target tornou o run
+histórico stale e indisponível para review. A recollection atual falhou por
+comparação, preservando aceitação automatizada dos demais critérios e
+projetando Quality `changed` + `failing`. Fontes, builds, estado e ports foram
+restaurados pelo gate.
+
+Essa promoção é local e portátil. Não é evidência de produção, hosted,
+device farm, dispositivo físico ou conformidade WCAG. Os gates de autoria e
+review, Motion/Context, MCP, distribuição externa, escala e auditoria terminal
+possuem evidência própria e mantêm os mesmos limites externos.
 
 ---
 
@@ -3618,25 +3709,25 @@ um tipo ou comando com nome semelhante não basta.
 
 | ID | Capacidade | Significa | Decisão | Fase | Critério de aceite |
 |----|------------|-----------|---------|------|--------------------|
-| E-01 | Gateway seletivo | por request: mock, passthrough allowlisted ou deny | absorver | V0.1/V0.2 | route do preset mocka; route permitida fora dele só faz passthrough em hybrid; desconhecida nega |
-| E-02 | Scope isolation | zero/um GatewayScope ativo e nenhum estado cross-session | absorver | V0.1 | ativar scope desativa o anterior; processo/token/state de outra sessão não mudam |
-| E-03 | Preset | estado de negócio compila plano completo + routing | absorver | V0.1 | aplicar preset substitui plano e reseta runtime, sem merge cego |
-| E-04 | `appliesTo` | route existe apenas no subset de presets declarado | absorver | V0.1 | routing, verify e probe excluem route fora do preset |
-| E-05 | Verify ≡ API | preview e app recebem os mesmos bytes do handler real | absorver | V0.1 | contract test compara status, headers selecionados e body bruto |
-| E-06 | Hybrid | sessão/login reais coexistem com mock apenas do fluxo | absorver com policy | V0.2 | sidecar acessa só upstream não produtivo allowlisted; mode/containment aparecem no fingerprint |
-| E-07 | Upstream sync | aliases remotos vêm de provider/config local, não hardcode | absorver | V0.2 | sync valida e publica status `ready`; partial/invalid não substitui profile válido |
-| E-08 | Pareamento host | app em emulador/simulador alcança sidecar local | absorver | V1 | Android e primeiro host-native suportado passam bootstrap, health e cleanup |
-| E-09 | Traffic | mock/passthrough/deny são auditáveis e sanitizados | absorver | V0.1 | TrafficEvent ordenado e diagnóstico sem secret |
-| E-10 | Session capture | auth/hints allowlisted e temporários alimentam probe/hybrid | absorver restrito | V0.2 | TTL, principal, redaction e invalidação por target/account |
-| E-11 | Probe chain | cadeia remota ordenada e filtrada pelo preset | absorver | V1 | `after`/`extract` resolvem params; route fora de `appliesTo` não executa |
-| E-12 | Quality → preset | checklist humano abre binding concedido que prepara estado | absorver via ReviewGuide + binding | V1 | ação efêmera materializa exatamente o binding; Review não recebe routing livre |
-| E-13 | Docs leves | texto/HTML sanitizado sem binários no content root | absorver em living docs | V0 | import vira draft; evidência usa artifact ref |
-| E-14 | Runtime mutável | workflow/epoch muda somente dentro da GatewaySession | absorver | V0.1 | reset é reproduzível; evidence inclui state digest quando relevante |
-| E-15 | Faults | latency, timeout e falha forçada por route | absorver | V0.1 | FaultProfile determinístico passa testes por endpoint |
-| E-16 | Extensão de scope | playbook completo: catálogo, handler, verify, docs, QA, probe, testes | absorver | V0.1+ | checklist §10.19 completo |
-| E-17 | Lifecycle host | bootstrap/update/remove/verify/sync seguros | substituir por CLI Dart | V1 | operações idempotentes, dry-run/undo e doctor explicável |
-| E-18 | Hygiene | secrets só locais; fixtures exclusivamente sintéticas | absorver | desde V0 | scanners e testes negativos não encontram secret/PII em fonte, log ou artifact |
-| E-19 | Console operacional | ativar, preset, verify, traffic, QA, probe, sync e status | Studio/CLI | V0.1–V1 | jobs §4.5 acessíveis com grants e sem duplicar fonte autoral |
+| E-01 | Gateway seletivo | por request: mock, passthrough allowlisted ou deny | absorver | Gateway isolado e containment | route do preset mocka; route permitida fora dele só faz passthrough em hybrid; desconhecida nega |
+| E-02 | Scope isolation | zero/um GatewayScope ativo e nenhum estado cross-session | absorver | Gateway isolado | ativar scope desativa o anterior; processo/token/state de outra sessão não mudam |
+| E-03 | Preset | estado de negócio compila plano completo + routing | absorver | Gateway isolado | aplicar preset substitui plano e reseta runtime, sem merge cego |
+| E-04 | `appliesTo` | route existe apenas no subset de presets declarado | absorver | Gateway isolado | routing, verify e probe excluem route fora do preset |
+| E-05 | Verify ≡ API | preview e app recebem os mesmos bytes do handler real | absorver | Gateway isolado | contract test compara status, headers selecionados e body bruto |
+| E-06 | Hybrid | sessão/login reais coexistem com mock apenas do fluxo | absorver com policy | Gateway containment | sidecar acessa só upstream não produtivo allowlisted; mode/containment aparecem no fingerprint |
+| E-07 | Upstream sync | aliases remotos vêm de provider/config local, não hardcode | absorver | Gateway containment | sync valida e publica status `ready`; partial/invalid não substitui profile válido |
+| E-08 | Pareamento host | app em emulador/simulador alcança sidecar local | absorver | web/Android | Android e primeiro host-native suportado passam bootstrap, health e cleanup |
+| E-09 | Traffic | mock/passthrough/deny são auditáveis e sanitizados | absorver | Gateway isolado | TrafficEvent ordenado e diagnóstico sem secret |
+| E-10 | Session capture | auth/hints allowlisted e temporários alimentam probe/hybrid | absorver restrito | Gateway containment | TTL, principal, redaction e invalidação por target/account |
+| E-11 | Probe chain | cadeia remota ordenada e filtrada pelo preset | absorver | web/Android | `after`/`extract` resolvem params; route fora de `appliesTo` não executa |
+| E-12 | Quality → preset | checklist humano abre binding concedido que prepara estado | absorver via ReviewGuide + binding | web/Android | ação efêmera materializa exatamente o binding; Review não recebe routing livre |
+| E-13 | Docs leves | texto/HTML sanitizado sem binários no content root | absorver em living docs | plataforma local | import vira draft; evidência usa artifact ref |
+| E-14 | Runtime mutável | workflow/epoch muda somente dentro da GatewaySession | absorver | Gateway isolado | reset é reproduzível; evidence inclui state digest quando relevante |
+| E-15 | Faults | latency, timeout e falha forçada por route | absorver | Gateway isolado | FaultProfile determinístico passa testes por endpoint |
+| E-16 | Extensão de scope | playbook completo: catálogo, handler, verify, docs, QA, probe, testes | absorver | Gateway isolado e extensões | checklist §10.19 completo |
+| E-17 | Lifecycle host | bootstrap/update/remove/verify/sync seguros | substituir por CLI Dart | web/Android | operações idempotentes, dry-run/undo e doctor explicável |
+| E-18 | Hygiene | secrets só locais; fixtures exclusivamente sintéticas | absorver | desde plataforma local | scanners e testes negativos não encontram secret/PII em fonte, log ou artifact |
+| E-19 | Console operacional | ativar, preset, verify, traffic, QA, probe, sync e status | Studio/CLI | Gateway isolado até Android | jobs §4.5 acessíveis com grants e sem duplicar fonte autoral |
 | E-20 | Arquitetura neutra | nenhum domínio, host, ID ou inventário real de consumidor | manter | sempre | gate anti-vazamento §27.3 passa |
 
 Capacidades periféricas do console legado — push de teste, build de aplicativo, snapshot de
@@ -3693,27 +3784,27 @@ Ceilings provisórios — alteráveis somente por decisão com nova baseline:
 
 | Fase | Métrica/corpus de referência | Budget |
 |------|------------------------------|--------|
-| V0 | `compile` cold: 1.000 docs/5.000 transitions | p95 ≤ 2 s |
-| V0 | recompile após um doc sem mudança estrutural | p95 ≤ 300 ms |
-| V0 | primeiro frame útil do Map após manifest local | p95 ≤ 1,5 s |
-| V0 | pan/zoom no Map, target 60 Hz | frame build+raster p95 ≤ 16,7 ms; p99 ≤ 33,3 ms |
-| V0 | Session ready com build web já disponível | p95 ≤ 5 s |
-| V0 | 20 ciclos start/reset/dispose | nenhum recurso órfão; crescimento retido ≤ 10% após GC estabilizado |
-| V0.1 | overhead mock local, body ≤ 256 KiB, sem FaultProfile | p95 ≤ 10 ms; p99 ≤ 25 ms |
-| V0.1 | buffer de TrafficEvent por sessão | ≤ 10.000 eventos ou 64 MiB; eviction explícita |
-| V0.3 | Documentar | zero mudança em código/pubspec/lockfile do app |
-| V0.3 | detach | zero arquivo modificado apagado; zero resíduo sem owner |
+| plataforma local | `compile` cold: 1.000 docs/5.000 transitions | p95 ≤ 2 s |
+| plataforma local | recompile após um doc sem mudança estrutural | p95 ≤ 300 ms |
+| plataforma local | primeiro frame útil do Map após manifest local | p95 ≤ 1,5 s |
+| plataforma local | pan/zoom no Map, target 60 Hz | frame build+raster p95 ≤ 16,7 ms; p99 ≤ 33,3 ms |
+| plataforma local | Session ready com build web já disponível | p95 ≤ 5 s |
+| plataforma local | 20 ciclos start/reset/dispose | nenhum recurso órfão; crescimento retido ≤ 10% após GC estabilizado |
+| Gateway isolado | overhead mock local, body ≤ 256 KiB, sem FaultProfile | p95 ≤ 10 ms; p99 ≤ 25 ms |
+| Gateway isolado | buffer de TrafficEvent por sessão | ≤ 10.000 eventos ou 64 MiB; eviction explícita |
+| ciclo de distribuição | Documentar | zero mudança em código/pubspec/lockfile do app |
+| ciclo de distribuição | detach | zero arquivo modificado apagado; zero resíduo sem owner |
 | MC | Module desabilitado | zero comando/RPC/rota/processo/listener/porta/device/rede |
 | MC | startup falho/cancelado | rollback inverso e zero capability/resource exportado |
 | AP | capture policy | frames/duração/timeout bounded; animação infinita não bloqueia o lote |
 | AP | persistência | zero PNG sem confirmação sintética; item failed sem artifact |
-| V4 | presence default | TTL 60 s; heartbeat expirado não aparece |
-| V4 | backup freshness | RPO ≤ 15 min; alerta antes de 10 min sem WAL arquivado |
-| V4 | recovery rehearsal | RTO ≤ 4 h até RLS/object/API smoke aprovados |
-| V5 | lease heartbeat | expiração nunca renova generation antiga nem produz sucesso |
-| V5 | sessão interativa | exclusiva e limitada pelo `RemoteExecutionPlan.expiresAt` |
-| V5 | terminal/retry | cleanup durável concluído antes de nova tentativa |
-| V5 | soak | zero task/lease/token/namespace lógico órfão após corpus misto |
+| hosted control plane | presence default | TTL 60 s; heartbeat expirado não aparece |
+| hosted control plane | backup freshness | RPO ≤ 15 min; alerta antes de 10 min sem WAL arquivado |
+| hosted control plane | recovery rehearsal | RTO ≤ 4 h até RLS/object/API smoke aprovados |
+| remote execution | lease heartbeat | expiração nunca renova generation antiga nem produz sucesso |
+| remote execution | sessão interativa | exclusiva e limitada pelo `RemoteExecutionPlan.expiresAt` |
+| remote execution | terminal/retry | cleanup durável concluído antes de nova tentativa |
+| remote execution | soak | zero task/lease/token/namespace lógico órfão após corpus misto |
 
 Cada medição falha de modo explícito quando o ambiente não corresponde ao
 manifest; ela não produz um “pass” incomparável. Budgets são revistos após o
@@ -3796,7 +3887,7 @@ de produção.
 - source adapters;
 - hosted documents/role matrix/expected-digest conflict;
 - signed remote plan, capability/ticket audience e binary framing.
-- ModuleCatalog/ResolvedKitPlan/EffectiveKitManifest e config/distribution v2;
+- ModuleCatalog/ResolvedKitPlan/EffectiveKitManifest e configuração/distribuição canônicas;
 - PreviewManifest/PreviewCaptureManifest/report e adjacent versions.
 
 #### Integration
@@ -3829,13 +3920,13 @@ de produção.
 
 #### End-to-end
 
-- tarefa humana V0;
-- V0.1 isolated;
-- V0.2 hybrid;
-- V0.3 adoption/detach/EvidenceProvider;
-- V1 host-native;
-- V4 hosted com dois tenants e credenciais distintas;
-- V5 web/Android batch/interativo no cluster certificado.
+- tarefa humana plataforma local;
+- Gateway isolado isolated;
+- Gateway containment hybrid;
+- ciclo de distribuição adoption/detach/EvidenceProvider;
+- web/Android host-native;
+- hosted control plane hosted com dois tenants e credenciais distintas;
+- remote execution web/Android batch/interativo no cluster certificado.
 
 ### 21.2 Gateway conformance suite
 
@@ -3952,7 +4043,7 @@ CI torna boundaries observáveis:
 |------------|------------------|
 | engine pure Dart | import graph rejeita Flutter, `dart:io` e adapters |
 | Studio sem privilégio | import graph rejeita `dart:io`/runtime; integração usa Host client |
-| consumidor desacoplado | entrypoint de produção não importa `devex_*`; tooling importa só `devex_flutter` |
+| consumidor desacoplado | entrypoint de produção não importa `execution_*`; tooling importa só `flutter_app_adapter` |
 | interpretação única | CLI one-shot e Host RPC geram mesmo resultado/machine output |
 | compile determinístico | N rebuilds + ordem de arquivo variada produzem mesmo digest |
 | Gateway por sessão | conformance prova PID/token/port/state distintos |
@@ -4044,7 +4135,7 @@ nunca em route name ou metric label de cardinalidade irrestrita.
 Kernel health acrescenta plan/catalog digest e, por Module, lifecycle, health,
 capabilities efetivas e diagnósticos sanitizados. Somente `ready`/`degraded`
 exportam capabilities; `disabled` não representa falha. O Host publica
-`devex.kit.describe` e `devex.kit.health` mesmo no profile mínimo.
+`composition.describe` e `composition.health` mesmo no profile mínimo.
 
 ### 22.5 Recovery
 
@@ -4138,15 +4229,15 @@ compatibilidade. `Substituída` mantém histórico e aponta para a decisão vige
 | D-021 | Aceita | CLI JSON é contrato base de automação |
 | D-022 | Aceita | toolchain pinada; upgrade separado da release |
 | D-023 | Aceita | Git é adapter local opcional; provider não entra no domínio |
-| D-024 | Aceita | V0 prova uma Journey/Scenario/Run/Evidence/Release; adoção ampla fica em V0.3 |
+| D-024 | Aceita | plataforma local prova uma Journey/Scenario/Run/Evidence/Release; adoção ampla fica em ciclo de distribuição |
 | D-025 | Substituída | hosted/remote deixaram de ser adiados; ver D-041…D-047 e ADR-0004/0005 |
-| D-026 | Aceita | DevExKit identifica o projeto; `devex` é o namespace técnico estável |
+| D-026 | Aceita | Abel identifica o projeto; `workspace` é o namespace técnico estável |
 | D-027 | Aceita | Workspace contém múltiplas Application sem exigir mutação do workspace do consumidor |
 | D-028 | Aceita | DistributionDescriptor define branding/plugins; ConsumerLayout define config, content root, entrypoint e aliases |
 | D-029 | Aceita | distribuição compatível compõe o core sem copiá-lo; hardfork incompatível vive em outro repositório |
 | D-030 | Aceita | ApplicationBootstrapPolicy + NetworkContainment efetivos são obrigatórios antes de claim de egress total |
 | D-031 | Aceita | testes existentes entram por EvidenceProvider e não são duplicados |
-| D-032 | Aceita | DevEx Host é autoridade local para efeitos; Studio é client Jaspr sem I/O privilegiado |
+| D-032 | Aceita | Workspace Host é autoridade local para efeitos; Studio é client Jaspr sem I/O privilegiado |
 | D-033 | Aceita | Studio usa view state imutável, fluxo unidirecional, ViewModels e constructor DI |
 | D-034 | Aceita | monorepo usa Pub Workspaces e packages nos boundaries de publicação/runtime |
 | D-035 | Aceita | backend mode, network containment, runtime fidelity e bootstrap assessment são dimensões ortogonais |
@@ -4156,16 +4247,16 @@ compatibilidade. `Substituída` mantém histórico e aponta para a decisão vige
 | D-039 | Aceita | JCS v1 usa I-JSON restrito, errata aplicada e `sha256:<hex>` declarado |
 | D-040 | Aceita | quatro BCs: Catalog & Docs, Sessions, Backend Gateway e Evidence & Release; Host não é BC |
 | D-041 | Aceita | hosted é plane opcional; PostgreSQL/RLS forced e S3 reforçam tenant em controles independentes |
-| D-042 | Aceita | OIDC Authorization Code + PKCE; role matrix explícita e nenhum password store DevExKit |
+| D-042 | Aceita | OIDC Authorization Code + PKCE; role matrix explícita e nenhum password store Abel |
 | D-043 | Aceita | expected digest + idempotency + event/outbox substituem last-write-wins, CRDT e dual write |
 | D-044 | Aceita | remote scheduler é persistente; lease generation e cleanup durável precedem retry |
 | D-045 | Aceita | cada tentativa remota é Kubernetes Job/namespace isolado; worker recebe plano/capability e nunca banco/source |
 | D-046 | Aceita | Android interativo usa scrcpy H.264/control; WebCodecs ou fallback PNG read-only explícito |
-| D-047 | Aceita | V4/V5 implementados não equivalem a produção/device-farm certificados sem PITR/CNI/admission/KVM E2E |
+| D-047 | Aceita | hosted control plane/remote execution implementados não equivalem a produção/device-farm certificados sem PITR/CNI/admission/KVM E2E |
 | D-048 | Aceita | Kit usa Modules built-in compile-time, providers e profiles resolvidos em um único plan digest; plugins permanecem out-of-process |
 | D-049 | Aceita | AutoPreview especializa Widget Preview para autoria, mas usa runner isolado próprio e declara fidelidade estrutural |
 | D-050 | Aceita | Host é autoridade do WorkspaceSnapshot; Studio consome catálogo/Evidence por contracts e resource handles, sem filesystem/CAS path ou sample em produção |
-| D-051 | Aceita | existe um único `apps/devex_studio` Jaspr client-side; UI System é Jaspr, UX System é Dart puro e não há renderer/fallback Flutter |
+| D-051 | Aceita | existe um único `apps/studio` Jaspr client-side; UI System é Jaspr, UX System é Dart puro e não há renderer/fallback Flutter |
 
 ### 23.2 Decisões Gateway
 
@@ -4179,7 +4270,7 @@ compatibilidade. `Substituída` mantém histórico e aponta para a decisão vige
 | D-G06 | Aceita | GatewayPreset, LaunchProfile e Scenario são conceitos distintos |
 | D-G07 | Aceita | contract probe chain declarativa, filtrada pelo preset e executada no data plane real |
 | D-G08 | Aceita | bootstrap host-native Android gerenciado, reversível e ownership-aware |
-| D-G09 | Aceita | núcleo `devex` estável; branding por distribuição, sem hardfork semântico |
+| D-G09 | Aceita | núcleo `workspace` estável; branding por distribuição, sem hardfork semântico |
 | D-G10 | Aceita | consumidor pode trazer fake próprio; Gateway é capability, não monopólio |
 | D-G11 | Aceita | hybrid não satisfaz determinismo nem torna seal válido por default |
 | D-G12 | Aceita | Gateway é sidecar Dart por processo e GatewaySession, supervisionado pelo Host/Runner |
@@ -4198,8 +4289,8 @@ compatibilidade. `Substituída` mantém histórico e aponta para a decisão vige
 | C-03 | legado PHP vs stack alvo | reimplementação Dart/Flutter; sidecar Dart, nunca subtree/runtime da stack PHP anterior |
 | C-04 | console operacional vs Studio | mapear jobs para Studio/CLI; não portar templates do console legado nem criar segunda fonte |
 | C-05 | estado mutável vs release por digest | estado pertence à GatewaySession; snapshot só entra por ExecutionFingerprint |
-| C-06 | nome upstream vs distribuição branded | `devex` é contrato estável; Helix é distribuição exemplo por ConsumerLayout/Descriptor |
-| C-07 | instalação privilegiada vs CLI reversível | bootstrap host-native opt-in, dry-run/undo, necessário apenas no V1 |
+| C-06 | nome upstream vs distribuição branded | `workspace` é contrato estável; Helix é distribuição exemplo por ConsumerLayout/Descriptor |
+| C-07 | instalação privilegiada vs CLI reversível | bootstrap host-native opt-in, dry-run/undo, necessário apenas no web/Android |
 | C-08 | um produto mock vs catálogo aditivo | exclusividade é policy da GatewaySession; catálogo pode conter várias Journeys/scopes |
 | C-09 | Review read-only vs execução interativa | Review permite efeito efêmero prebound, sem autoria/configuração/routing livre |
 | C-10 | fonte canônica vs arquivo monolítico | ARCHITECTURE governa índice normativo; contratos extraídos mantêm ownership e precedência registrados |
@@ -4216,7 +4307,7 @@ Alternativas rejeitadas:
 | permitir proxy implícito para route desconhecida | cria risco de segurança e comportamento não auditável |
 | tratar `isolated` como prova automática de rede offline | Gateway não observa conexões que o target faz fora dele |
 | permitir Studio acessar filesystem/processo diretamente | duplica Application Services e expande a superfície privilegiada |
-| carregar plugin de terceiros in-process no V0 | extensão equivale a execução de código com privilégios do Host |
+| carregar plugin de terceiros in-process no plataforma local | extensão equivale a execução de código com privilégios do Host |
 
 Uma decisão alterada recebe status `Substituída`; não se edita significado em
 silêncio.
@@ -4228,7 +4319,7 @@ silêncio.
 | Risco | Mitigação / sinal de revisão |
 |-------|-------------------------------|
 | Escopo infinito | roadmap por vertical; hosted/remote opt-in e certificados por gates separados |
-| Studio sem Gateway não substitui o gateway legado | matriz E-01…E-20 + gate V1 |
+| Studio sem Gateway não substitui o gateway legado | matriz E-01…E-20 + gate web/Android |
 | Gateway engolir Sessions | BCs e ports separados |
 | Host virar god object | Host só compõe handlers/ports; regras ficam nos BCs e import tests |
 | GatewayPreset colidir com Scenario | modelo/nomes explícitos |
@@ -4241,7 +4332,7 @@ silêncio.
 | Portar a stack PHP anterior | D-G03 + scan de dependências |
 | Flutter contaminar core | pure Dart modules/tests |
 | Studio duplicar engine/efeitos | Host authoritative + client repository tipado |
-| V0 ainda grande | limitar CLI/source/agents; tarefa humana única |
+| plataforma local ainda grande | limitar CLI/source/agents; tarefa humana única |
 | Journey Map virar mural | projection/zoom/outline |
 | Execution runtime virar backdoor | seams públicas/checkpoints honestos |
 | Tooling vazar produção | composition root + import scans |
@@ -4259,7 +4350,7 @@ silêncio.
 | Artifact store crescer | CAS/retention/GC |
 | Documento voltar a ser monólito inconsistente | índice normativo + ADR/spec ownership + link/reference checks |
 | Package sprawl | modular monolith; extração só por publicação/runtime/owner |
-| API experimental do Widget Preview mudar | adapter `devex_preview` isolado, compatibilidade Flutter estreita e conformance por upgrade |
+| API experimental do Widget Preview mudar | adapter `flutter_preview` isolado, compatibilidade Flutter estreita e conformance por upgrade |
 | Combinações de módulos explodirem | profiles normativos, cobertura pairwise e gates de ausência por módulo com efeito |
 | Plugin comprometer Host | sem plugin dinâmico in-process; process/capability boundary |
 | Configuração modular virar flags dispersas | um `ResolvedKitPlan` canônico governa CLI, Host, Studio e fingerprint |
@@ -4268,7 +4359,7 @@ silêncio.
 | Dependency graph habilitar efeito oculto | dependência resource-bearing ausente falha; adoption só propõe patch em dry-run |
 | CLI, Host e Studio divergirem | plan digest único e `EffectiveKitManifest` observado pelas três superfícies |
 | Profile virar branch especial | profiles são overlays normalizados pelo mesmo resolver da configuração explícita |
-| Config v2 quebrar consumers v1 | tradução em memória para `legacy-full-local-v1`, mesmo composition root e rollback de distribuição |
+| Configuração antiga chegar ao runtime | `workspace.yaml` canônico exige schema 2 e falha antes da resolução ou de efeitos |
 | Tenant filter esquecido | forced RLS + NOBYPASSRLS + tenant PK/FK/index + API authz independente |
 | Pool conserva tenant anterior | transação + SET LOCAL + no-context denial test |
 | Object URL vira confused deputy | key tenant+digest, descriptor, origin/bucket fixos, TTL e policy externa |
@@ -4280,16 +4371,16 @@ silêncio.
 | Cleanup órfão concorre com retry | durable cleanup queue, confirmação de namespace ausente e soak |
 | Configuração confundida com enforcement | gates externos separados para PITR, bucket, CNI, admission, Gateway API e KVM |
 
-Risco técnico central do V0: controlar app real com API pequena e honesta.
+Risco técnico central da plataforma local: controlar app real com API pequena e honesta.
 
-Risco técnico central do V0.1/V0.2: implementar mock/proxy seguro sem tornar
+Risco técnico central do Gateway isolado e containment: implementar mock/proxy seguro sem tornar
 Gateway uma segunda aplicação de backend.
 
-Risco técnico central do V4: qualquer dimensão sem tenant — API, transação,
+Risco técnico central do hosted control plane: qualquer dimensão sem tenant — API, transação,
 object key, cursor, cache ou telemetry — pode furar a separação mesmo quando as
 outras estão corretas.
 
-Risco técnico central do V5: KVM e controle remoto aumentam privilégio; por isso
+Risco técnico central do remote execution: KVM e controle remoto aumentam privilégio; por isso
 worker é descartável, não recebe banco/source e retry nunca antecede cleanup.
 
 ---
@@ -4302,7 +4393,7 @@ Já resolvidas e não reabertas sem substituir decisão:
 
 - Gateway é sidecar Dart por processo/GatewaySession e control plane parent-owned
   usa stdio (D-G12/D-G16);
-- Studio é client do DevEx Host, não owner de I/O privilegiado (D-032);
+- Studio é client do Workspace Host, não owner de I/O privilegiado (D-032);
 - ReviewGuide + binding concedido materializam sessão sem routing livre
   (D-G17);
 - backend mode e network containment são dimensões diferentes (D-035);
@@ -4311,11 +4402,11 @@ Já resolvidas e não reabertas sem substituir decisão:
 - implementação legada pode coexistir até o gate §27.2, sem overwrite in-place;
 - hybrid é backend mode, não nível de fidelity nem seal automático.
 - Q-01: `json_schema` fica encapsulado pelo perfil fechado Draft 2020-12 e JCS
-  pertence a `devex_contracts` (ADR-0001 e perfil v1);
+  pertence a `experience_contracts` (ADR-0001 e perfil v1);
 - Q-03: Host RPC usa JSON-RPC 2.0/WebSocket e target web usa envelope
   `postMessage` autenticado (ADR-0003 e protocol v1);
 - Q-04: factory neutra e consumer-owned é compartilhada entre entrypoints; só
-  tooling importa `devex_flutter` (resultado S-03);
+  tooling importa `flutter_app_adapter` (resultado S-03);
 - Q-05: Journey Map usa DOM/CSS Jaspr, windowing bounded, LOD de interação e
   Outline HTML acessível; o baseline Flutter S-04 é apenas histórico.
 - Q-06: `shelf`/`dart:io` permanece no data plane após conformance de limites,
@@ -4346,7 +4437,7 @@ Já resolvidas e não reabertas sem substituir decisão:
   exigem preview digest e grant (ADR-0010).
 - Q-18: impact usa snapshots filesystem/Git, globs e dependências; qualquer
   incerteza invalida reuso. Corpus rotulado: 14 decisões, zero falso negativo e
-  zero falso positivo no gate V2 (ADR-0010).
+  zero falso positivo no gate source automation (ADR-0010).
 - Q-19: hosted usa OIDC/PKCE, role matrix, tenant context transacional,
   PostgreSQL forced RLS/NOBYPASSRLS, S3 tenant+digest e threat model HR-01…HR-24
   (ADR-0004 e `docs/security/hosted-remote-threat-model.md`).
@@ -4355,9 +4446,9 @@ Questões restantes possuem gate e método de decisão:
 
 | ID | Questão | Bloqueia | Como resolver |
 |----|---------|----------|---------------|
-| Q-14 | iOS Simulator mapping | pós-V5 | nova ADR, execução em macOS real + cleanup |
+| Q-14 | iOS Simulator mapping | pós-remote execution | nova ADR, execução em macOS real + cleanup |
 
-P0 foi fechado com resultado para Q-01, Q-03, Q-04 e Q-05. As demais não
+validação fundacional foi fechado com resultado para Q-01, Q-03, Q-04 e Q-05. As demais não
 bloqueiam começar a fase anterior, mas bloqueiam a primeira fase indicada na
 coluna.
 
@@ -4391,9 +4482,9 @@ coluna.
 | DistributionDescriptor | composição versionada de branding, plugins, policies e layout |
 | Evidence | observação ligada a ExecutionFingerprint/subject |
 | EvidenceProvider | adapter de um runner existente para artifacts/evidence canônicos |
-| AutoPreview | annotation Flutter opcional para Widget Previewer e Evidence estrutural via runner DevEx separado |
+| AutoPreview | annotation Flutter opcional para Widget Previewer e Evidence estrutural via runner de auto-preview separado |
 | Variant | dimensão visual canônica de viewport, DPR, brightness, locale, text scale e theme de um Scenario |
-| Distribuição | composição de marca, instalador e update channel sobre o núcleo `devex` |
+| Distribuição | composição de marca, instalador e update channel sobre o núcleo `workspace` |
 | gateway legado | gateway seletivo anterior usado só como referência |
 | ExecutionTarget | forma de iniciar, controlar e capturar uma Application |
 | ExecutionFingerprint | identidade efetiva de target, runtime, toolchain e fronteiras |
@@ -4412,11 +4503,15 @@ coluna.
 | Journey | grafo de caminhos |
 | Journey Map | projeção espacial estática de uma Journey |
 | LaunchProfile | launch sem claim de estado |
-| DevExKit | projeto, repositório e distribuição de referência do namespace `devex` |
-| DevEx Host | processo Dart VM local que autoriza e supervisiona efeitos/Application Services |
+| Abel | projeto, repositório e distribuição de referência do namespace `workspace` |
+| Workspace Host | processo Dart VM local que autoriza e supervisiona efeitos/Application Services |
 | NetworkContainment | enforcement de rede do target: unconstrained, gatewayOnly ou targetEnforced |
 | Passthrough | request encaminhada ao upstream |
 | Projection | lente do grafo |
+| NodeInstance | occurrence visual de um Scenario dentro de uma Projection |
+| ScenarioFacetManifest | taxonomia consumer-owned, completa e ligada ao Catalog por digest |
+| ScenarioLabManifest | plano declarativo catalog-bound para Lab e Quality; não é resultado de execução |
+| ExperienceContentSet | geração atômica de snapshot, topologia e manifests adjacentes |
 | Release | manifest imutável por digest |
 | ReleaseBundle | embalagem verificável de Release e artifacts |
 | RemoteRun | execução web/Android hosted com state machine e tentativa fenced |
@@ -4430,7 +4525,7 @@ coluna.
 | SessionTrace | observações append-only |
 | Tenant context | tenant autenticado aplicado localmente à transação e reforçado por RLS |
 | TrafficEvent | observação sanitizada de uma request processada |
-| Soft fork | distribuição por composição que preserva contratos e conformance devex |
+| Soft fork | distribuição por composição que preserva contratos e conformance workspace |
 | Hardfork | implementação incompatível com namespace/conformance próprios |
 | Hub | alias lógico de uma API/base URL do app; nunca inventário real do consumidor |
 | Upstream group | conjunto lógico de routes que compartilha um alias de upstream |
@@ -4479,7 +4574,7 @@ Enquanto este for o documento arquitetural principal:
 - branding pode alterar config filename, content root, tooling entrypoint e
   aliases via ConsumerLayout;
 - branding não altera schemas, kinds, digests, CLI JSON, exit codes ou
-  protocolo `devex`;
+  protocolo `workspace`;
 - content root nunca contém cache, sessão ou secret;
 - nenhum runtime PHP é introduzido;
 - cada fase tem tarefa humana, prova e non-goals;
@@ -4497,7 +4592,7 @@ Enquanto este for o documento arquitetural principal:
 Este gate foi aprovado em 2026-08-09:
 
 - [x] baseline implementado e stack Dart/Jaspr/Flutter-adapters está explícita;
-- [x] quatro BCs e o boundary não-domínio do DevEx Host estão no diagrama;
+- [x] quatro BCs e o boundary não-domínio do Workspace Host estão no diagrama;
 - [x] mock/passthrough/deny, isolation e verify ≡ API têm invariantes;
 - [x] backend mode e NetworkContainment estão separados e T-09 possui plano;
 - [x] matriz E-01…E-20 contém significado, fase e critério;
@@ -4505,18 +4600,18 @@ Este gate foi aprovado em 2026-08-09:
 - [x] GatewayPreset, LaunchProfile e Scenario são distintos;
 - [x] jobs operacionais estão mapeados a Studio/CLI sem portar UI legado;
 - [x] consumidor pode continuar usando fake próprio;
-- [x] V0 task e non-goals estão aceitos;
+- [x] plataforma local task e non-goals estão aceitos;
 - [x] D-026…D-040 e D-G01…D-G17 não têm proposta bloqueante;
 - [x] T-01…T-14 foram revisadas e possuem fase/evidência;
 - [x] S-01…S-04 possuem resultado registrado;
 - [x] Q-01, Q-03, Q-04 e Q-05 foram fechadas;
-- [x] Pub Workspace, package boundaries, sample e DevEx Host foram definidos;
+- [x] Pub Workspace, package boundaries, sample e Workspace Host foram definidos;
 - [x] checklist anti-vazamento §27.3 passa;
 - [x] registro normativo §27.4 não possui contrato órfão ou contraditório.
 
 ### 27.2 Gate para afirmar substituição do gateway legado
 
-Este gate foi aprovado para web/Android em 2026-08-09 após V1 provar:
+Este gate foi aprovado para web/Android em 2026-08-09 após web/Android provar:
 
 - [x] E-01…E-20;
 - [x] host-native Android gerenciado;
@@ -4532,7 +4627,7 @@ Este gate foi aprovado para web/Android em 2026-08-09 após V1 provar:
 - [x] nenhuma dependência da stack PHP anterior.
 
 A claim é limitada à matriz web/Android documentada em
-`docs/architecture/v1-results.md`; não inclui iOS, dispositivo físico, hosted
+`docs/architecture/web-android-results.md`; não inclui iOS, dispositivo físico, hosted
 ou device farm.
 
 ### 27.3 Gate anti-vazamento
@@ -4571,74 +4666,79 @@ Validação mecânica mínima:
 | Artifact | Status atual | Owner | Governado por |
 |----------|--------------|-------|---------------|
 | `ARCHITECTURE.md` | ativo | architecture owner | inteiro |
-| `schemas/v1/*.schema.json` | ativo v1 | Contracts | §§6–7 |
-| `docs/contracts/json-schema-profile-v1.md` | ativo v1 | Contracts | §§5–7, ADR-0001 |
-| `docs/protocol/host-app-adapter-v1.md` | ativo v1 | Sessions/Protocol | §9, ADR-0003 |
-| `schemas/v1/session-runtime.schema.json` | ativo v1 | Sessions/Contracts | §§6.5, 9, ADR-0003 |
-| `schemas/v1/kit-composition.schema.json` | ativo v1 MC1–MC6 | Architecture/Contracts | §§3.24, 18.9, ADR-0012 |
-| `schemas/v1/preview-capture.schema.json` | ativo v1 AP1–AP4 | Evidence/Contracts | §§12, 18.9, ADR-0013 |
-| `schemas/v1/catalog-manifest.schema.json` | ativo v1 SR1 | Catalog/Contracts | §§6.2, 8, 18.10, ADR-0014 |
-| `schemas/v1/studio-workspace.schema.json` | ativo v1 SR1 | Studio/Contracts | §§6.2, 8, 18.10, ADR-0014 |
-| `schemas/v2/consumer-config.schema.json` | ativo v2 MC1–MC4 | Architecture/Contracts | §§7, 18.9, ADR-0012 |
-| `schemas/v2/distribution-descriptor.schema.json` | ativo v2 | Distribution/Contracts | §§6.3, 13, 18.9, ADR-0012 |
-| `schemas/v2/distribution-release.schema.json` | ativo v2 | Distribution/Contracts | §§13–14, 18.9, ADR-0012 |
-| `docs/contracts/module-composition-v1.md` | ativo v1 MC1–MC6 | Architecture/Contracts | §§3.24, 18.9, ADR-0012 |
-| `docs/contracts/consumer-configuration-v2.md` | ativo v2 MC1–MC4 | Architecture/Contracts | §§7, 18.9, ADR-0012 |
-| `docs/contracts/distribution-release-v2.md` | ativo v2 | Distribution/Contracts | §§13–14, 18.9, ADR-0012 |
-| `docs/contracts/auto-preview-v1.md` | ativo v1 AP1–AP4 | Evidence/Contracts | §§12, 18.9, ADR-0013 |
-| `docs/contracts/studio-workspace-v1.md` | ativo v1 SR1 | Studio/Contracts | §§6.2, 8, 18.10, ADR-0014 |
-| `docs/protocol/studio-host-v1.md` | ativo v1 SR2–SR3 | Studio/Host/Protocol | §§8, 9.2, 17, 18.10, ADR-0014 |
-| `docs/adr/0013-auto-preview-evidence-provider.md` | decisão aceita AP1 | Evidence/Architecture | §§12, 18.9, ADR-0013 |
-| `docs/quality/module-conformance-v1.md` | conformance ativa MC | Architecture/QA | §§18.9, 21, ADR-0012 |
-| `docs/quality/auto-preview-conformance-v1.md` | conformance ativa AP | Evidence/QA | §§12, 18.9, 21, ADR-0013 |
-| `docs/security/auto-preview-threat-model.md` | ativo AP3 | Evidence/Security | §§17, 18.9, ADR-0013 |
-| `docs/operations/module-startup.md` | runbook ativo MC2–MC6 | Architecture/Operations | §§18.9, 22, ADR-0012 |
-| `docs/architecture/p0-results.md` | evidência P0 | Architecture/QA | §§18.0, 20.2 |
-| `docs/architecture/v0-results.md` | evidência V0 | Architecture/QA | §§18.1, 20–21 |
-| `docs/architecture/v01-results.md` | evidência V0.1 | Gateway/QA | §§10, 18.2, 20–21 |
-| `docs/architecture/v02-results.md` | evidência V0.2 | Gateway/Security/QA | §§10, 17, 18.3, 20–21 |
-| `docs/architecture/v03-results.md` | evidência V0.3 | Distribution/Evidence/QA | §§11–14, 18.4, 20–21 |
-| `docs/architecture/v1-results.md` | evidência V1 web/Android | Architecture/QA | §§18.5, 19–21, 27.2 |
-| `docs/architecture/v2-results.md` | evidência V2 | Source/Automation/QA | §§13, 16–18, 20–21 |
-| `docs/architecture/v3-results.md` | evidência V3 Android | Evidence/Sessions/QA | §§9, 12–13, 18, 20–21 |
-| `docs/architecture/v4-results.md` | evidência portátil V4 | Hosted/Security/QA | §§5–7, 16–18, 20–22, ADR-0004 |
-| `docs/architecture/v5-results.md` | evidência portátil V5 | Remote/Security/QA | §§5–6, 9, 15–18, 20–22, ADR-0005 |
-| `docs/architecture/master-plan-audit.md` | auditoria P0–V5 + MC/AP | Architecture/QA | §§18, 20–21, 27.6 |
+| `schemas/{catalog,distribution,evidence,gateway,hosted,runtime,source}/*.schema.json` | contratos ativos organizados por domínio | Contracts | §§6–7 |
+| `docs/contracts/json-schema-profile.md` | ativo v1 | Contracts | §§5–7, ADR-0001 |
+| `docs/protocols/host-app-adapter.md` | ativo v1 | Sessions/Protocol | §9, ADR-0003 |
+| `schemas/runtime/session-runtime.schema.json` | ativo | Sessions/Contracts | §§6.5, 9, ADR-0003 |
+| `schemas/distribution/kit-composition.schema.json` | composição modular ativa | Architecture/Contracts | §§3.24, 18.9, ADR-0012 |
+| `schemas/evidence/preview-capture.schema.json` | AutoPreview ativo | Evidence/Contracts | §§12, 18.9, ADR-0013 |
+| `schemas/catalog/catalog-manifest.schema.json` | catálogo ativo | Catalog/Contracts | §§6.2, 8, 18.10, ADR-0014 |
+| `docs/architecture/decisions/0017-experience-topology-and-projection-layout.md` | decisão aceita; topologia/layout executados | Catalog/Studio | §§3.14, 6.4, 8, ADR-0017 |
+| `docs/architecture/decisions/0018-atomic-experience-content-and-scenario-facets.md` | decisão aceita; conteúdo/facets executados | Catalog/Host/Studio | §§6.4, 8, ADR-0018 |
+| `schemas/runtime/experience-content-set.schema.json` | conteúdo de experiência ativo | Studio/Contracts | §§6.4, 8, ADR-0018 |
+| `schemas/catalog/scenario-facet-manifest.schema.json` | facets de cenário ativos | Catalog/Contracts | §§6.4, 8, ADR-0018 |
+| `schemas/catalog/scenario-lab-manifest.schema.json` | Scenario Lab ativo e executado localmente | Catalog/Contracts | §§6.4–6.5, 8, 9, 18.11 |
+| `docs/architecture/distribution-agnostic-experience-platform-plan.md` | rastreador não normativo ativo | Architecture | §§1–27, ADR-0017, ADR-0018 |
+| `schemas/runtime/studio-workspace.schema.json` | workspace do Studio ativo | Studio/Contracts | §§6.2, 8, 18.10, ADR-0014 |
+| `schemas/distribution/consumer-config.schema.json` | configuração de consumer ativa | Architecture/Contracts | §§7, 18.9, ADR-0012 |
+| `schemas/distribution/distribution-descriptor.schema.json` | contrato canônico | Distribution/Contracts | §§6.3, 13, 18.9, ADR-0012 |
+| `schemas/distribution/distribution-release.schema.json` | contrato canônico | Distribution/Contracts | §§13–14, 18.9, ADR-0012 |
+| `docs/contracts/module-composition.md` | composição modular ativa | Architecture/Contracts | §§3.24, 18.9, ADR-0012 |
+| `docs/contracts/consumer-configuration.md` | configuração de consumer ativa | Architecture/Contracts | §§7, 18.9, ADR-0012 |
+| `docs/contracts/distribution-release.md` | contrato canônico | Distribution/Contracts | §§13–14, 18.9, ADR-0012 |
+| `docs/contracts/auto-preview.md` | AutoPreview ativo | Evidence/Contracts | §§12, 18.9, ADR-0013 |
+| `docs/contracts/studio-workspace.md` | workspace do Studio ativo | Studio/Contracts | §§6.2, 8, 18.10, ADR-0014 |
+| `docs/protocols/studio-host.md` | transporte e startup do Studio ativos | Studio/Host/Protocol | §§8, 9.2, 17, 18.10, ADR-0014 |
+| `docs/architecture/decisions/0013-auto-preview-evidence-provider.md` | decisão aceita para AutoPreview | Evidence/Architecture | §§12, 18.9, ADR-0013 |
+| `docs/quality/module-conformance.md` | conformance ativa MC | Architecture/QA | §§18.9, 21, ADR-0012 |
+| `docs/quality/auto-preview-conformance.md` | conformance ativa AP | Evidence/QA | §§12, 18.9, 21, ADR-0013 |
+| `docs/security/auto-preview-threat-model.md` | contenção do AutoPreview ativa | Evidence/Security | §§17, 18.9, ADR-0013 |
+| `docs/operations/module-startup.md` | runbook modular ativo | Architecture/Operations | §§18.9, 22, ADR-0012 |
+| `docs/architecture/foundation-validation-results.md` | evidência validação fundacional | Architecture/QA | §§18.0, 20.2 |
+| `docs/architecture/local-platform-results.md` | evidência plataforma local | Architecture/QA | §§18.1, 20–21 |
+| `docs/architecture/gateway-isolation-results.md` | evidência Gateway isolado | Gateway/QA | §§10, 18.2, 20–21 |
+| `docs/architecture/gateway-containment-results.md` | evidência Gateway containment | Gateway/Security/QA | §§10, 17, 18.3, 20–21 |
+| `docs/architecture/distribution-lifecycle-results.md` | evidência ciclo de distribuição | Distribution/Evidence/QA | §§11–14, 18.4, 20–21 |
+| `docs/architecture/web-android-results.md` | evidência web/Android | Architecture/QA | §§18.5, 19–21, 27.2 |
+| `docs/architecture/source-automation-results.md` | evidência source automation | Source/Automation/QA | §§13, 16–18, 20–21 |
+| `docs/architecture/android-native-evidence-results.md` | evidência Android Evidence Android | Evidence/Sessions/QA | §§9, 12–13, 18, 20–21 |
+| `docs/architecture/hosted-control-plane-results.md` | evidência portátil hosted control plane | Hosted/Security/QA | §§5–7, 16–18, 20–22, ADR-0004 |
+| `docs/architecture/remote-execution-results.md` | evidência portátil remote execution | Remote/Security/QA | §§5–6, 9, 15–18, 20–22, ADR-0005 |
+| `docs/architecture/platform-capability-audit.md` | auditoria todas as capacidades históricas + MC/AP | Architecture/QA | §§18, 20–21, 27.6 |
 | `docs/architecture/modular-kit-refactor-plan.md` | plano MC/AP executado | Architecture/QA | §§3.24, 18.9, ADR-0012 |
-| `docs/architecture/modular-composition-results.md` | evidência MC0–MC6 | Architecture/QA | §§18.9, 20–21, ADR-0012 |
-| `docs/architecture/auto-preview-results.md` | evidência AP0–AP4 | Evidence/QA | §§12, 18.9, 20–21, ADR-0013 |
-| `docs/architecture/devex-studio-reconstruction-plan.md` | plano ativo SR0–SR9 | Studio/Architecture/QA | §§8, 18.10, 20–21, ADR-0014 |
-| `docs/adr/0014-host-authoritative-studio-workspace.md` | decisão aceita SR0 | Studio/Architecture | §§8, 9.2, 17, 18.10 |
-| `docs/security/studio-host-threat-model.md` | ativo SR2–SR3 | Studio/Host/Security | §§8, 17, 18.10, ADR-0014 |
-| `docs/operations/studio-startup.md` | runbook ativo SR3 | Studio/Host/Operations | §§8, 18.10, 22, ADR-0014 |
-| `docs/security/hosted-remote-threat-model.md` | ativo V4/V5 | Security + Hosted/Remote | §17, ADR-0004/0005 |
-| `docs/operations/hosted-recovery.md` | ativo V4 | Hosted Operations | §§18.7, 20, 22, ADR-0004 |
-| `docs/quality/e01-e20-v1.md` | matriz executável V1 | Gateway/QA | §§19–21, ADR-0009 |
-| `docs/contracts/evidence-release-v1.md` | ativo v1 | Evidence & Release | §§12–13 |
-| `schemas/v1/gateway-plan.schema.json` | ativo v1 | Gateway | §10, ADR-0006 |
-| `docs/contracts/gateway-runtime-v1.md` | ativo v1 | Gateway/Contracts | §§6.6, 10, 17, ADR-0006/0007 |
-| `schemas/v1/containment-report.schema.json` | ativo v1 | Sessions/Target | §§9–10, ADR-0007 |
-| `schemas/v1/adoption.schema.json` | ativo v1 | Distribution | §14, ADR-0008 |
-| `schemas/v1/test-evidence-summary.schema.json` | ativo v1 | Evidence | §§11–12, ADR-0008 |
-| `schemas/v1/distribution-release.schema.json` | ativo v1 | Distribution | §14, ADR-0008 |
-| `schemas/v1/app-adapter-capture-command.schema.json` | ativo v1 | Sessions/Evidence | §§9, 12, ADR-0009 |
-| `schemas/v1/source-automation.schema.json` | ativo v1 | Source & Automation | §§6.9, 16, ADR-0010 |
-| `schemas/v1/devex-bundle.schema.json` | ativo v1 | Evidence & Release | §§12–13, ADR-0010 |
-| `schemas/v1/plugin-manifest.schema.json` | ativo v1 | Source & Automation | §§16–17, ADR-0010 |
-| `schemas/v1/android-evidence.schema.json` | ativo v1 | Evidence/Sessions | §§9, 12–13, ADR-0011 |
-| `schemas/v1/hosted-collaboration.schema.json` | ativo v1 | Hosted/Contracts | §§6.14, 7.5, ADR-0004 |
-| `schemas/v1/remote-execution.schema.json` | ativo v1 | Remote/Contracts | §§6.14, 9.10, ADR-0005 |
-| `docs/contracts/source-automation-v1.md` | ativo v1 | Source & Automation | §§6.9, 16, ADR-0010 |
-| `docs/contracts/devex-bundle-v1.md` | ativo v1 | Evidence & Release | §13, ADR-0010 |
-| `docs/protocol/mcp-read-only-v1.md` | ativo v1 | Source & Automation | §16, ADR-0010 |
-| `docs/contracts/android-evidence-v1.md` | ativo v1 | Evidence/Sessions | §§9, 12–13, ADR-0011 |
-| `docs/contracts/hosted-remote-v1.md` | ativo v1 | Hosted/Remote/Contracts | §§6.14, 9.10, ADR-0004/0005 |
-| `deploy/helm/devex-hosted/` | deploy V4/V5 | Hosted/Remote Operations | §§15.8, 17.12, 22 |
-| `.github/workflows/release-images.yml` | supply chain V4/V5 | Release Engineering | §§17.10, 18.7–18.8 |
-| `schemas/v1/evidence-release.schema.json` | ativo v1 | Evidence & Release | §§12–13 |
-| `packages/devex_contracts/tool/standards_conformance.dart` | ativo P0 | Contracts | §§5, 20–21 |
-| `test/conformance/` e suites de contracts | ativo por vertical | owners dos contratos | §21 |
-| `docs/adr/0001`…`0014` | ativos | owners das decisões | §§23 e 27 |
+| `docs/architecture/modular-composition-results.md` | evidência da composição modular | Architecture/QA | §§18.9, 20–21, ADR-0012 |
+| `docs/architecture/auto-preview-results.md` | evidência do AutoPreview | Evidence/QA | §§12, 18.9, 20–21, ADR-0013 |
+| `docs/architecture/studio-reconstruction-plan.md` | plano executado do Studio | Studio/Architecture/QA | §§8, 18.10, 20–21, ADR-0014 |
+| `docs/architecture/decisions/0014-host-authoritative-studio-workspace.md` | decisão aceita para o Studio autoritativo | Studio/Architecture | §§8, 9.2, 17, 18.10 |
+| `docs/security/studio-host-threat-model.md` | transporte e startup do Studio ativos | Studio/Host/Security | §§8, 17, 18.10, ADR-0014 |
+| `docs/operations/studio-startup.md` | runbook de startup do Studio ativo | Studio/Host/Operations | §§8, 18.10, 22, ADR-0014 |
+| `docs/security/hosted-remote-threat-model.md` | ativo hosted control plane/remote execution | Security + Hosted/Remote | §17, ADR-0004/0005 |
+| `docs/operations/hosted-recovery.md` | ativo hosted control plane | Hosted Operations | §§18.7, 20, 22, ADR-0004 |
+| `docs/quality/platform-evidence-matrix.md` | matriz executável web/Android | Gateway/QA | §§19–21, ADR-0009 |
+| `docs/contracts/evidence-release.md` | ativo v1 | Evidence & Release | §§12–13 |
+| `schemas/gateway/gateway-plan.schema.json` | ativo | Gateway | §10, ADR-0006 |
+| `docs/contracts/gateway-runtime.md` | ativo v1 | Gateway/Contracts | §§6.6, 10, 17, ADR-0006/0007 |
+| `schemas/gateway/containment-report.schema.json` | ativo | Sessions/Target | §§9–10, ADR-0007 |
+| `schemas/distribution/adoption.schema.json` | ativo | Distribution | §14, ADR-0008 |
+| `schemas/evidence/test-evidence-summary.schema.json` | ativo | Evidence | §§11–12, ADR-0008 |
+| `schemas/evidence/app-adapter-capture-command.schema.json` | ativo | Sessions/Evidence | §§9, 12, ADR-0009 |
+| `schemas/source/source-automation.schema.json` | ativo | Source & Automation | §§6.9, 16, ADR-0010 |
+| `schemas/evidence/evidence-bundle.schema.json` | ativo | Evidence & Release | §§12–13, ADR-0010 |
+| `schemas/source/plugin-manifest.schema.json` | ativo | Source & Automation | §§16–17, ADR-0010 |
+| `schemas/evidence/android-evidence.schema.json` | ativo | Evidence/Sessions | §§9, 12–13, ADR-0011 |
+| `schemas/hosted/hosted-collaboration.schema.json` | ativo | Hosted/Contracts | §§6.14, 7.5, ADR-0004 |
+| `schemas/hosted/remote-execution.schema.json` | ativo | Remote/Contracts | §§6.14, 9.10, ADR-0005 |
+| `docs/contracts/source-automation.md` | ativo v1 | Source & Automation | §§6.9, 16, ADR-0010 |
+| `docs/contracts/evidence-bundle.md` | ativo v1 | Evidence & Release | §13, ADR-0010 |
+| `docs/protocols/mcp-read-only.md` | ativo v1 | Source & Automation | §16, ADR-0010 |
+| `docs/contracts/android-evidence.md` | ativo v1 | Evidence/Sessions | §§9, 12–13, ADR-0011 |
+| `docs/contracts/hosted-remote.md` | ativo v1 | Hosted/Remote/Contracts | §§6.14, 9.10, ADR-0004/0005 |
+| `deploy/helm/control-plane/` | deploy hosted control plane/remote execution | Hosted/Remote Operations | §§15.8, 17.12, 22 |
+| `.github/workflows/release-images.yml` | supply chain hosted control plane/remote execution | Release Engineering | §§17.10, 18.7–18.8 |
+| `schemas/evidence/evidence-release.schema.json` | ativo | Evidence & Release | §§12–13 |
+| `libs/experience_contracts/tool/standards_conformance.dart` | ativo validação fundacional | Contracts | §§5, 20–21 |
+| `tests/conformance/` e suites de contracts | ativo por vertical | owners dos contratos | §21 |
+| `docs/architecture/decisions/0001`…`0014` | ativos | owners das decisões | §§23 e 27 |
 
 Artifact planejado não é fingido como existente. Ao ser criado, recebe versão,
 compatibility policy, fixtures e link exato neste registro. Remover ou renomear
@@ -4658,17 +4758,17 @@ Toda mudança material informa:
 Uma checkbox de gate só recebe `[x]` após evidence executada e ligada ao
 artifact/revision. Planejamento ou confiança não contam como conclusão.
 
-### 27.6 Claims V4/V5 e gates externos
+### 27.6 Claims hosted control plane/remote execution e gates externos
 
 Estados distintos evitam que implementação portátil seja confundida com
 certificação operacional:
 
 | Claim | Estado | Evidência / condição |
 |-------|--------|----------------------|
-| `V4 implemented` | permitido | contracts/API/CLI, PostgreSQL/RLS real, recovery lógico, Helm/supply chain |
-| `V4 production-certified` | proibido | exige PITR/WAL, object versions, IdP/bucket, failover e cluster reais |
-| `V5 implemented` | permitido | scheduler/worker/gateway/Studio, PG real, soak e manifests strict |
-| `V5 device-farm-certified` | proibido | exige CNI/admission/Gateway API/KVM E2E e node-loss/soak reais |
+| `hosted control plane implemented` | permitido | contracts/API/CLI, PostgreSQL/RLS real, recovery lógico, Helm/supply chain |
+| `hosted control plane production-certified` | proibido | exige PITR/WAL, object versions, IdP/bucket, failover e cluster reais |
+| `remote execution implemented` | permitido | scheduler/worker/gateway/Studio, PG real, soak e manifests strict |
+| `remote execution device-farm-certified` | proibido | exige CNI/admission/Gateway API/KVM E2E e node-loss/soak reais |
 
 Gates portáteis executados:
 
@@ -4688,10 +4788,10 @@ Gates de infraestrutura não executados neste repositório:
 - [ ] web/Android batch/interativo e node-loss em pool KVM dedicado;
 - [ ] soak prolongado, userdata wipe e capacidade/fairness multi-tenant.
 
-Detalhes e comandos estão em `docs/architecture/v4-results.md` e
-`docs/architecture/v5-results.md`. A rastreabilidade integral do plano mestre,
+Detalhes e comandos estão em `docs/architecture/hosted-control-plane-results.md` e
+`docs/architecture/remote-execution-results.md`. A rastreabilidade integral do plano mestre,
 incluindo requisitos portáteis e gates externos, está em
-`docs/architecture/master-plan-audit.md`.
+`docs/architecture/platform-capability-audit.md`.
 
 ---
 

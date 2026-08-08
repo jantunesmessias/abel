@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/gateway/contract-probe-plan",
+  "type": "object",
+  "required": ["schemaVersion", "kind", "id", "presetId", "steps", "parameterDefaults", "artifactRetention", "artifactClassification"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "kind": {"const": "ContractProbePlan"},
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"},
+    "presetId": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"},
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "required": ["routeId", "order", "after", "extract"],
+        "properties": {
+          "routeId": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"},
+          "order": {"type": "integer", "minimum": 0, "maximum": 10000},
+          "after": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"}
+          },
+          "extract": {
+            "type": "object",
+            "propertyNames": {"pattern": "^[a-z][a-z0-9_]{0,63}$"},
+            "additionalProperties": {
+              "type": "object",
+              "required": ["fromRouteId", "paths"],
+              "properties": {
+                "fromRouteId": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"},
+                "paths": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 8,
+                  "items": {"type": "string", "maxLength": 512}
+                }
+              },
+              "unevaluatedProperties": false
+            }
+          },
+          "requestBodyTemplate": {}
+        },
+        "unevaluatedProperties": false
+      }
+    },
+    "parameterDefaults": {
+      "type": "object",
+      "propertyNames": {"pattern": "^[a-z][a-z0-9_]{0,63}$"},
+      "additionalProperties": {"type": "string", "minLength": 1, "maxLength": 4096}
+    },
+    "artifactRetention": {"enum": ["ephemeral", "cas"]},
+    "artifactClassification": {"enum": ["public", "internal", "sensitive"]}
+  },
+  "unevaluatedProperties": false
+}

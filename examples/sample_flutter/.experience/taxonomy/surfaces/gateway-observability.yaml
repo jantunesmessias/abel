@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: ExperienceSurface
+metadata:
+  id: gateway-observability
+spec:
+  applicationId: sample
+  displayName: Gateway observability

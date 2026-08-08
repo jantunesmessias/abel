@@ -1,0 +1,420 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/runtime/scenario-lab-relay",
+  "title": "Scenario Lab relay protocol documents",
+  "oneOf": [
+    {"$ref": "#/$defs/descriptor"},
+    {"$ref": "#/$defs/description"},
+    {"$ref": "#/$defs/helloSubmission"},
+    {"$ref": "#/$defs/helloAcknowledgement"},
+    {"$ref": "#/$defs/pollRequest"},
+    {"$ref": "#/$defs/pollResponse"},
+    {"$ref": "#/$defs/resultSubmission"},
+    {"$ref": "#/$defs/resultAcknowledgement"}
+  ],
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "maxLength": 256
+    },
+    "transportId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{8,128}$"
+    },
+    "launchAttemptId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{16,128}$"
+    },
+    "nonce": {"type": "string", "pattern": "^[A-Za-z0-9_-]{22,128}$"},
+    "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "version": {"type": "integer", "minimum": 1, "maximum": 1000000}
+      }
+    },
+    "controlValue": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": {"const": "boolean"},
+            "value": {"type": "boolean"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": {"const": "choice"},
+            "value": {"$ref": "#/$defs/id"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": {"const": "integer"},
+            "value": {"type": "integer", "minimum": -1000000, "maximum": 1000000}
+          }
+        }
+      ]
+    },
+    "failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cause"],
+      "properties": {
+        "cause": {
+          "enum": [
+            "unsupported",
+            "policyDenied",
+            "rejected",
+            "invalidValue",
+            "timedOut",
+            "disconnected",
+            "internalError"
+          ]
+        },
+        "diagnosticDigest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "uploadGrant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "requestId",
+        "sessionId",
+        "expectedMediaType",
+        "uploadUri",
+        "expiresAt",
+        "maxBytes"
+      ],
+      "properties": {
+        "method": {"const": "PUT"},
+        "requestId": {"$ref": "#/$defs/transportId"},
+        "sessionId": {"$ref": "#/$defs/transportId"},
+        "expectedMediaType": {"const": "image/png"},
+        "uploadUri": {
+          "type": "string",
+          "pattern": "^http://(?:127\\.0\\.0\\.1|localhost|\\[::1\\]):[1-9][0-9]{0,4}/capture-uploads/[A-Za-z0-9_-]{8,128}\\?token=[A-Za-z0-9_-]{8,128}$",
+          "maxLength": 4096
+        },
+        "expiresAt": {"type": "string", "format": "date-time", "maxLength": 64},
+        "maxBytes": {"type": "integer", "minimum": 1024, "maximum": 33554432}
+      }
+    },
+    "hello": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "runId",
+        "adapterInstanceId",
+        "sequence",
+        "nonce",
+        "capabilities",
+        "evidenceProviderIds",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "AppAdapterRelayHello"},
+        "runId": {"$ref": "#/$defs/id"},
+        "adapterInstanceId": {"$ref": "#/$defs/id"},
+        "sequence": {"const": 0},
+        "nonce": {"$ref": "#/$defs/nonce"},
+        "capabilities": {
+          "type": "array",
+          "maxItems": 256,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/capability"}
+        },
+        "evidenceProviderIds": {
+          "type": "array",
+          "maxItems": 256,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        },
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "readCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "operation", "runId", "commandId", "sequence", "nonce", "controlId", "capability", "operationId", "commandDigest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "AppAdapterRelayCommand"},
+        "operation": {"const": "read"},
+        "runId": {"$ref": "#/$defs/id"},
+        "commandId": {"$ref": "#/$defs/id"},
+        "sequence": {"$ref": "#/$defs/sequence"},
+        "nonce": {"$ref": "#/$defs/nonce"},
+        "controlId": {"$ref": "#/$defs/id"},
+        "capability": {"$ref": "#/$defs/capability"},
+        "operationId": {"$ref": "#/$defs/id"},
+        "commandDigest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "writeCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "operation", "runId", "commandId", "sequence", "nonce", "controlId", "capability", "operationId", "value", "commandDigest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "AppAdapterRelayCommand"},
+        "operation": {"const": "write"},
+        "runId": {"$ref": "#/$defs/id"},
+        "commandId": {"$ref": "#/$defs/id"},
+        "sequence": {"$ref": "#/$defs/sequence"},
+        "nonce": {"$ref": "#/$defs/nonce"},
+        "controlId": {"$ref": "#/$defs/id"},
+        "capability": {"$ref": "#/$defs/capability"},
+        "operationId": {"$ref": "#/$defs/id"},
+        "value": {"$ref": "#/$defs/controlValue"},
+        "commandDigest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "resetCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "operation", "runId", "commandId", "sequence", "nonce", "controlId", "capability", "operationId", "commandDigest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "AppAdapterRelayCommand"},
+        "operation": {"const": "reset"},
+        "runId": {"$ref": "#/$defs/id"},
+        "commandId": {"$ref": "#/$defs/id"},
+        "sequence": {"$ref": "#/$defs/sequence"},
+        "nonce": {"$ref": "#/$defs/nonce"},
+        "controlId": {"$ref": "#/$defs/id"},
+        "capability": {"$ref": "#/$defs/capability"},
+        "operationId": {"$ref": "#/$defs/id"},
+        "commandDigest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "captureCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "operation", "runId", "commandId", "sequence", "nonce", "requiredEvidenceId", "providerId", "uploadGrant", "commandDigest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "AppAdapterRelayCommand"},
+        "operation": {"const": "capture"},
+        "runId": {"$ref": "#/$defs/id"},
+        "commandId": {"$ref": "#/$defs/id"},
+        "sequence": {"$ref": "#/$defs/sequence"},
+        "nonce": {"$ref": "#/$defs/nonce"},
+        "requiredEvidenceId": {"$ref": "#/$defs/id"},
+        "providerId": {"$ref": "#/$defs/id"},
+        "uploadGrant": {"$ref": "#/$defs/uploadGrant"},
+        "commandDigest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "command": {
+      "oneOf": [
+        {"$ref": "#/$defs/readCommand"},
+        {"$ref": "#/$defs/writeCommand"},
+        {"$ref": "#/$defs/resetCommand"},
+        {"$ref": "#/$defs/captureCommand"}
+      ]
+    },
+    "readResult": {"$ref": "#/$defs/valueResultRead"},
+    "writeResult": {"$ref": "#/$defs/valueResultWrite"},
+    "resetResult": {"$ref": "#/$defs/valueResultReset"},
+    "valueResultRead": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "operation", "runId", "commandId", "sequence", "nonce", "state", "resultDigest"],
+      "properties": {
+        "schemaVersion": {"const": 1}, "kind": {"const": "AppAdapterRelayResult"}, "operation": {"const": "read"},
+        "runId": {"$ref": "#/$defs/id"}, "commandId": {"$ref": "#/$defs/id"}, "sequence": {"$ref": "#/$defs/sequence"}, "nonce": {"$ref": "#/$defs/nonce"},
+        "state": {"enum": ["succeeded", "failed", "cancelled"]}, "failure": {"$ref": "#/$defs/failure"}, "value": {"$ref": "#/$defs/controlValue"}, "resultDigest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {"if": {"properties": {"state": {"const": "succeeded"}}, "required": ["state"]}, "then": {"required": ["value"], "not": {"required": ["failure"]}}, "else": {"not": {"required": ["value"]}}},
+        {"if": {"properties": {"state": {"const": "failed"}}, "required": ["state"]}, "then": {"required": ["failure"]}, "else": {"not": {"required": ["failure"]}}}
+      ]
+    },
+    "valueResultWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "operation", "runId", "commandId", "sequence", "nonce", "state", "resultDigest"],
+      "properties": {
+        "schemaVersion": {"const": 1}, "kind": {"const": "AppAdapterRelayResult"}, "operation": {"const": "write"},
+        "runId": {"$ref": "#/$defs/id"}, "commandId": {"$ref": "#/$defs/id"}, "sequence": {"$ref": "#/$defs/sequence"}, "nonce": {"$ref": "#/$defs/nonce"},
+        "state": {"enum": ["succeeded", "failed", "cancelled"]}, "failure": {"$ref": "#/$defs/failure"}, "value": {"$ref": "#/$defs/controlValue"}, "resultDigest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {"if": {"properties": {"state": {"const": "succeeded"}}, "required": ["state"]}, "then": {"required": ["value"], "not": {"required": ["failure"]}}, "else": {"not": {"required": ["value"]}}},
+        {"if": {"properties": {"state": {"const": "failed"}}, "required": ["state"]}, "then": {"required": ["failure"]}, "else": {"not": {"required": ["failure"]}}}
+      ]
+    },
+    "valueResultReset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "operation", "runId", "commandId", "sequence", "nonce", "state", "resultDigest"],
+      "properties": {
+        "schemaVersion": {"const": 1}, "kind": {"const": "AppAdapterRelayResult"}, "operation": {"const": "reset"},
+        "runId": {"$ref": "#/$defs/id"}, "commandId": {"$ref": "#/$defs/id"}, "sequence": {"$ref": "#/$defs/sequence"}, "nonce": {"$ref": "#/$defs/nonce"},
+        "state": {"enum": ["succeeded", "failed", "cancelled"]}, "failure": {"$ref": "#/$defs/failure"}, "value": {"$ref": "#/$defs/controlValue"}, "resultDigest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {"if": {"properties": {"state": {"const": "succeeded"}}, "required": ["state"]}, "then": {"required": ["value"], "not": {"required": ["failure"]}}, "else": {"not": {"required": ["value"]}}},
+        {"if": {"properties": {"state": {"const": "failed"}}, "required": ["state"]}, "then": {"required": ["failure"]}, "else": {"not": {"required": ["failure"]}}}
+      ]
+    },
+    "captureResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "operation", "runId", "commandId", "sequence", "nonce", "state", "resultDigest"],
+      "properties": {
+        "schemaVersion": {"const": 1}, "kind": {"const": "AppAdapterRelayResult"}, "operation": {"const": "capture"},
+        "runId": {"$ref": "#/$defs/id"}, "commandId": {"$ref": "#/$defs/id"}, "sequence": {"$ref": "#/$defs/sequence"}, "nonce": {"$ref": "#/$defs/nonce"},
+        "state": {"enum": ["succeeded", "failed", "cancelled"]}, "failure": {"$ref": "#/$defs/failure"}, "uploadRequestId": {"$ref": "#/$defs/transportId"}, "resultDigest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {"if": {"properties": {"state": {"const": "succeeded"}}, "required": ["state"]}, "then": {"required": ["uploadRequestId"], "not": {"required": ["failure"]}}, "else": {"not": {"required": ["uploadRequestId"]}}},
+        {"if": {"properties": {"state": {"const": "failed"}}, "required": ["state"]}, "then": {"required": ["failure"]}, "else": {"not": {"required": ["failure"]}}}
+      ]
+    },
+    "result": {
+      "oneOf": [
+        {"$ref": "#/$defs/readResult"},
+        {"$ref": "#/$defs/writeResult"},
+        {"$ref": "#/$defs/resetResult"},
+        {"$ref": "#/$defs/captureResult"}
+      ]
+    },
+    "descriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "runId", "targetId", "launchProfileId", "launchAttemptId", "origin", "nonce", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioLabRelayTargetDescriptor"},
+        "runId": {"$ref": "#/$defs/id"},
+        "targetId": {"$ref": "#/$defs/id"},
+        "launchProfileId": {"$ref": "#/$defs/id"},
+        "launchAttemptId": {"$ref": "#/$defs/launchAttemptId"},
+        "origin": {"type": "string", "format": "uri", "maxLength": 2048},
+        "nonce": {"$ref": "#/$defs/nonce"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "description": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "runId", "status", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioLabRelayDescription"},
+        "runId": {"$ref": "#/$defs/id"},
+        "status": {"enum": ["pending", "ready", "closed"]},
+        "descriptor": {"$ref": "#/$defs/descriptor"},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {"if": {"properties": {"status": {"const": "ready"}}, "required": ["status"]}, "then": {"required": ["descriptor"]}, "else": {"not": {"required": ["descriptor"]}}}
+      ]
+    },
+    "helloSubmission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "descriptorDigest", "hello", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioLabRelayHelloSubmission"},
+        "descriptorDigest": {"$ref": "#/$defs/digest"},
+        "hello": {"$ref": "#/$defs/hello"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "helloAcknowledgement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "runId", "descriptorDigest", "acceptedHelloDigest", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioLabRelayHelloAcknowledgement"},
+        "runId": {"$ref": "#/$defs/id"},
+        "descriptorDigest": {"$ref": "#/$defs/digest"},
+        "acceptedHelloDigest": {"$ref": "#/$defs/digest"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "pollRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "runId", "descriptorDigest", "afterSequence", "waitMs", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioLabRelayPollRequest"},
+        "runId": {"$ref": "#/$defs/id"},
+        "descriptorDigest": {"$ref": "#/$defs/digest"},
+        "afterSequence": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+        "waitMs": {"type": "integer", "minimum": 0, "maximum": 30000},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "pollResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "runId", "descriptorDigest", "afterSequence", "state", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioLabRelayPollResponse"},
+        "runId": {"$ref": "#/$defs/id"},
+        "descriptorDigest": {"$ref": "#/$defs/digest"},
+        "afterSequence": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+        "state": {"enum": ["command", "idle", "closed"]},
+        "command": {"$ref": "#/$defs/command"},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {"if": {"properties": {"state": {"const": "command"}}, "required": ["state"]}, "then": {"required": ["command"]}, "else": {"not": {"required": ["command"]}}}
+      ]
+    },
+    "resultSubmission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "descriptorDigest", "result", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioLabRelayResultSubmission"},
+        "descriptorDigest": {"$ref": "#/$defs/digest"},
+        "result": {"$ref": "#/$defs/result"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "resultAcknowledgement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "runId", "descriptorDigest", "acceptedResultDigest", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioLabRelayResultAcknowledgement"},
+        "runId": {"$ref": "#/$defs/id"},
+        "descriptorDigest": {"$ref": "#/$defs/digest"},
+        "acceptedResultDigest": {"$ref": "#/$defs/digest"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    }
+  }
+}

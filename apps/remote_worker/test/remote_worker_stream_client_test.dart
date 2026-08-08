@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:devex_contracts/devex_contracts.dart';
-import 'package:devex_remote_worker/remote_worker.dart';
+import 'package:experience_contracts/experience_contracts.dart';
+import 'package:remote_worker/remote_worker.dart';
 import 'package:test/test.dart';
 
 void main() {

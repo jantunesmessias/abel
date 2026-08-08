@@ -1,0 +1,47 @@
+h1,
+h2,
+h3,
+strong {
+  color: var(--studio-ui-text);
+}
+
+h1 {
+  font-size: clamp(1.55rem, 2vw, 2.25rem);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+
+h2 {
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+h3 {
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+p,
+li,
+dt,
+dd,
+input,
+select,
+button {
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+small {
+  color: var(--studio-ui-text-muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.studio-ui-eyebrow {
+  color: var(--studio-ui-accent);
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}

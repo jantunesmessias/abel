@@ -1,11 +1,11 @@
 # Plano de refatoração — composição modular e AutoPreview
 
-Status: fundações MC0–MC6 e AP0–AP4 implementadas em 2026-08-10; MC6/AP4 não
-incluem a integração operacional completa do Studio, planejada separadamente
-em SR0–SR9.
+Status: composição modular e AutoPreview implementados em 2026-08-10. Os gates
+iniciais do Studio e da projeção do Journey Map não incluíam a integração
+operacional completa, comprovada posteriormente pela reconstrução do Studio.
 
 Este documento operacional implementa ADR-0012 sem reescrever a evidência
-histórica P0–V5. O objetivo é tornar o DevExKit um Kit configurável por Module,
+histórica anterior. O objetivo é tornar o Abel um Kit configurável por Module,
 Capability, Provider e Profile, e entregar AutoPreview como primeiro vertical
 novo sobre essa fundação.
 
@@ -23,7 +23,6 @@ Profiles mínimos:
 | `gateway-lab` | `catalog`, artifact store, Sessions, Gateway e Studio shell |
 | `gateway-lab-headless` | `catalog`, artifact store, Sessions e Gateway, sem Studio |
 | `full-local` | superfície local completa atual |
-| `legacy-full-local-v1` | tradução interna da consumer config v1 |
 
 Config v2 explícita:
 
@@ -48,19 +47,19 @@ kit:
       enabled: false
 ```
 
-## 2. Baseline MC0
+## 2. Baseline da composição
 
 Worktree inicial:
 
 - branch `main` um commit ahead e um behind de `origin/main`;
-- `ARCHITECTURE.md` possui mudanças preexistentes P0–V5;
+- `ARCHITECTURE.md` possui mudanças preexistentes FOUNDATION–remote execution;
 - a maior parte da implementação está presente como conteúdo não rastreado;
 - essas mudanças são preservadas e não atribuídas a este refactor.
 
 Gate executado em 2026-08-10:
 
 ```text
-./tool/check.sh → exit 0
+melos run check → exit 0
 ```
 
 Cobertura observada: format, analyze fatal, architecture/supply-chain,
@@ -71,27 +70,27 @@ Gateway, hosted, remote, contenção Linux netns e consumers `sample_flutter` e
 ## 3. Gates e ordem crítica
 
 ```text
-MC0 → MC1 → MC2 → MC3
-                  ├──→ MC4 CLI
-                  ├──→ MC5 Host/Gateway
-                  └──→ AP0–AP3
-MC5 → MC6 Studio
-AP3 + MC6 → AP4 Journey Map
-depois → Android/restante → Distribution v2 → estabilização
+baseline → contratos → configuração e resolver → kernel e lifecycle
+                                      ├──→ CLI
+                                      ├──→ Host, Sessions e Gateway
+                                      └──→ scanner, runner e Evidence do AutoPreview
+Host, Sessions e Gateway → composição do Studio
+Evidence do AutoPreview + composição do Studio → projeção no Journey Map
+depois → Android/restante → distribuição → estabilização
 ```
 
-### MC0 — baseline e decisão
+### baseline da composição — baseline e decisão
 
 - [x] registrar worktree e gate existente;
 - [x] criar ADR-0012;
 - [x] criar este plano;
 - [x] atualizar princípios, riscos, roadmap e registro normativo;
 - [x] ratificar a taxonomia; IDs e dependency graph serão codificados no
-  primeiro fixture de contracts MC1.
+  primeiro fixture de contracts de composição.
 
-### MC1 — contracts e schemas
+### contratos de composição — contracts e schemas
 
-Adicionar em `devex_contracts`:
+Adicionar em `experience_contracts`:
 
 - `ModuleId`, `ModuleCapabilityRef`, `ModuleRequirement`;
 - `ModuleDescriptor`, `ModuleCatalog`;
@@ -101,30 +100,30 @@ Adicionar em `devex_contracts`:
 
 Schemas:
 
-- `schemas/v1/kit-composition.schema.json`;
-- `schemas/v1/preview-capture.schema.json` no AP1;
-- `schemas/v2/consumer-config.schema.json`;
-- `schemas/v2/distribution-descriptor.schema.json`;
-- `schemas/v2/distribution-release.schema.json`.
+- `schemas/distribution/kit-composition.schema.json`;
+- `schemas/evidence/preview-capture.schema.json` nos contratos do AutoPreview;
+- `schemas/distribution/consumer-config.schema.json`;
+- `schemas/distribution/distribution-descriptor.schema.json`;
+- `schemas/distribution/distribution-release.schema.json`.
 
 Gate: round-trip fechado, canonicalização, digest, ordem estável, fixtures
 válidas/inválidas e versões adjacentes, sem mudança funcional.
 
-### MC2 — config v2 e resolver
+### configuração e resolver modular — config v2 e resolver
 
-`devex_engine` recebe normalizer, profile expander, provider resolution,
+`experience_engine` recebe normalizer, profile expander, provider resolution,
 conflicts/cycles/platform checks e topological order determinística.
-`devex_runtime` recebe `WorkspaceConfigurationLoader`; filesystem discovery e
+`execution_runtime` recebe `WorkspaceConfigurationLoader`; filesystem discovery e
 interpretação tornam-se responsabilidades separadas. Loaders de Gateway e
 providers deixam de reler configuração por conta própria.
 
-Config v1 é traduzida para `legacy-full-local-v1` e atravessa o mesmo resolver.
-Precedência: Kernel < Distribution < Profile < Workspace < local < startup.
+O arquivo principal canônico atravessa um único resolver. Precedência: Kernel
+< Distribution < Profile < Workspace < local < startup.
 
-Gate: v1 equivalente, digest independente de ordem, paths confinados, secrets
-literais rejeitados e toda falha anterior a efeitos.
+Gate: schema canônico obrigatório, digest independente de ordem, paths
+confinados, secrets literais rejeitados e toda falha anterior a efeitos.
 
-### MC3 — Kernel e lifecycle
+### kernel e lifecycle modular — Kernel e lifecycle
 
 Implementar catálogo/factory registry compile-time, `ModuleContext`,
 contributions, lifecycle coordinator e health registry. Não existe reflection,
@@ -133,35 +132,34 @@ dynamic Dart loading nem service locator irrestrito.
 Gate: módulo desabilitado produz zero comando/RPC/rota/processo/porta/artifact;
 failure injection desfaz startup em ordem inversa e não deixa orphan.
 
-### MC4 — CLI
+### CLI modular — CLI
 
 Separar bootstrap parser, plan loader, command registry e contribuições por
 módulo. Bootstrap commands funcionam sem workspace: `version`, `init`,
-distribution, `modules` e `config migrate`.
+distribution e `modules`.
 
 Comandos novos:
 
 ```text
-devex modules list
-devex modules explain
-devex modules doctor
-devex config migrate --to 2 --dry-run|--apply
+workspace modules list
+workspace modules explain
+workspace modules doctor
 ```
 
 Gate: help e dispatch derivados do plano, machine output v1 compatível e erro
 estruturado para Module indisponível.
 
-### MC5 — Host, Sessions, Capture e Gateway
+### Host, Sessions e Gateway modulares — Host, Sessions, Capture e Gateway
 
 O Host valida um `ResolvedKitPlan` transportado por staging autorizado, monta
 RPC contributions e publica `EffectiveKitManifest`. Kernel RPC:
-`devex.kit.describe`, `devex.kit.health` e evento `devex.kit.changed`.
+`composition.describe`, `composition.health` e evento `composition.changed`.
 
 Extrair na ordem Sessions, App Adapter Capture e Gateway. Gate: combinações
 com/sem Gateway, vinte ciclos, failure injection, shutdown concorrente, child
 death e zero resíduo.
 
-### MC6 — Studio
+### composição do Studio — Studio
 
 Adicionar repository do manifest e contributions de navegação/rotas. O Studio
 não inicia módulos. Deep link indisponível recebe estado estruturado; Grant e
@@ -173,38 +171,38 @@ reader, reconnect e um único plan digest.
 Escopo comprovado: repository seam, routes/contributions condicionais e
 projeção in-memory. Shell completo, catálogo real vindo do Host, resource
 handles, inspector/provider selection e startup supervisionado não fazem parte
-de MC6; pertencem a
-`docs/architecture/devex-studio-reconstruction-plan.md`.
+de composição do Studio; pertencem a
+`docs/architecture/studio-reconstruction-plan.md`.
 
-## 4. AutoPreview AP0–AP4
+## 4. AutoPreview
 
-### AP0 — spike
+### spike do AutoPreview — spike
 
 No `sample_flutter`, usar uma factory real top-level com `@AutoPreview`, provar
 Widget Previewer oficial, descoberta Analyzer e duas capturas via `flutter
-test`, sem `build_runner`, geração em `lib/` ou import DevExKit no `main.dart`.
+test`, sem `build_runner`, geração em `lib/` ou import Abel no `main.dart`.
 
-### AP1 — API e contracts
+### contratos do AutoPreview — API e contracts
 
-Criar package `devex_preview` dependente apenas de Flutter e contracts.
+Criar package `flutter_preview` dependente apenas de Flutter e contracts.
 Implementar `AutoPreview`, `AutoMultiPreview`, `AutoPreviewVariant` e marker de
 compatibilidade Flutter 3.44.x. Contracts: `Variant`, descriptors, manifests,
 capture items/report, status e capture key. Ratificar ADR-0013.
 
-### AP2 — scanner/compiler
+### scanner e compiler do AutoPreview — scanner/compiler
 
 Analyzer e filesystem ficam no runtime; normalização permanece no engine.
 Suporte inicial: função pública top-level, retorno Widget/WidgetBuilder,
 argumentos const, `lib/**/*.dart`, IDs explícitos e registry efêmero somente em
 `.dart_tool`.
 
-### AP3 — runner/Evidence
+### runner e Evidence do AutoPreview — runner/Evidence
 
 Scaffold efêmero `flutter test`, stabilization policy limitada,
 RepaintBoundary, subprocesso, env allowlist, no secrets, sandbox/rede quando
 disponível, quotas, failure isolation, PNG inspector, CAS e EvidenceProvider.
 
-### AP4 — Journey Map
+### projeção do AutoPreview no Journey Map — Journey Map
 
 Projetar Scenario × Variant para artifact handle, provider, fidelity,
 freshness e diagnóstico. Studio nunca recebe CAS path. LOD, placeholders e
@@ -212,8 +210,8 @@ freshness e diagnóstico. Studio nunca recebe CAS path. LOD, placeholders e
 previews afetados.
 
 Escopo comprovado: contracts/projector e estados exercitados em teste. A cadeia
-operacional CAS → Host → Studio e a apresentação em device frames pertencem a
-SR2–SR7.
+operacional CAS → Host → Studio e a apresentação em device frames pertencem à
+integração operacional do Studio.
 
 ## 5. Migração e distribuição
 
@@ -222,11 +220,11 @@ source impact, plugins, MCP, hosted/remote clients e release local. Cada
 extração remove o registro estático correspondente, testa ausência e mantém o
 profile legado.
 
-Distribution v2 começa completa/configurável e depois aceita bundles enxutos.
+Distribution começa completa/configurável e depois aceita bundles enxutos.
 Manifest registra modules, profiles, components, files e ModuleCatalog digest.
 CLI é obrigatória; Host, Gateway e Studio são condicionais. Builders geram
 entrypoint apenas em `.dart_tool` e provam rebuild byte-idêntico, install,
-update e rollback v1/v2.
+update e rollback.
 
 ## 6. Conformance
 
@@ -245,24 +243,24 @@ Suites obrigatórias:
 Ferramentas ativas:
 
 ```text
-tool/verify_auto_preview.sh
-tool/verify_modular_distribution.sh
-tool/verify_v03_distribution.sh
+tools/verify/verify_auto_preview.sh
+tools/verify/verify_modular_distribution.sh
+tools/verify/verify_distribution_lifecycle.sh
 ```
 
-Gates P0–V5 existentes permanecem; gate novo não substitui evidência anterior.
+Gates FOUNDATION–remote execution existentes permanecem; gate novo não substitui evidência anterior.
 
 ## 7. Atualização documental
 
 Criar durante o vertical correspondente:
 
 - ADR-0013 AutoPreview;
-- `docs/contracts/module-composition-v1.md`;
-- `docs/contracts/consumer-configuration-v2.md`;
-- `docs/contracts/distribution-release-v2.md`;
-- `docs/contracts/auto-preview-v1.md`;
-- `docs/quality/module-conformance-v1.md`;
-- `docs/quality/auto-preview-conformance-v1.md`;
+- `docs/contracts/module-composition.md`;
+- `docs/contracts/consumer-configuration.md`;
+- `docs/contracts/distribution-release.md`;
+- `docs/contracts/auto-preview.md`;
+- `docs/quality/module-conformance.md`;
+- `docs/quality/auto-preview-conformance.md`;
 - `docs/security/auto-preview-threat-model.md`;
 - `docs/operations/module-startup.md`.
 
@@ -276,11 +274,11 @@ Somente após gates executados:
 roots, Studio, Gateway/AutoPreview, distribuição, adoção, CLI, segurança,
 roadmap, budgets, conformance, health, riscos, glossário e registro normativo.
 README recebe profiles, config v2, commands, compatibility e comparação entre
-AutoPreview, App Adapter e Android. Result docs P0–V5 não têm claims alteradas.
+AutoPreview, App Adapter e Android. Resultados anteriores não têm claims alteradas.
 
 ## 8. Definition of Done
 
-- [x] v1/v2 convergem para o mesmo resolver;
+- [x] configuração e distribuição convergem para resolvers canônicos;
 - [x] CLI/Host/Studio observam o mesmo plan digest;
 - [x] nenhum recurso fica registrado fora de Module contribution;
 - [x] profiles principais e combinações focadas passam;

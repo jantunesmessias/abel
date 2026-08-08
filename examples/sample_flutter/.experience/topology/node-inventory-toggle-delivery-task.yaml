@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: NodeInstance
+metadata:
+  id: inventory-toggle-delivery-task
+spec:
+  projectionId: delivery-inventory
+  scenarioId: toggle-delivery-task

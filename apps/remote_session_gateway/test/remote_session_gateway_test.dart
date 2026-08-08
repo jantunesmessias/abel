@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:devex_contracts/devex_contracts.dart';
-import 'package:devex_engine/devex_engine.dart';
-import 'package:devex_remote_session_gateway/remote_session_gateway.dart';
-import 'package:devex_runtime/devex_runtime.dart';
+import 'package:execution_runtime/execution_runtime.dart';
+import 'package:experience_contracts/experience_contracts.dart';
+import 'package:experience_engine/experience_engine.dart';
 import 'package:jose/jose.dart';
+import 'package:remote_session_gateway/remote_session_gateway.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:test/test.dart';
 
@@ -238,7 +238,7 @@ void main() {
             'application',
             'javascript',
           );
-          request.response.write('self.devexTarget=true;');
+          request.response.write('self.targetMarker=true;');
         } else {
           request.response.statusCode = HttpStatus.notFound;
         }
@@ -351,7 +351,7 @@ void main() {
       expect(assetResponse.statusCode, HttpStatus.ok);
       expect(
         await utf8.decoder.bind(assetResponse).join(),
-        contains('devexTarget'),
+        contains('targetMarker'),
       );
       expect(forwardedCookies, everyElement(isNull));
 

@@ -1,11 +1,11 @@
-# DevEx UI System
+# Studio UI System
 
 Status: implementação Jaspr ativa em 2026-08-11.
 
-O UI System é a linguagem visual executável do único DevEx Studio. O package
-`devex_ui_system` depende de Jaspr, HTML/CSS, Lucide e do `devex_ux_system`; não
+O UI System é a linguagem visual executável do único Abel Studio. O package
+`studio_ui` depende de Jaspr, HTML/CSS, Lucide e do `interaction_model`; não
 depende de Flutter e não reexporta Material/Cupertino. O guard
-`tool/architecture_guard.dart` torna essa fronteira executável.
+`tools/gates/architecture_guard.dart` torna essa fronteira executável.
 
 ## Foundations
 
@@ -16,22 +16,22 @@ depende de Flutter e não reexporta Material/Cupertino. O guard
 - tipografia de ferramenta responsiva, sem fonte remota;
 - temas claro/escuro por `prefers-color-scheme`;
 - tons `neutral`, `info`, `positive`, `warning` e `critical`;
-- ícones Lucide tree-shakeable encapsulados por `DevExIconName`.
+- ícones Lucide tree-shakeable encapsulados por `StudioIconName`.
 
-Os tokens vivem em `apps/devex_studio/web/styles/tokens.css`; reset, primitives,
+Os tokens vivem em `apps/studio/web/styles/tokens.css`; reset, primitives,
 components e layout permanecem em folhas locais separadas. Nenhum asset visual
 é carregado de CDN.
 
 ## Componentes públicos atuais
 
-- `DevExTheme`, `DevExPanel`, `DevExMetric` e `DevExStatusPill`;
-- `DevExButton`, `DevExIconButton`, `DevExTextInput`, `DevExSearchField` e
-  `DevExSelect`;
-- `DevExTabs`, `DevExBreadcrumbs`, `DevExDefinitionList` e `DevExPageHeader`;
-- `DevExFeedbackBanner`, `DevExEmptyState`, `DevExProgress` e `DevExDivider`;
-- `DevExDialog`, implementado com `<dialog>` nativo, `showModal`, Escape,
+- `StudioTheme`, `StudioPanel`, `StudioMetric` e `StudioStatusPill`;
+- `StudioButton`, `StudioIconButton`, `StudioTextInput`, `StudioSearchField` e
+  `StudioSelect`;
+- `StudioTabs`, `StudioBreadcrumbs`, `StudioDefinitionList` e `StudioPageHeader`;
+- `StudioFeedbackBanner`, `StudioEmptyState`, `StudioProgress` e `StudioDivider`;
+- `StudioDialog`, implementado com `<dialog>` nativo, `showModal`, Escape,
   autofocus e restauração do foco no opener;
-- `DevExDeviceFrame`, cujo frame permanece fora do PNG canônico.
+- `StudioDeviceFrame`, cujo frame permanece fora do PNG canônico.
 
 Navegação, tabs, links, selects e inputs preservam alvo interativo mínimo de
 48 px no browser. Imagens de Evidence usam `object-fit: contain` e respeitam a
@@ -50,14 +50,14 @@ da capability Remote.
 4. Motion usa tokens e zera duração sob `prefers-reduced-motion`.
 5. Texto a 200% deve refluir sem overflow horizontal do documento.
 6. Iframes usam origin separado, sandbox e `no-referrer`.
-7. Novos ícones entram por `DevExIconName`; SVG inline artesanal é proibido.
+7. Novos ícones entram por `StudioIconName`; SVG inline artesanal é proibido.
 
 ## Evidência e limites
 
-`tool/studio_jaspr_cdp_probe.dart`, executado com Google Chrome, verifica DOM
+`tools/probes/studio_jaspr_cdp_probe.dart`, executado com Google Chrome, verifica DOM
 semântico, nomes acessíveis, Tab, reflow a 200%, redução de motion, `<dialog>`,
 AX tree, logs severos e performance de interação. Component tests vivem em
-`packages/devex_ui_system/test` e `apps/devex_studio/test/jaspr`.
+`libs/studio_ui/test` e `apps/studio/test/jaspr`.
 
 Na execução oficial de 2026-08-11, o menor alvo medido foi 48 px, nenhum dos 29
 controles focáveis ficou sem nome, oito Tab stops distintos foram visitados,

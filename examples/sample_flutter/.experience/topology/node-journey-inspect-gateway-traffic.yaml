@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: NodeInstance
+metadata:
+  id: journey-inspect-gateway-traffic
+spec:
+  projectionId: delivery-journey
+  scenarioId: inspect-gateway-traffic

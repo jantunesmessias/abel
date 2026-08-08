@@ -1,12 +1,28 @@
 .dart_tool/
+.artifacts/
 build/
+/assets/flutter_assets/
 .packages
 .flutter-plugins
 .flutter-plugins-dependencies
 coverage/
 *.log
 *.lock.tmp
-devex.local.yaml
+*.pid
+*.sock
+workspace.local.yaml
+
+# Local credentials and signing material
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
 
 # IDE and platform-local files
 .idea/
@@ -16,6 +32,7 @@ devex.local.yaml
 
 # Android/Flutter generated state
 **/android/.gradle/
+**/android/.kotlin/
 **/android/local.properties
 **/android/key.properties
 **/ios/Flutter/ephemeral/

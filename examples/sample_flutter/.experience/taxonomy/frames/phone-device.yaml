@@ -1,0 +1,8 @@
+schemaVersion: 2
+kind: PresentationFrame
+metadata:
+  id: phone-device
+spec:
+  displayName: Phone device
+  frameKind: device
+  formFactorId: phone

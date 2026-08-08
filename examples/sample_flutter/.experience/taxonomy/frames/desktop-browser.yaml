@@ -1,0 +1,8 @@
+schemaVersion: 2
+kind: PresentationFrame
+metadata:
+  id: desktop-browser
+spec:
+  displayName: Desktop browser
+  frameKind: browser
+  formFactorId: desktop

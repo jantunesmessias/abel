@@ -1,0 +1,11 @@
+schemaVersion: 1
+kind: Scenario
+metadata:
+  id: inspect-gateway-traffic
+spec:
+  applicationId: sample
+  title: Inspect Gateway traffic
+  description: Compare a deterministic fixture with passthrough traffic to the real sample API.
+  sourceReferences:
+    - repository: workspace
+      path: .experience/gateway

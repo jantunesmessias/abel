@@ -42,11 +42,11 @@ final class OpenTelemetryHostedTelemetry implements HostedTelemetry {
       resource: otel_sdk.Resource(<otel_api.Attribute>[
         otel_api.Attribute.fromString(
           otel_api.ResourceAttributes.serviceName,
-          'devex-hosted-control-plane',
+          'control-plane-control-plane',
         ),
         otel_api.Attribute.fromString(
           otel_api.ResourceAttributes.serviceNamespace,
-          'devex',
+          'workspace',
         ),
         otel_api.Attribute.fromString(
           otel_api.ResourceAttributes.serviceVersion,
@@ -67,7 +67,10 @@ final class OpenTelemetryHostedTelemetry implements HostedTelemetry {
         ),
       ],
     );
-    _tracer = _provider.getTracer('devex.hosted.http', version: serviceVersion);
+    _tracer = _provider.getTracer(
+      'workspace.hosted.http',
+      version: serviceVersion,
+    );
   }
 
   late final otel_sdk.TracerProviderBase _provider;

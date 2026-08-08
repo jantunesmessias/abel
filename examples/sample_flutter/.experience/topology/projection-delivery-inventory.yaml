@@ -1,0 +1,16 @@
+schemaVersion: 2
+kind: ExperienceProjection
+metadata:
+  id: delivery-inventory
+spec:
+  boardId: delivery-lab-board
+  applicationId: sample
+  title: Delivery Lab scenario inventory
+  projectionKind: inventory
+  nodeInstanceIds:
+    - inventory-dashboard-loading
+    - inventory-dashboard-ready
+    - inventory-toggle-delivery-task
+    - inventory-dashboard-failed
+    - inventory-inspect-gateway-traffic
+  edgeInstanceIds: []

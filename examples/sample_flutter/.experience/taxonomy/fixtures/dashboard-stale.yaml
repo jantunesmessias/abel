@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: ScenarioFixture
+metadata:
+  id: sample.dashboard.stale
+spec:
+  applicationId: sample
+  displayName: Stale delivery snapshot

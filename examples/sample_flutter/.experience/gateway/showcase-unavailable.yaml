@@ -1,0 +1,12 @@
+schemaVersion: 1
+kind: GatewayPreset
+metadata:
+  id: showcase-unavailable
+spec:
+  scopeId: showcase-api
+  description: Deterministic recoverable dependency outage
+  backendMode: isolated
+  routeIds:
+    - dashboard-unavailable
+  initialState:
+    mode: unavailable

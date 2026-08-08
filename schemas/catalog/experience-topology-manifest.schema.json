@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/catalog/experience-topology-manifest",
+  "title": "ExperienceTopologyManifest",
+  "$ref": "#/$defs/manifest",
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "board": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "applicationId", "title", "projectionIds"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "applicationId": {"$ref": "#/$defs/opaqueId"},
+        "title": {"$ref": "#/$defs/title"},
+        "projectionIds": {
+          "type": "array",
+          "maxItems": 50000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        }
+      }
+    },
+    "projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "boardId",
+        "applicationId",
+        "title",
+        "kind",
+        "nodeInstanceIds",
+        "edgeInstanceIds"
+      ],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "boardId": {"$ref": "#/$defs/opaqueId"},
+        "applicationId": {"$ref": "#/$defs/opaqueId"},
+        "title": {"$ref": "#/$defs/title"},
+        "kind": {
+          "enum": [
+            "journey",
+            "inventory",
+            "history",
+            "comparison",
+            "changeset"
+          ]
+        },
+        "journeyId": {"$ref": "#/$defs/opaqueId"},
+        "nodeInstanceIds": {
+          "type": "array",
+          "maxItems": 500000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        },
+        "edgeInstanceIds": {
+          "type": "array",
+          "maxItems": 1000000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        }
+      },
+      "if": {"properties": {"kind": {"const": "journey"}}},
+      "then": {"required": ["journeyId"]}
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "projectionId", "scenarioId"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "projectionId": {"$ref": "#/$defs/opaqueId"},
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "comparisonRole": {
+          "enum": ["canonical", "baseline", "candidate"]
+        }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "projectionId",
+        "transitionId",
+        "fromNodeId",
+        "toNodeId"
+      ],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "projectionId": {"$ref": "#/$defs/opaqueId"},
+        "transitionId": {"$ref": "#/$defs/opaqueId"},
+        "fromNodeId": {"$ref": "#/$defs/opaqueId"},
+        "toNodeId": {"$ref": "#/$defs/opaqueId"}
+      }
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "catalogDigest",
+        "boards",
+        "projections",
+        "nodes",
+        "edges",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ExperienceTopologyManifest"},
+        "catalogDigest": {"$ref": "#/$defs/digest"},
+        "boards": {
+          "type": "array",
+          "maxItems": 10000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/board"}
+        },
+        "projections": {
+          "type": "array",
+          "maxItems": 50000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/projection"}
+        },
+        "nodes": {
+          "type": "array",
+          "maxItems": 500000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/node"}
+        },
+        "edges": {
+          "type": "array",
+          "maxItems": 1000000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/edge"}
+        },
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    }
+  }
+}

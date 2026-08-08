@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:devex_remote_session_gateway/remote_session_gateway.dart';
-import 'package:devex_runtime/devex_runtime.dart';
+import 'package:execution_runtime/execution_runtime.dart';
 import 'package:jose/jose.dart';
+import 'package:remote_session_gateway/remote_session_gateway.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 
 Future<void> main() async {
@@ -20,7 +20,7 @@ Future<void> main() async {
     return value == null || value.isEmpty ? null : value;
   }
 
-  final trustFile = File(requiredValue('DEVEX_REMOTE_JWKS_FILE'));
+  final trustFile = File(requiredValue('REMOTE_SESSION_JWKS_FILE'));
   if (!trustFile.existsSync() ||
       Link(trustFile.path).existsSync() ||
       trustFile.lengthSync() > 1024 * 1024) {
@@ -31,26 +31,24 @@ Future<void> main() async {
     throw StateError('remote gateway trust file is not a JWK set');
   }
   final clock = SystemClock();
-  final targetOrigin = optionalValue('DEVEX_WEB_TARGET_ORIGIN');
+  final targetOrigin = optionalValue('REMOTE_WEB_TARGET_ORIGIN');
   final application = RemoteSessionGatewayApplication(
     verifier: RemoteWorkerTokenVerifier(
       trustedKeys: JsonWebKeySet.fromJson(trust),
-      allowedAlgorithms: (environment['DEVEX_REMOTE_ALGORITHMS'] ?? 'ES256')
+      allowedAlgorithms: (environment['REMOTE_SESSION_ALGORITHMS'] ?? 'ES256')
           .split(',')
           .map((value) => value.trim())
           .where((value) => value.isNotEmpty)
           .toSet(),
       clock: clock,
     ),
-    expectedRunId: requiredValue('DEVEX_RUN_ID'),
-    allowedViewerOrigins: requiredValue('DEVEX_ALLOWED_STUDIO_ORIGINS')
+    expectedRunId: requiredValue('REMOTE_RUN_ID'),
+    allowedViewerOrigins: requiredValue('STUDIO_ALLOWED_ORIGINS')
         .split(',')
         .map((value) => value.trim())
         .where((value) => value.isNotEmpty)
         .toSet(),
-    sessionDeadline: DateTime.parse(
-      requiredValue('DEVEX_SESSION_DEADLINE'),
-    ).toUtc(),
+    sessionDeadline: DateTime.parse(requiredValue('SESSION_DEADLINE')).toUtc(),
     clock: clock,
     webTargetOrigin: targetOrigin == null ? null : Uri.parse(targetOrigin),
   );
@@ -62,7 +60,9 @@ Future<void> main() async {
     port,
     poweredByHeader: null,
   );
-  stdout.writeln('devex remote session gateway listening on ${server.port}');
+  stdout.writeln(
+    'workspace remote session gateway listening on ${server.port}',
+  );
 
   final stopping = Completer<void>();
   late final StreamSubscription<ProcessSignal> term;

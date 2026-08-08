@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/source/source-automation",
+  "title": "Source and Automation",
+  "oneOf": [
+    {"$ref": "#/$defs/sourceSnapshot"},
+    {"$ref": "#/$defs/changeSet"},
+    {"$ref": "#/$defs/impactPlan"},
+    {"$ref": "#/$defs/contextBundle"},
+    {"$ref": "#/$defs/agentTask"},
+    {"$ref": "#/$defs/agentProposal"}
+  ],
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "opaqueId": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"},
+    "path": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"},
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "root"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"},
+        "kind": {"enum": ["filesystem", "git"]},
+        "root": {"type": "string", "minLength": 1},
+        "revision": {"type": "string", "minLength": 1}
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "digest", "size"],
+      "properties": {
+        "path": {"$ref": "#/$defs/path"},
+        "digest": {"$ref": "#/$defs/digest"},
+        "size": {"type": "integer", "minimum": 0}
+      }
+    },
+    "sourceSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "repository", "revision", "completeness", "files", "omissions", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "SourceSnapshot"},
+        "repository": {"$ref": "#/$defs/repository"},
+        "revision": {"type": "string", "minLength": 1},
+        "completeness": {"enum": ["complete", "partial", "unknown"]},
+        "files": {"type": "array", "items": {"$ref": "#/$defs/file"}},
+        "omissions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind"],
+      "properties": {
+        "path": {"$ref": "#/$defs/path"},
+        "kind": {"enum": ["added", "modified", "deleted"]},
+        "beforeDigest": {"$ref": "#/$defs/digest"},
+        "afterDigest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "changeSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "repositoryId", "baseSnapshotDigest", "currentSnapshotDigest", "complete", "changes", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ChangeSet"},
+        "repositoryId": {"type": "string", "minLength": 1},
+        "baseSnapshotDigest": {"$ref": "#/$defs/digest"},
+        "currentSnapshotDigest": {"$ref": "#/$defs/digest"},
+        "complete": {"type": "boolean"},
+        "changes": {"type": "array", "items": {"$ref": "#/$defs/change"}},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "impactItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bindingId", "subject", "reasons"],
+      "properties": {
+        "bindingId": {"type": "string", "minLength": 1},
+        "subject": {"type": "string", "minLength": 1},
+        "reasons": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["direct", "transitive", "incompleteSnapshot", "unknownBinding"]}}
+      }
+    },
+    "impactPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "changeSetDigest", "currentSnapshotDigest", "complete", "allowsEvidenceReuse", "impacted", "reusableSubjects", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ImpactPlan"},
+        "changeSetDigest": {"$ref": "#/$defs/digest"},
+        "currentSnapshotDigest": {"$ref": "#/$defs/digest"},
+        "complete": {"type": "boolean"},
+        "allowsEvidenceReuse": {"type": "boolean"},
+        "impacted": {"type": "array", "items": {"$ref": "#/$defs/impactItem"}},
+        "reusableSubjects": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "contextFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "digest", "content"],
+      "properties": {
+        "path": {"$ref": "#/$defs/path"},
+        "digest": {"$ref": "#/$defs/digest"},
+        "content": {"type": "string"}
+      }
+    },
+    "contextBundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "snapshotDigest", "files", "redactions", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ContextBundle"},
+        "snapshotDigest": {"$ref": "#/$defs/digest"},
+        "files": {"type": "array", "items": {"$ref": "#/$defs/contextFile"}},
+        "redactions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "agentTask": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "principalId",
+        "contextBundleDigest",
+        "baseSnapshotDigest",
+        "objective",
+        "allowedEffects",
+        "createdAt",
+        "expiresAt",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "AgentTask"},
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "principalId": {"$ref": "#/$defs/opaqueId"},
+        "contextBundleDigest": {"$ref": "#/$defs/digest"},
+        "baseSnapshotDigest": {"$ref": "#/$defs/digest"},
+        "objective": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "\\S"
+        },
+        "allowedEffects": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["inspect", "propose"]}
+        },
+        "createdAt": {"type": "string", "format": "date-time"},
+        "expiresAt": {"type": "string", "format": "date-time"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "agentProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "taskId",
+        "taskDigest",
+        "baseSnapshotDigest",
+        "changeSetDigest",
+        "summary",
+        "createdAt",
+        "requiresExplicitApply",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "AgentProposal"},
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "taskId": {"$ref": "#/$defs/opaqueId"},
+        "taskDigest": {"$ref": "#/$defs/digest"},
+        "baseSnapshotDigest": {"$ref": "#/$defs/digest"},
+        "changeSetDigest": {"$ref": "#/$defs/digest"},
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "\\S"
+        },
+        "createdAt": {"type": "string", "format": "date-time"},
+        "requiresExplicitApply": {"const": true},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    }
+  }
+}

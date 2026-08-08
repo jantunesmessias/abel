@@ -1,0 +1,9 @@
+schemaVersion: 2
+kind: HumanApprovalRequirement
+metadata:
+  id: approve-dashboard-ready-visual
+spec:
+  scenarioId: dashboard-ready
+  reviewGuideId: delivery-workspace-review
+  reviewGuideStepId: review-ready-lab
+  scope: evidenceSet

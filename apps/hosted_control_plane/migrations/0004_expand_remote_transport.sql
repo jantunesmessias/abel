@@ -1,4 +1,4 @@
-SET search_path = devex_hosted, pg_catalog;
+SET search_path = control_plane, pg_catalog;
 
 ALTER TABLE remote_artifact_manifests
   ADD COLUMN interactive_transport text;

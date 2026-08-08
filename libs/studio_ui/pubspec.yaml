@@ -1,0 +1,16 @@
+name: studio_ui
+version: 0.1.0-dev
+resolution: workspace
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  interaction_model: ^0.1.0-dev
+  jaspr: 0.23.3
+  jaspr_lucide: 0.55.0
+  web: 1.1.1
+
+dev_dependencies:
+  jaspr_test: 0.23.3
+  test: ^1.26.3

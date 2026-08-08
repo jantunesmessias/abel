@@ -25,7 +25,7 @@ privacidade dos pixels.
 | ID | Threat | Controle v1 | Risco residual |
 |----|--------|-------------|----------------|
 | AP-T01 | source/path escapa por traversal ou symlink | raiz canônica, `lib` confinado, links proibidos, registry/staging confinado | TOCTOU do filesystem local hostil |
-| AP-T02 | preview lê secrets do processo pai | environment allowlisted; nenhum secret configurado pelo DevExKit | código pode ler credenciais já acessíveis ao mesmo usuário por outros meios |
+| AP-T02 | preview lê secrets do processo pai | environment allowlisted; nenhum secret configurado pelo Abel | código pode ler credenciais já acessíveis ao mesmo usuário por outros meios |
 | AP-T03 | loop/animação causa DoS | policy e processo com timeout; lote serial; limites de frames/duração | subprocesso pode consumir CPU/memória até o limite do SO |
 | AP-T04 | stdout/stderr ou PNG exaure disco/memória | budgets de diagnóstico/artifact, truncation e PNG inspector | quota forte de memória depende do sandbox do host |
 | AP-T05 | protocolo forjado ou path arbitrário | token imprevisível por scaffold, chaves allowlisted e paths precomputados | código no mesmo subprocesso pode observar a fonte gerada |

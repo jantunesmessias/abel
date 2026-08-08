@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/catalog/motion-context",
+  "title": "Motion and Context Builder",
+  "oneOf": [
+    {"$ref": "#/$defs/motionManifest"},
+    {"$ref": "#/$defs/contextDescription"},
+    {"$ref": "#/$defs/contextBuildRequest"},
+    {"$ref": "#/$defs/contextBuildResult"}
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "maxLength": 256
+    },
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "category": {"enum": ["sources", "images", "evidence", "history", "changes"]},
+    "motionObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "atFraction", "kind"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "label": {"type": "string", "minLength": 1, "maxLength": 512},
+        "atFraction": {"type": "number", "minimum": 0, "maximum": 1},
+        "kind": {"enum": ["stateVisible", "transitionCompleted", "contentStable"]}
+      }
+    },
+    "motionStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "transitionId", "fromNodeId", "toNodeId", "startMs", "fullDurationMs", "reducedDurationMs", "easing", "observations"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "transitionId": {"$ref": "#/$defs/id"},
+        "fromNodeId": {"$ref": "#/$defs/id"},
+        "toNodeId": {"$ref": "#/$defs/id"},
+        "startMs": {"type": "integer", "minimum": 0, "maximum": 600000},
+        "fullDurationMs": {"type": "integer", "minimum": 1, "maximum": 60000},
+        "reducedDurationMs": {"type": "integer", "minimum": 0, "maximum": 60000},
+        "easing": {"enum": ["linear", "easeInOut"]},
+        "observations": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "#/$defs/motionObservation"}}
+      }
+    },
+    "motionSequence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "projectionId", "title", "steps", "staticSummary", "motionRequiredForComprehension"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "projectionId": {"$ref": "#/$defs/id"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 512},
+        "steps": {"type": "array", "minItems": 1, "maxItems": 256, "items": {"$ref": "#/$defs/motionStep"}},
+        "staticSummary": {"type": "string", "minLength": 1, "maxLength": 2048},
+        "motionRequiredForComprehension": {"const": false}
+      }
+    },
+    "motionManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "catalogDigest", "topologyDigest", "sequences", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "MotionManifest"},
+        "catalogDigest": {"$ref": "#/$defs/digest"},
+        "topologyDigest": {"$ref": "#/$defs/digest"},
+        "sequences": {"type": "array", "maxItems": 10000, "items": {"$ref": "#/$defs/motionSequence"}},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["boardId", "projectionId"],
+      "properties": {
+        "boardId": {"$ref": "#/$defs/id"},
+        "projectionId": {"$ref": "#/$defs/id"},
+        "journeyId": {"$ref": "#/$defs/id"},
+        "scenarioId": {"$ref": "#/$defs/id"},
+        "changeSetDigest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "inclusion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sources", "images", "evidence", "history", "changes"],
+      "properties": {
+        "sources": {"type": "boolean"},
+        "images": {"type": "boolean"},
+        "evidence": {"type": "boolean"},
+        "history": {"type": "boolean"},
+        "changes": {"type": "boolean"}
+      }
+    },
+    "categoryBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxItems", "maxBytes"],
+      "properties": {
+        "maxItems": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "maxBytes": {"type": "integer", "minimum": 0, "maximum": 4194304}
+      }
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sources", "images", "evidence", "history", "changes"],
+      "properties": {
+        "sources": {"$ref": "#/$defs/categoryBudget"},
+        "images": {"$ref": "#/$defs/categoryBudget"},
+        "evidence": {"$ref": "#/$defs/categoryBudget"},
+        "history": {"$ref": "#/$defs/categoryBudget"},
+        "changes": {"$ref": "#/$defs/categoryBudget"}
+      }
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["items", "bytes"],
+      "properties": {
+        "items": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "bytes": {"type": "integer", "minimum": 0, "maximum": 4194304}
+      }
+    },
+    "usageSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sources", "images", "evidence", "history", "changes"],
+      "properties": {
+        "sources": {"$ref": "#/$defs/usage"},
+        "images": {"$ref": "#/$defs/usage"},
+        "evidence": {"$ref": "#/$defs/usage"},
+        "history": {"$ref": "#/$defs/usage"},
+        "changes": {"$ref": "#/$defs/usage"}
+      }
+    },
+    "contextItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category", "id", "mediaType", "content", "digest"],
+      "properties": {
+        "category": {"$ref": "#/$defs/category"},
+        "id": {"$ref": "#/$defs/id"},
+        "mediaType": {"type": "string", "minLength": 1, "maxLength": 128},
+        "content": {"type": "string", "maxLength": 262144},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "omission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category", "subject", "reason"],
+      "properties": {
+        "category": {"$ref": "#/$defs/category"},
+        "subject": {"type": "string", "minLength": 1, "maxLength": 512},
+        "reason": {"enum": ["omittedByRequest", "budgetExceeded", "unavailable", "unsupported", "redacted", "stale", "unsafe"]}
+      }
+    },
+    "contextBundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "contentSetDigest", "selection", "inclusion", "requestedBudgets", "effectiveBudgets", "items", "usage", "omissions", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ExperienceContextBundle"},
+        "contentSetDigest": {"$ref": "#/$defs/digest"},
+        "selection": {"$ref": "#/$defs/selection"},
+        "inclusion": {"$ref": "#/$defs/inclusion"},
+        "requestedBudgets": {"$ref": "#/$defs/budgets"},
+        "effectiveBudgets": {"$ref": "#/$defs/budgets"},
+        "items": {"type": "array", "maxItems": 5000, "items": {"$ref": "#/$defs/contextItem"}},
+        "usage": {"$ref": "#/$defs/usageSet"},
+        "omissions": {"type": "array", "maxItems": 5000, "items": {"$ref": "#/$defs/omission"}},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "contextDescription": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "status", "contentSetDigest", "supportedCategories", "maximumBudgets"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ContextBuilderDescription"},
+        "status": {"const": "ready"},
+        "contentSetDigest": {"$ref": "#/$defs/digest"},
+        "supportedCategories": {"type": "array", "minItems": 1, "maxItems": 5, "uniqueItems": true, "items": {"$ref": "#/$defs/category"}},
+        "maximumBudgets": {"$ref": "#/$defs/budgets"}
+      }
+    },
+    "contextBuildRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedContentSetDigest", "selection", "inclusion", "budgets"],
+      "properties": {
+        "expectedContentSetDigest": {"$ref": "#/$defs/digest"},
+        "selection": {"$ref": "#/$defs/selection"},
+        "inclusion": {"$ref": "#/$defs/inclusion"},
+        "budgets": {"$ref": "#/$defs/budgets"}
+      }
+    },
+    "contextBuildResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "bundle"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ContextBuildResult"},
+        "bundle": {"$ref": "#/$defs/contextBundle"}
+      }
+    }
+  }
+}

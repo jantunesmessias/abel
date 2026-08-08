@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: ExperienceComponent
+metadata:
+  id: showcase-task-list
+spec:
+  applicationId: sample
+  displayName: Showcase task list

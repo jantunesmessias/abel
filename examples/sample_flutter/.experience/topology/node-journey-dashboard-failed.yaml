@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: NodeInstance
+metadata:
+  id: journey-dashboard-failed
+spec:
+  projectionId: delivery-journey
+  scenarioId: dashboard-failed

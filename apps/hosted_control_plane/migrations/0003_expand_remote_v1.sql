@@ -1,4 +1,4 @@
-SET search_path = devex_hosted, pg_catalog;
+SET search_path = control_plane, pg_catalog;
 
 CREATE TABLE remote_requests (
   tenant_id text NOT NULL,
@@ -135,8 +135,8 @@ BEGIN
     EXECUTE format('ALTER TABLE %I FORCE ROW LEVEL SECURITY', table_name);
     EXECUTE format(
       'CREATE POLICY tenant_isolation ON %I USING '
-      '(tenant_id = nullif(current_setting(''devex.tenant_id'', true), '''')) '
-      'WITH CHECK (tenant_id = nullif(current_setting(''devex.tenant_id'', true), ''''))',
+      '(tenant_id = nullif(current_setting(''control_plane.tenant_id'', true), '''')) '
+      'WITH CHECK (tenant_id = nullif(current_setting(''control_plane.tenant_id'', true), ''''))',
       table_name
     );
   END LOOP;
@@ -148,10 +148,10 @@ RETURNS TABLE (tenant_id text)
 LANGUAGE sql
 SECURITY DEFINER
 STABLE
-SET search_path = pg_catalog, devex_hosted
+SET search_path = pg_catalog, control_plane
 AS $function$
   SELECT DISTINCT lease.tenant_id
-  FROM devex_hosted.remote_leases AS lease
+  FROM control_plane.remote_leases AS lease
   WHERE lease.expires_at <= reference_time
   ORDER BY lease.tenant_id
 $function$;
@@ -161,10 +161,10 @@ RETURNS TABLE (tenant_id text)
 LANGUAGE sql
 SECURITY DEFINER
 STABLE
-SET search_path = pg_catalog, devex_hosted
+SET search_path = pg_catalog, control_plane
 AS $function$
   SELECT DISTINCT run.tenant_id
-  FROM devex_hosted.remote_runs AS run
+  FROM control_plane.remote_runs AS run
   WHERE run.state = 'queued'
   ORDER BY run.tenant_id
 $function$;

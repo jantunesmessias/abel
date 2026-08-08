@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:devex_contracts/devex_contracts.dart';
-import 'package:devex_engine/devex_engine.dart';
-import 'package:devex_hosted_control_plane/hosted_control_plane.dart';
-import 'package:devex_runtime/devex_runtime.dart';
+import 'package:execution_runtime/execution_runtime.dart';
+import 'package:experience_contracts/experience_contracts.dart';
+import 'package:experience_engine/experience_engine.dart';
+import 'package:hosted_control_plane/hosted_control_plane.dart';
 import 'package:shelf/shelf.dart';
 import 'package:test/test.dart';
 
@@ -49,7 +49,7 @@ void main() {
       objectStore: S3CompatibleObjectStore(
         configuration: S3ObjectStoreConfiguration(
           endpoint: Uri.parse('https://objects.example.test'),
-          bucket: 'devex-artifacts',
+          bucket: 'workspace-artifacts',
           region: 'us-test-1',
           credentials: const S3Credentials(
             accessKeyId: 'access',
@@ -101,7 +101,7 @@ void main() {
       expect(second.statusCode, 409);
       final conflict =
           jsonDecode(await second.readAsString()) as Map<String, Object?>;
-      expect(conflict['code'], 'DEVEX_HOSTED_CONFLICT');
+      expect(conflict['code'], 'CONTROL_PLANE_CONFLICT');
       expect(
         (conflict['conflict']! as Map<String, Object?>).keys,
         containsAll(<String>['baseDigest', 'currentDigest', 'proposedDigest']),
@@ -196,7 +196,7 @@ Request _request(
   Uri.parse('http://localhost$path'),
   headers: <String, String>{
     'authorization': 'Bearer $token',
-    'x-devex-tenant': tenant,
+    'x-workspace-tenant': tenant,
     if (body != null) 'content-type': 'application/json',
   },
   body: body == null ? null : jsonEncode(body),

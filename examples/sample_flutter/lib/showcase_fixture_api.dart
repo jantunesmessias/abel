@@ -1,35 +1,41 @@
-import 'dart:async';
-
 import 'package:sample_flutter/showcase_api.dart';
 import 'package:sample_flutter/showcase_models.dart';
 
 final class SyntheticShowcaseApi implements ShowcaseApi {
-  SyntheticShowcaseApi({this.failure, this.dashboard});
+  SyntheticShowcaseApi({ShowcaseDashboardResult? result})
+    : result = result ?? ShowcaseDashboardResult.ready(syntheticDashboard());
 
-  final Object? failure;
-  final ShowcaseDashboard? dashboard;
+  final ShowcaseDashboardResult result;
 
   @override
-  Future<ShowcaseDashboard> loadDashboard() {
-    final error = failure;
-    if (error != null) return Future<ShowcaseDashboard>.error(error);
-    return Future<ShowcaseDashboard>.value(dashboard ?? syntheticDashboard());
-  }
+  Future<ShowcaseDashboardResult> loadDashboard() =>
+      Future<ShowcaseDashboardResult>.value(result);
 
   @override
   Future<void> toggleTask(String projectId, String taskId) =>
       Future<void>.value();
 }
 
-final class PendingShowcaseApi implements ShowcaseApi {
-  @override
-  Future<ShowcaseDashboard> loadDashboard() =>
-      Completer<ShowcaseDashboard>().future;
-
-  @override
-  Future<void> toggleTask(String projectId, String taskId) =>
-      Completer<void>().future;
-}
+ShowcaseDashboardResult syntheticDashboardResult(
+  ShowcaseDashboardState state,
+) => switch (state) {
+  ShowcaseDashboardState.ready => ShowcaseDashboardResult.ready(
+    syntheticDashboard(),
+  ),
+  ShowcaseDashboardState.loading => const ShowcaseDashboardResult.loading(),
+  ShowcaseDashboardState.empty => const ShowcaseDashboardResult.empty(),
+  ShowcaseDashboardState.stale => ShowcaseDashboardResult.stale(
+    syntheticDashboard(),
+    staleSince: DateTime.utc(2026, 8, 13, 12),
+  ),
+  ShowcaseDashboardState.unavailable =>
+    const ShowcaseDashboardResult.unavailable(
+      errorCode: 'SAMPLE_DEPENDENCY_UNAVAILABLE',
+    ),
+  ShowcaseDashboardState.failure => const ShowcaseDashboardResult.failure(
+    errorCode: 'SAMPLE_API_FAILURE',
+  ),
+};
 
 ShowcaseDashboard syntheticDashboard({
   bool deliveryTaskCompleted = false,

@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:devex_contracts/devex_contracts.dart';
-import 'package:devex_engine/devex_engine.dart';
-import 'package:devex_hosted_control_plane/hosted_control_plane.dart';
-import 'package:devex_runtime/devex_runtime.dart';
+import 'package:execution_runtime/execution_runtime.dart';
+import 'package:experience_contracts/experience_contracts.dart';
+import 'package:experience_engine/experience_engine.dart';
+import 'package:hosted_control_plane/hosted_control_plane.dart';
 import 'package:jose/jose.dart';
 import 'package:shelf/shelf.dart';
 import 'package:test/test.dart';
@@ -67,7 +67,7 @@ void main() {
         objectStore: S3CompatibleObjectStore(
           configuration: S3ObjectStoreConfiguration(
             endpoint: Uri.parse('https://objects.example.test'),
-            bucket: 'devex-artifacts',
+            bucket: 'workspace-artifacts',
             region: 'us-test-1',
             credentials: const S3Credentials(
               accessKeyId: 'access',
@@ -201,7 +201,7 @@ void main() {
       final forgedContainment = RemoteContainmentReport(
         tenantId: containment.tenantId,
         runId: containment.runId,
-        namespace: 'devex-run-forged',
+        namespace: 'workspace-run-forged',
         serviceAccount: containment.serviceAccount,
         podSecurityProfile: containment.podSecurityProfile,
         defaultDenyEgress: containment.defaultDenyEgress,
@@ -355,7 +355,7 @@ Request _oidcRequest(
   Uri.parse('http://localhost$path'),
   headers: <String, String>{
     'authorization': 'Bearer $token',
-    'x-devex-tenant': 'tenant-a',
+    'x-workspace-tenant': 'tenant-a',
     'content-type': 'application/json',
   },
   body: jsonEncode(body),

@@ -1,0 +1,6 @@
+schemaVersion: 2
+kind: FormFactor
+metadata:
+  id: phone
+spec:
+  displayName: Phone

@@ -1,0 +1,19 @@
+schemaVersion: 2
+kind: ScenarioFacet
+metadata:
+  id: dashboard-failed
+spec:
+  scenarioId: dashboard-failed
+  lifecycle: current
+  scenarioKindId: observable-state
+  surfaceId: delivery-dashboard
+  stateId: dashboard.failed
+  ownershipAreaId: delivery-experience
+  tagIds: [dashboard, resilience]
+  componentIds: [showcase-dashboard-page]
+  fixtureId: sample.dashboard.failure
+  renderSource:
+    kind: previewDescriptor
+    previewId: sample.dashboard.failed
+  presentationFrameIds: [phone-device]
+  preferredPresentationFrameId: phone-device

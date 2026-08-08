@@ -1,0 +1,22 @@
+schemaVersion: 2
+kind: ExperienceProjection
+metadata:
+  id: delivery-journey
+spec:
+  boardId: delivery-lab-board
+  applicationId: sample
+  title: Operate and inspect delivery
+  projectionKind: journey
+  journeyId: operate-delivery-workspace
+  nodeInstanceIds:
+    - journey-dashboard-loading
+    - journey-dashboard-ready
+    - journey-toggle-delivery-task
+    - journey-dashboard-failed
+    - journey-inspect-gateway-traffic
+  edgeInstanceIds:
+    - journey-loading-to-ready
+    - journey-ready-to-failed
+    - journey-ready-to-gateway
+    - journey-ready-to-toggle
+    - journey-toggle-to-gateway

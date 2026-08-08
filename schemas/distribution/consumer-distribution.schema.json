@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/distribution/consumer-distribution",
+  "title": "Consumer-composed local distribution",
+  "oneOf": [
+    {"$ref": "#/$defs/specification"},
+    {"$ref": "#/$defs/inventory"}
+  ],
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"
+    },
+    "semanticVersion": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+    },
+    "caretVersion": {
+      "type": "string",
+      "pattern": "^\\^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "configFile",
+        "configEnvironmentVariable",
+        "contentRoot",
+        "localConfigFile",
+        "toolingEntrypoint",
+        "commandAliases"
+      ],
+      "properties": {
+        "configFile": {"$ref": "#/$defs/relativePath"},
+        "configEnvironmentVariable": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]{2,127}$"
+        },
+        "contentRoot": {"$ref": "#/$defs/relativePath"},
+        "localConfigFile": {"$ref": "#/$defs/relativePath"},
+        "toolingEntrypoint": {"$ref": "#/$defs/relativePath"},
+        "commandAliases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{0,63}$"}
+        }
+      }
+    },
+    "distribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "id",
+        "displayName",
+        "coreCompatibility",
+        "defaultLayout",
+        "commandAliases"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 512},
+        "coreCompatibility": {"$ref": "#/$defs/caretVersion"},
+        "defaultLayout": {"$ref": "#/$defs/layout"},
+        "commandAliases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{0,63}$"}
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "core",
+        "distributionReleaseSchemaVersion",
+        "consumerConfigurationSchemaVersion",
+        "authoringDocumentSchemaVersions"
+      ],
+      "properties": {
+        "core": {"$ref": "#/$defs/caretVersion"},
+        "distributionReleaseSchemaVersion": {"const": 2},
+        "consumerConfigurationSchemaVersion": {"const": 2},
+        "authoringDocumentSchemaVersions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": [1, 2]}
+        }
+      }
+    },
+    "module": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "coreCompatibility",
+        "descriptorDigest",
+        "surfaces"
+      ],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "version": {"$ref": "#/$defs/semanticVersion"},
+        "coreCompatibility": {"$ref": "#/$defs/caretVersion"},
+        "descriptorDigest": {"$ref": "#/$defs/digest"},
+        "surfaces": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"enum": ["cli", "host", "gateway", "studio"]}
+        }
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "digest", "size", "role"],
+      "properties": {
+        "path": {"$ref": "#/$defs/relativePath"},
+        "digest": {"$ref": "#/$defs/digest"},
+        "size": {"type": "integer", "minimum": 0},
+        "role": {"$ref": "#/$defs/opaqueId"}
+      }
+    },
+    "specification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "distribution",
+        "releaseVersion",
+        "profileId",
+        "studioAssets",
+        "compatibility",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ConsumerDistributionSpec"},
+        "distribution": {"$ref": "#/$defs/distribution"},
+        "releaseVersion": {"$ref": "#/$defs/semanticVersion"},
+        "profileId": {"$ref": "#/$defs/opaqueId"},
+        "studioAssets": {"enum": ["included", "absent"]},
+        "compatibility": {"$ref": "#/$defs/compatibility"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "inventory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "distributionId",
+        "releaseVersion",
+        "coreVersion",
+        "profileId",
+        "studioAssets",
+        "compatibility",
+        "specDigest",
+        "baseReleaseDigest",
+        "moduleCatalogDigest",
+        "resolvedPlanDigest",
+        "consumerConfigurationDigest",
+        "catalogDigest",
+        "modules",
+        "files",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ConsumerDistributionInventory"},
+        "distributionId": {"$ref": "#/$defs/opaqueId"},
+        "releaseVersion": {"$ref": "#/$defs/semanticVersion"},
+        "coreVersion": {"$ref": "#/$defs/semanticVersion"},
+        "profileId": {"$ref": "#/$defs/opaqueId"},
+        "studioAssets": {"enum": ["included", "absent"]},
+        "compatibility": {"$ref": "#/$defs/compatibility"},
+        "specDigest": {"$ref": "#/$defs/digest"},
+        "baseReleaseDigest": {"$ref": "#/$defs/digest"},
+        "moduleCatalogDigest": {"$ref": "#/$defs/digest"},
+        "resolvedPlanDigest": {"$ref": "#/$defs/digest"},
+        "consumerConfigurationDigest": {"$ref": "#/$defs/digest"},
+        "catalogDigest": {"$ref": "#/$defs/digest"},
+        "modules": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/module"}
+        },
+        "files": {
+          "type": "array",
+          "minItems": 4,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/file"}
+        },
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    }
+  }
+}

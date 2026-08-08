@@ -1,0 +1,28 @@
+schemaVersion: 1
+kind: ReviewGuide
+metadata:
+  id: delivery-workspace-review
+spec:
+  applicationId: sample
+  title: Delivery workspace review
+  steps:
+    - id: open-ready
+      instruction: Start the web target with the hybrid Gateway preset.
+      observationCriteria: The dashboard renders upstream data and identifies its runtime.
+      scenarioId: dashboard-ready
+      bindingId: dashboard-ready-web
+    - id: review-ready-lab
+      instruction: Run the dashboard-ready Scenario Lab script and inspect its collected Evidence.
+      observationCriteria: Automated acceptance and the human Evidence decision remain separate.
+      scenarioId: dashboard-ready
+      bindingId: dashboard-ready-lab-web
+    - id: open-failure
+      instruction: Apply the failure preset and retry the dashboard request.
+      observationCriteria: An unexpected failure is identified independently from dependency unavailability.
+      scenarioId: dashboard-failed
+      bindingId: dashboard-failed-web
+    - id: open-unavailable
+      instruction: Apply the unavailable preset and retry the dashboard request.
+      observationCriteria: A recoverable dependency outage is identified without presenting a generic failure.
+      scenarioId: dashboard-unavailable
+      bindingId: dashboard-unavailable-web

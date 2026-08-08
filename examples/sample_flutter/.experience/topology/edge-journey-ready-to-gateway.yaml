@@ -1,0 +1,9 @@
+schemaVersion: 2
+kind: EdgeInstance
+metadata:
+  id: journey-ready-to-gateway
+spec:
+  projectionId: delivery-journey
+  transitionId: ready-to-gateway
+  fromNodeId: journey-dashboard-ready
+  toNodeId: journey-inspect-gateway-traffic

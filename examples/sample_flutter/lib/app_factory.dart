@@ -1,31 +1,54 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sample_flutter/showcase_api.dart';
 import 'package:sample_flutter/showcase_models.dart';
 
 @immutable
 final class SampleAppConfig {
-  const SampleAppConfig({required this.apiBaseUrl, required this.environment});
+  const SampleAppConfig({
+    required this.apiBaseUrl,
+    required this.environment,
+    this.dashboardState = ShowcaseDashboardState.ready,
+  });
 
   const SampleAppConfig.production()
     : apiBaseUrl = 'http://127.0.0.1:8181',
-      environment = 'local-production';
+      environment = 'local-production',
+      dashboardState = ShowcaseDashboardState.ready;
 
   final String apiBaseUrl;
   final String environment;
+  final ShowcaseDashboardState dashboardState;
 }
 
-Widget createSampleApp(SampleAppConfig config, {ShowcaseApi? api}) => SampleApp(
+Widget createSampleApp(
+  SampleAppConfig config, {
+  ShowcaseApi? api,
+  ValueListenable<bool>? readyHighlight,
+}) => SampleApp(
   config: config,
-  api: api ?? HttpShowcaseApi(baseUrl: config.apiBaseUrl),
+  api:
+      api ??
+      HttpShowcaseApi(
+        baseUrl: config.apiBaseUrl,
+        dashboardState: config.dashboardState,
+      ),
+  readyHighlight: readyHighlight,
 );
 
 final class SampleApp extends StatelessWidget {
-  const SampleApp({required this.config, required this.api, super.key});
+  const SampleApp({
+    required this.config,
+    required this.api,
+    required this.readyHighlight,
+    super.key,
+  });
 
   final SampleAppConfig config;
   final ShowcaseApi api;
+  final ValueListenable<bool>? readyHighlight;
 
   @override
   Widget build(BuildContext context) => MaterialApp(
@@ -33,7 +56,11 @@ final class SampleApp extends StatelessWidget {
     debugShowCheckedModeBanner: false,
     theme: _theme(Brightness.light),
     darkTheme: _theme(Brightness.dark),
-    home: ShowcaseDashboardPage(config: config, api: api),
+    home: ShowcaseDashboardPage(
+      config: config,
+      api: api,
+      readyHighlight: readyHighlight,
+    ),
   );
 }
 
@@ -61,20 +88,21 @@ final class ShowcaseDashboardPage extends StatefulWidget {
   const ShowcaseDashboardPage({
     required this.config,
     required this.api,
+    required this.readyHighlight,
     super.key,
   });
 
   final SampleAppConfig config;
   final ShowcaseApi api;
+  final ValueListenable<bool>? readyHighlight;
 
   @override
   State<ShowcaseDashboardPage> createState() => _ShowcaseDashboardPageState();
 }
 
 final class _ShowcaseDashboardPageState extends State<ShowcaseDashboardPage> {
-  ShowcaseDashboard? _dashboard;
-  Object? _error;
-  var _loading = true;
+  ShowcaseDashboardResult _result = const ShowcaseDashboardResult.loading();
+  Object? _mutationError;
   final Set<String> _mutatingTasks = <String>{};
 
   @override
@@ -85,29 +113,34 @@ final class _ShowcaseDashboardPageState extends State<ShowcaseDashboardPage> {
 
   Future<void> _load() async {
     setState(() {
-      _loading = true;
-      _error = null;
+      _result = const ShowcaseDashboardResult.loading();
+      _mutationError = null;
     });
     try {
-      final dashboard = await widget.api.loadDashboard();
+      final result = await widget.api.loadDashboard();
       if (!mounted) return;
-      setState(() => _dashboard = dashboard);
+      setState(() => _result = result);
     } on Object catch (error) {
       if (!mounted) return;
-      setState(() => _error = error);
-    } finally {
-      if (mounted) setState(() => _loading = false);
+      setState(
+        () => _result = ShowcaseDashboardResult.failure(
+          errorCode: _loadFailureCode(error),
+        ),
+      );
     }
   }
 
   Future<void> _toggle(ShowcaseProject project, ShowcaseTask task) async {
     final operationId = '${project.id}.${task.id}';
-    setState(() => _mutatingTasks.add(operationId));
+    setState(() {
+      _mutatingTasks.add(operationId);
+      _mutationError = null;
+    });
     try {
       await widget.api.toggleTask(project.id, task.id);
       await _load();
     } on Object catch (error) {
-      if (mounted) setState(() => _error = error);
+      if (mounted) setState(() => _mutationError = error);
     } finally {
       if (mounted) setState(() => _mutatingTasks.remove(operationId));
     }
@@ -121,7 +154,7 @@ final class _ShowcaseDashboardPageState extends State<ShowcaseDashboardPage> {
         children: <Widget>[
           Text('Delivery Lab'),
           Text(
-            'DevExKit complete showcase',
+            'Abel complete showcase',
             style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
           ),
         ],
@@ -129,7 +162,9 @@ final class _ShowcaseDashboardPageState extends State<ShowcaseDashboardPage> {
       actions: <Widget>[
         IconButton(
           tooltip: 'Refresh dashboard',
-          onPressed: _loading ? null : _load,
+          onPressed: _result.state == ShowcaseDashboardState.loading
+              ? null
+              : _load,
           icon: const Icon(Icons.refresh),
         ),
         const SizedBox(width: 8),
@@ -138,17 +173,28 @@ final class _ShowcaseDashboardPageState extends State<ShowcaseDashboardPage> {
     body: SafeArea(
       child: Semantics(
         identifier: 'showcase.dashboard',
-        child: switch ((_loading, _dashboard, _error)) {
-          (true, null, _) => const _LoadingState(),
-          (_, null, final error?) => _ErrorState(error: error, onRetry: _load),
-          (_, final dashboard?, _) => _DashboardContent(
+        child: switch (_result.state) {
+          ShowcaseDashboardState.loading => const _LoadingState(),
+          ShowcaseDashboardState.empty => _EmptyState(onRefresh: _load),
+          ShowcaseDashboardState.unavailable => _UnavailableState(
+            errorCode: _result.errorCode!,
+            onRetry: _load,
+          ),
+          ShowcaseDashboardState.failure => _FailureState(
+            errorCode: _result.errorCode!,
+            onRetry: _load,
+          ),
+          ShowcaseDashboardState.ready ||
+          ShowcaseDashboardState.stale => _DashboardContent(
             config: widget.config,
-            dashboard: dashboard,
+            dashboard: _result.dashboard!,
+            state: _result.state,
+            staleSince: _result.staleSince,
+            readyHighlight: widget.readyHighlight,
             mutatingTasks: _mutatingTasks,
             onToggle: _toggle,
-            warning: _error,
+            warning: _mutationError,
           ),
-          _ => const SizedBox.shrink(),
         },
       ),
     ),
@@ -161,7 +207,7 @@ final class _LoadingState extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Center(
     child: Semantics(
-      identifier: 'showcase.loading',
+      identifier: 'showcase.state.loading',
       liveRegion: true,
       child: const Column(
         mainAxisSize: MainAxisSize.min,
@@ -175,61 +221,142 @@ final class _LoadingState extends StatelessWidget {
   );
 }
 
-final class _ErrorState extends StatelessWidget {
-  const _ErrorState({required this.error, required this.onRetry});
+final class _EmptyState extends StatelessWidget {
+  const _EmptyState({required this.onRefresh});
 
-  final Object error;
+  final VoidCallback onRefresh;
+
+  @override
+  Widget build(BuildContext context) => _StateMessage(
+    identifier: 'showcase.state.empty',
+    icon: Icons.inbox_outlined,
+    title: 'No delivery projects yet',
+    description:
+        'The workspace is available and returned a successful empty result.',
+    actionLabel: 'Refresh',
+    onAction: onRefresh,
+  );
+}
+
+final class _UnavailableState extends StatelessWidget {
+  const _UnavailableState({required this.errorCode, required this.onRetry});
+
+  final String errorCode;
   final VoidCallback onRetry;
 
   @override
-  Widget build(BuildContext context) => Center(
-    child: Semantics(
-      identifier: 'showcase.error',
-      liveRegion: true,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 420),
-        child: Card(
-          margin: const EdgeInsets.all(24),
-          child: Padding(
-            padding: const EdgeInsets.all(28),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Icon(
-                  Icons.cloud_off_outlined,
-                  size: 48,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'The workspace API is unavailable',
-                  style: Theme.of(context).textTheme.titleLarge,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Start the sample API or activate a deterministic Gateway preset.',
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                FilledButton.icon(
-                  onPressed: onRetry,
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Try again'),
-                ),
-              ],
+  Widget build(BuildContext context) => _StateMessage(
+    identifier: 'showcase.state.unavailable',
+    icon: Icons.cloud_off_outlined,
+    title: 'The workspace API is unavailable',
+    description:
+        'This dependency outage is recoverable. Start the sample API or activate the unavailable Gateway preset.',
+    diagnosticCode: errorCode,
+    actionLabel: 'Try again',
+    onAction: onRetry,
+  );
+}
+
+final class _FailureState extends StatelessWidget {
+  const _FailureState({required this.errorCode, required this.onRetry});
+
+  final String errorCode;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => _StateMessage(
+    identifier: 'showcase.state.failure',
+    icon: Icons.bug_report_outlined,
+    title: 'The dashboard could not be loaded',
+    description:
+        'The API reported an unexpected failure. Inspect the diagnostic code before retrying.',
+    diagnosticCode: errorCode,
+    actionLabel: 'Try again',
+    onAction: onRetry,
+    errorTone: true,
+  );
+}
+
+final class _StateMessage extends StatelessWidget {
+  const _StateMessage({
+    required this.identifier,
+    required this.icon,
+    required this.title,
+    required this.description,
+    required this.actionLabel,
+    required this.onAction,
+    this.diagnosticCode,
+    this.errorTone = false,
+  });
+
+  final String identifier;
+  final IconData icon;
+  final String title;
+  final String description;
+  final String? diagnosticCode;
+  final String actionLabel;
+  final VoidCallback onAction;
+  final bool errorTone;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Center(
+      child: Semantics(
+        identifier: identifier,
+        liveRegion: true,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 460),
+          child: Card(
+            margin: const EdgeInsets.all(24),
+            child: Padding(
+              padding: const EdgeInsets.all(28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(
+                    icon,
+                    size: 48,
+                    color: errorTone ? scheme.error : scheme.primary,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(description, textAlign: TextAlign.center),
+                  if (diagnosticCode != null) ...<Widget>[
+                    const SizedBox(height: 12),
+                    Text(
+                      'Diagnostic · $diagnosticCode',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                  ],
+                  const SizedBox(height: 20),
+                  FilledButton.icon(
+                    onPressed: onAction,
+                    icon: const Icon(Icons.refresh),
+                    label: Text(actionLabel),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 final class _DashboardContent extends StatelessWidget {
   const _DashboardContent({
     required this.config,
     required this.dashboard,
+    required this.state,
+    required this.staleSince,
+    required this.readyHighlight,
     required this.mutatingTasks,
     required this.onToggle,
     required this.warning,
@@ -237,57 +364,117 @@ final class _DashboardContent extends StatelessWidget {
 
   final SampleAppConfig config;
   final ShowcaseDashboard dashboard;
+  final ShowcaseDashboardState state;
+  final DateTime? staleSince;
+  final ValueListenable<bool>? readyHighlight;
   final Set<String> mutatingTasks;
   final void Function(ShowcaseProject, ShowcaseTask) onToggle;
   final Object? warning;
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) {
-      final wide = constraints.maxWidth >= 980;
-      final content = <Widget>[
-        _HeroSummary(summary: dashboard.summary),
-        if (warning != null) ...<Widget>[
-          const SizedBox(height: 16),
-          _InlineWarning(message: '$warning'),
-        ],
-        const SizedBox(height: 20),
-        Text('Active projects', style: Theme.of(context).textTheme.titleLarge),
-        const SizedBox(height: 12),
-        for (final project in dashboard.projects) ...<Widget>[
-          _ProjectCard(
-            project: project,
-            mutatingTasks: mutatingTasks,
-            onToggle: onToggle,
-          ),
-          const SizedBox(height: 12),
-        ],
-      ];
-      final activity = _ActivityPanel(
-        activity: dashboard.activity,
-        config: config,
-        revision: dashboard.revision,
-      );
-      return SingleChildScrollView(
-        padding: EdgeInsets.all(wide ? 28 : 16),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1280),
-            child: wide
-                ? Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Expanded(flex: 7, child: Column(children: content)),
-                      const SizedBox(width: 20),
-                      Expanded(flex: 3, child: activity),
-                    ],
-                  )
-                : Column(children: <Widget>[...content, activity]),
+  Widget build(BuildContext context) {
+    final content = Semantics(
+      identifier: 'showcase.state.${state.name}',
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final wide = constraints.maxWidth >= 980;
+          final content = <Widget>[
+            if (state == ShowcaseDashboardState.stale) ...<Widget>[
+              _StaleNotice(staleSince: staleSince!),
+              const SizedBox(height: 16),
+            ],
+            _HeroSummary(summary: dashboard.summary),
+            if (warning != null) ...<Widget>[
+              const SizedBox(height: 16),
+              _InlineWarning(message: '$warning'),
+            ],
+            const SizedBox(height: 20),
+            Text(
+              'Active projects',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 12),
+            for (final project in dashboard.projects) ...<Widget>[
+              _ProjectCard(
+                project: project,
+                mutatingTasks: mutatingTasks,
+                onToggle: onToggle,
+              ),
+              const SizedBox(height: 12),
+            ],
+          ];
+          final activity = _ActivityPanel(
+            activity: dashboard.activity,
+            config: config,
+            revision: dashboard.revision,
+          );
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(wide ? 28 : 16),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1280),
+                child: wide
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Expanded(flex: 7, child: Column(children: content)),
+                          const SizedBox(width: 20),
+                          Expanded(flex: 3, child: activity),
+                        ],
+                      )
+                    : Column(children: <Widget>[...content, activity]),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+    final highlight = readyHighlight;
+    if (highlight == null) {
+      return _ReadyHighlightFrame(enabled: false, child: content);
+    }
+    return ValueListenableBuilder<bool>(
+      valueListenable: highlight,
+      child: content,
+      builder: (context, enabled, child) => _ReadyHighlightFrame(
+        enabled: state == ShowcaseDashboardState.ready && enabled,
+        child: child!,
+      ),
+    );
+  }
+}
+
+final class _ReadyHighlightFrame extends StatelessWidget {
+  const _ReadyHighlightFrame({required this.enabled, required this.child});
+
+  final bool enabled;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Semantics(
+      container: true,
+      identifier: 'showcase.control.dashboard-ready-highlight',
+      label: 'Delivery readiness highlight',
+      value: enabled ? 'enabled' : 'disabled',
+      child: DecoratedBox(
+        key: ValueKey<String>(
+          'showcase.control.dashboard-ready-highlight.${enabled ? 'enabled' : 'disabled'}',
+        ),
+        decoration: BoxDecoration(
+          color: enabled
+              ? scheme.primaryContainer.withValues(alpha: 0.34)
+              : scheme.surfaceContainerLowest,
+          border: Border.all(
+            color: enabled ? scheme.primary : Colors.transparent,
+            width: 4,
           ),
         ),
-      );
-    },
-  );
+        child: child,
+      ),
+    );
+  }
 }
 
 final class _HeroSummary extends StatelessWidget {
@@ -338,6 +525,36 @@ final class _HeroSummary extends StatelessWidget {
       ),
     );
   }
+}
+
+final class _StaleNotice extends StatelessWidget {
+  const _StaleNotice({required this.staleSince});
+
+  final DateTime staleSince;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    identifier: 'showcase.stale.notice',
+    liveRegion: true,
+    child: Material(
+      color: Theme.of(context).colorScheme.tertiaryContainer,
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: <Widget>[
+            const Icon(Icons.history),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Showing a stale snapshot from ${staleSince.toUtc().toIso8601String()}.',
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
 final class _Metric extends StatelessWidget {
@@ -568,3 +785,9 @@ final class _InlineWarning extends StatelessWidget {
     ),
   );
 }
+
+String _loadFailureCode(Object error) => switch (error) {
+  ShowcaseApiException() => error.code,
+  TimeoutException() => 'CLIENT_TIMEOUT',
+  _ => 'CLIENT_LOAD_FAILURE',
+};

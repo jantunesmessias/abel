@@ -1,10 +1,10 @@
 # Resultados do spike descartável do Studio Jaspr
 
 Data: 2026-08-10. Escopo: fase J2 da ADR-0016. O código permanece em
-`.dart_tool/devex/spikes/` e não integra a Distribution.
+`.dart_tool/experience_platform/spikes/` e não integra a Distribution.
 
 Este relatório descreve somente o que foi executado. Ele não promove o visual
-do spike a produto e não comprova o cutover de `apps/devex_studio`.
+do spike a produto e não comprova o cutover de `apps/studio`.
 
 ## Confirmed
 
@@ -35,18 +35,18 @@ Evidência visual local do spike técnico:
 
 | Estado | Arquivo de trabalho |
 |---|---|
-| Host conectado | `/tmp/devex-jaspr-spike/01-overview.png` |
-| deep link direto | `/tmp/devex-jaspr-spike/04-deep-link-waited.png` |
-| envelope inválido rejeitado | `/tmp/devex-jaspr-spike/07-target-negative.png` |
-| snapshot stale | `/tmp/devex-jaspr-spike/08-host-stale.png` |
-| sessão recuperada | `/tmp/devex-jaspr-spike/09-host-recovered.png` |
+| Host conectado | `/tmp/workspace-jaspr-spike/01-overview.png` |
+| deep link direto | `/tmp/workspace-jaspr-spike/04-deep-link-waited.png` |
+| envelope inválido rejeitado | `/tmp/workspace-jaspr-spike/07-target-negative.png` |
+| snapshot stale | `/tmp/workspace-jaspr-spike/08-host-stale.png` |
+| sessão recuperada | `/tmp/workspace-jaspr-spike/09-host-recovered.png` |
 
 ## Partial
 
 - a CSP foi exercitada como meta tag; headers da Distribution ainda não foram
   implementados;
 - o Host Client do spike reproduz apenas o mínimo do protocolo. O vertical
-  final deve reutilizar `devex_contracts` e o Host Client tipado do Studio;
+  final deve reutilizar `experience_contracts` e o Host Client tipado do Studio;
 - o output bruto `build/jaspr` inclui assets de tooling/packages que não são
   referenciados pelo HTML. A Distribution precisa publicar um allowlist
   explícito, não copiar o diretório bruto;
@@ -59,10 +59,10 @@ Evidência visual local do spike técnico:
 
 ## Unverified
 
-- package, entrypoint e build reais de `apps/devex_studio`;
+- package, entrypoint e build reais de `apps/studio`;
 - UI System Jaspr, componentes, temas, foco, teclado e acessibilidade;
 - fluxos completos de initialize/events/resume/preview collection;
-- supervisor `devex dev`, readiness, shutdown e distribuição headless;
+- supervisor `workspace dev`, readiness, shutdown e distribuição headless;
 - performance, reflow 360 px, texto 200%, contraste e reduced motion;
 - stale → collect → fresh do AutoPreview com PNG real;
 - duas builds finais e audit completo da Distribution.

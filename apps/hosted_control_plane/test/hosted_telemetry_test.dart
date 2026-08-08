@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:devex_hosted_control_plane/hosted_control_plane.dart';
+import 'package:hosted_control_plane/hosted_control_plane.dart';
 import 'package:shelf/shelf.dart';
 import 'package:test/test.dart';
 

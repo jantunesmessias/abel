@@ -1,0 +1,13 @@
+name: experience_engine
+version: 0.1.0-dev
+resolution: workspace
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  experience_contracts: ^0.1.0-dev
+  yaml: ^3.1.3
+
+dev_dependencies:
+  test: ^1.26.3

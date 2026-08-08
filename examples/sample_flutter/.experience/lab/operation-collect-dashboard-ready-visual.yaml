@@ -1,0 +1,8 @@
+schemaVersion: 2
+kind: ScenarioLabOperation
+metadata:
+  id: collect-dashboard-ready-visual
+spec:
+  scenarioId: dashboard-ready
+  kind: collectEvidence
+  evidenceRequirementId: dashboard-ready-visual

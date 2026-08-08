@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/evidence/test-evidence-summary",
+  "title": "TestEvidenceSummary",
+  "type": "object",
+  "required": [
+    "schemaVersion", "kind", "providerId", "runnerProtocolVersion",
+    "runnerVersion", "success", "total", "passed", "failed", "skipped",
+    "durationMilliseconds", "platforms", "reportArtifact",
+    "referencedArtifacts", "digest"
+  ],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "kind": {"const": "TestEvidenceSummary"},
+    "providerId": {"const": "dart-test-json-v1"},
+    "runnerProtocolVersion": {"const": "0.1.1"},
+    "runnerVersion": {"type": "string", "minLength": 1},
+    "success": {"type": "boolean"},
+    "total": {"type": "integer", "minimum": 0},
+    "passed": {"type": "integer", "minimum": 0},
+    "failed": {"type": "integer", "minimum": 0},
+    "skipped": {"type": "integer", "minimum": 0},
+    "durationMilliseconds": {"type": "integer", "minimum": 0},
+    "platforms": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "reportArtifact": {"$ref": "#/$defs/artifact"},
+    "referencedArtifacts": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/artifact"}
+    },
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "artifact": {
+      "type": "object",
+      "required": ["digest", "size", "mediaType", "classification", "role"],
+      "properties": {
+        "digest": {"$ref": "#/$defs/digest"},
+        "size": {"type": "integer", "minimum": 0},
+        "mediaType": {"type": "string", "minLength": 1},
+        "classification": {"enum": ["public", "internal", "sensitive"]},
+        "role": {"type": "string", "minLength": 1},
+        "pixelDigest": {"$ref": "#/$defs/digest"},
+        "width": {"type": "integer", "minimum": 1},
+        "height": {"type": "integer", "minimum": 1}
+      },
+      "dependentRequired": {
+        "pixelDigest": ["width", "height"],
+        "width": ["pixelDigest", "height"],
+        "height": ["pixelDigest", "width"]
+      },
+      "allOf": [
+        {
+          "if": {"required": ["pixelDigest"]},
+          "then": {"properties": {"mediaType": {"const": "image/png"}}}
+        }
+      ],
+      "additionalProperties": false
+    }
+  }
+}

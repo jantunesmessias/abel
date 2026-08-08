@@ -1,0 +1,12 @@
+schemaVersion: 2
+kind: AutomatedAcceptanceCriterion
+metadata:
+  id: dashboard-ready-control-restored
+spec:
+  scenarioId: dashboard-ready
+  displayName: Dashboard highlight control is restored
+  kind: controlEquals
+  controlId: dashboard-ready-highlight-enabled
+  expectedValue:
+    kind: boolean
+    value: false

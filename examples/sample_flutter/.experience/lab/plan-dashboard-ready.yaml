@@ -1,0 +1,28 @@
+schemaVersion: 2
+kind: ScenarioLabPlan
+metadata:
+  id: dashboard-ready
+spec:
+  scenarioId: dashboard-ready
+  executionBindingIds:
+    - dashboard-ready-lab-web
+  controlIds:
+    - dashboard-ready-highlight-enabled
+  operationIds:
+    - enable-dashboard-ready-highlight
+    - collect-dashboard-ready-visual
+    - reset-dashboard-ready-highlight
+  scriptIds:
+    - exercise-dashboard-ready-lab
+  automatedAcceptanceCriterionIds:
+    - dashboard-ready-script-succeeds
+    - dashboard-ready-visual-accepted
+    - dashboard-ready-control-restored
+  requiredEvidenceIds:
+    - dashboard-ready-visual
+  comparisonBindingIds:
+    - dashboard-ready-baseline-candidate
+  humanApprovalRequirementIds:
+    - approve-dashboard-ready-visual
+  supplementalArtifactIds:
+    - dashboard-ready-synthetic-baseline

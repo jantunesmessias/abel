@@ -1,0 +1,27 @@
+name: studio
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  experience_contracts: ^0.1.0-dev
+  experience_engine: ^0.1.0-dev
+  interaction_model: ^0.1.0-dev
+  jaspr: 0.23.3
+  jaspr_router: 0.9.0
+  studio_ui: ^0.1.0-dev
+  web: ^1.1.1
+  web_socket_channel: ^3.0.3
+
+dev_dependencies:
+  build_runner: ^2.10.0
+  build_web_compilers: ^4.8.0
+  jaspr_builder: 0.23.3
+  jaspr_test: 0.23.3
+  test: ^1.26.3
+
+jaspr:
+  mode: client
+  styles: standalone

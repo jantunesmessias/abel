@@ -1,0 +1,79 @@
+schemaVersion: 2
+kind: ProjectionLayout
+metadata:
+  id: delivery-inventory
+spec:
+  projectionId: delivery-inventory
+  nodeFrames:
+    - nodeInstanceId: inventory-dashboard-loading
+      x: 80
+      y: 80
+      width: 220
+      height: 120
+      groupId: inventory-dashboard-group
+      laneId: inventory-state-lane
+    - nodeInstanceId: inventory-dashboard-ready
+      x: 360
+      y: 80
+      width: 220
+      height: 120
+      groupId: inventory-dashboard-group
+      laneId: inventory-state-lane
+    - nodeInstanceId: inventory-dashboard-failed
+      x: 640
+      y: 80
+      width: 220
+      height: 120
+      groupId: inventory-dashboard-group
+      laneId: inventory-state-lane
+    - nodeInstanceId: inventory-toggle-delivery-task
+      x: 360
+      y: 360
+      width: 220
+      height: 120
+      groupId: inventory-dashboard-group
+      laneId: inventory-operation-lane
+    - nodeInstanceId: inventory-inspect-gateway-traffic
+      x: 1020
+      y: 360
+      width: 220
+      height: 120
+      groupId: inventory-gateway-group
+      laneId: inventory-operation-lane
+  groups:
+    - id: inventory-dashboard-group
+      title: Delivery dashboard
+      x: 40
+      y: 20
+      width: 860
+      height: 500
+    - id: inventory-gateway-group
+      title: Gateway observability
+      x: 960
+      y: 20
+      width: 320
+      height: 500
+  lanes:
+    - id: inventory-state-lane
+      title: Observable states
+      x: 20
+      y: 60
+      width: 1260
+      height: 180
+    - id: inventory-operation-lane
+      title: Reviewer operations
+      x: 20
+      y: 340
+      width: 1260
+      height: 180
+  annotations:
+    - id: inventory-reuse-note
+      text: This inventory reuses the five semantic Scenarios while owning a separate set of visual NodeInstances.
+      x: 960
+      y: 80
+      width: 320
+      height: 140
+  camera:
+    x: 0
+    y: 0
+    zoom: 0.9

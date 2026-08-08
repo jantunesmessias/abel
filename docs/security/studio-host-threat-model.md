@@ -43,7 +43,7 @@ No modo empacotado, o bootstrap exige `Sec-Fetch-Site: same-origin`, não aceita
 query, não habilita CORS e nunca é cacheável. No hot reload, ele é exposto pelo
 Host somente quando `--studio-dev-origin` foi configurado com um origin HTTP
 loopback; exige `Origin` exato, responde com CORS para essa única audience,
-mantém `no-store` e continua proibindo query. `DEVEX_STUDIO_BOOTSTRAP_URL`
+mantém `no-store` e continua proibindo query. `STUDIO_BOOTSTRAP_URL`
 contém apenas o endpoint, nunca o token.
 
 Esses controles impedem leitura por outra página no modelo do browser. Não
@@ -90,9 +90,9 @@ plugins, SO, permissões, teclado ou comportamento host-native.
 - browser E2E com Host real, handles/PNGs reais e zero log severo;
 - resources bounded, digest verificado, `sensitive` negado e cache `no-store`;
 - vinte ciclos Host + Studio e shutdown por sinal sem listener residual;
-- Distribution v2 slim e supply-chain/architecture guards; reproduções Jaspr
+- Distribution slim canônica e supply-chain/architecture guards; reproduções Jaspr
   modular e full passaram com bundles de mesmo digest, incluindo headless sem
   Studio.
 
 Esses gates são locais e portáteis; não alteram os riscos residuais nem
-certificam sandbox de OS, host multiusuário ou infraestrutura V4/V5.
+certificam sandbox de OS, host multiusuário ou infraestrutura hosted control plane/remote execution.

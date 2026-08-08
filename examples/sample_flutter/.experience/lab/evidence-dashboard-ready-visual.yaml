@@ -1,0 +1,17 @@
+schemaVersion: 2
+kind: RequiredEvidence
+metadata:
+  id: dashboard-ready-visual
+spec:
+  scenarioId: dashboard-ready
+  providerId: capture.app-adapter
+  fidelity: simulated
+  variantId: phone.light.en-us
+  freshness: fresh
+  allowedClassifications:
+    - public
+    - internal
+  evidencePolicyId: static-v1
+  comparisonPolicy:
+    kind: visual
+    policyId: dashboard-ready-pixel-v1

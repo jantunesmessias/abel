@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: NodeInstance
+metadata:
+  id: journey-dashboard-loading
+spec:
+  projectionId: delivery-journey
+  scenarioId: dashboard-loading

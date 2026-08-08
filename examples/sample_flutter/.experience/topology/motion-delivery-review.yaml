@@ -1,0 +1,35 @@
+schemaVersion: 2
+kind: MotionSequence
+metadata:
+  id: delivery-review-motion
+spec:
+  projectionId: delivery-journey
+  title: Delivery review sequence
+  staticSummary: Loading resolves to ready, then the reviewer can inspect Gateway traffic directly or after toggling a delivery task.
+  steps:
+    - id: loading-to-ready
+      transitionId: loading-to-ready
+      fromNodeId: journey-dashboard-loading
+      toNodeId: journey-dashboard-ready
+      startMs: 0
+      fullDurationMs: 420
+      reducedDurationMs: 80
+      easing: easeInOut
+      observations:
+        - id: ready-content-visible
+          label: Ready dashboard content is visible and named in the static summary.
+          atFraction: 1.0
+          kind: stateVisible
+    - id: ready-to-gateway
+      transitionId: ready-to-gateway
+      fromNodeId: journey-dashboard-ready
+      toNodeId: journey-inspect-gateway-traffic
+      startMs: 520
+      fullDurationMs: 360
+      reducedDurationMs: 60
+      easing: linear
+      observations:
+        - id: gateway-inspection-visible
+          label: Gateway inspection is visible and remains reachable without motion.
+          atFraction: 1.0
+          kind: transitionCompleted

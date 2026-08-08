@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: ScenarioState
+metadata:
+  id: dashboard.failed
+spec:
+  surfaceId: delivery-dashboard
+  displayName: Unexpected failure

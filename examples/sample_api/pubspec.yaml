@@ -1,5 +1,5 @@
 name: sample_api
-description: Generic local API used by the complete DevExKit showcase.
+description: Generic local API used by the complete Abel showcase.
 version: 0.1.0
 publish_to: none
 resolution: workspace

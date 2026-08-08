@@ -1,7 +1,7 @@
-# Migração do único DevEx Studio para Jaspr
+# Migração do único Abel Studio para Jaspr
 
 Status: cutover executado em 2026-08-11; distribuição/gates finais registrados
-em `devex-studio-reconstruction-results.md`. Decisão: ADR-0016. Este documento
+em `studio-reconstruction-results.md`. Decisão: ADR-0016. Este documento
 preserva o baseline e o diário histórico; não descreve a UI atual como Flutter.
 
 ## 1. Estado inicial preservado
@@ -19,24 +19,24 @@ Baseline registrado em 2026-08-10:
   Studio e token somente no body;
 - Chrome mostrou `Host conectado`, Journey Map, duas Scenarios, AutoPreview
   estrutural e Inspector;
-- `./tool/check.sh` passou integralmente antes do início da migração.
+- `melos run check` passou integralmente antes do início da migração.
 
 Capturas válidas no mesmo viewport de 1948 × 1108:
 
 | Produto/estado | Arquivo de trabalho | SHA-256 |
 |---|---|---|
-| Atlas, Journey board | `/tmp/devex-ux-audit-round-2/04-atlas.png` | `311b47ee14236c0cfb047f11b04a478a6cb91327e3e7c2208c7719b2a9217914` |
-| DevExKit, Journey conectado | `/tmp/devex-host-recovery/host-session-current.png` | `4012e00137ab5693fed5de567d9e728c13c9b95935bdcea509d2a001bb888c35` |
+| Atlas, Journey board | `/tmp/workspace-ux-audit-round-2/04-atlas.png` | `311b47ee14236c0cfb047f11b04a478a6cb91327e3e7c2208c7719b2a9217914` |
+| Abel, Journey conectado | `/tmp/workspace-host-recovery/host-session-current.png` | `4012e00137ab5693fed5de567d9e728c13c9b95935bdcea509d2a001bb888c35` |
 
 Essas capturas são baseline local, não golden e não prova da futura UI Jaspr.
 Elas foram inspecionadas e rejeitariam estados vazios, loading ou janela
 incorreta.
 
-## 2. Matriz Atlas × baseline DevExKit
+## 2. Matriz Atlas × baseline Abel
 
 Status visual atual, antes do cutover:
 
-| Critério | Atlas | DevExKit Flutter baseline | Direção Jaspr | Status |
+| Critério | Atlas | Abel Flutter baseline | Direção Jaspr | Status |
 |---|---|---|---|---|
 | Entrada da tarefa | board denso e fluxo ativo imediatamente visíveis | busca e árvore de aplicação claras, mas Journey exige contexto prévio | Overview com ação prioritária e continuidade para Journey | Partial |
 | Arquitetura da informação | explorer, mapa, lanes e detalhe coexistem | explorer, mapa e inspector coexistem com menos densidade | preservar três painéis com disclosure responsivo | Partial |
@@ -51,7 +51,7 @@ Status visual atual, antes do cutover:
 | Web semântico | implementação do Atlas não é claim deste repo | Semantics Flutter adaptada | landmarks/HTML nativos e AX tree browser | Unverified |
 | Performance | não medida nesta rodada | benchmark Flutter 1k nodes aprovado | novos budgets DOM/layout/memória necessários | Unverified |
 
-Não existe claim de “melhor que Atlas” nesta fase. O DevExKit já possui uma
+Não existe claim de “melhor que Atlas” nesta fase. O Abel já possui uma
 vantagem funcional observável em provenance de Evidence; o Atlas mantém
 vantagem em densidade, visão geral e velocidade de scan no board.
 
@@ -122,7 +122,7 @@ Flutter no cutover.
 
 ### Fase J2 — Spike descartável
 
-Local: `.dart_tool/devex/spikes/jaspr_studio/`.
+Local: `.dart_tool/experience_platform/spikes/jaspr_studio/`.
 
 Provar Pub Workspace, `mode: client`, routing, bootstrap, WebSocket, Origin,
 CORS, reconnect, handle, iframe isolado e `jaspr build`. O spike não vira app,
@@ -138,8 +138,8 @@ J2 antes da conclusão.
 
 ### Fase J3 — UI/UX System
 
-- preservar `devex_ux_system` Dart puro;
-- reimplementar `devex_ui_system` com Jaspr/HTML/CSS;
+- preservar `interaction_model` Dart puro;
+- reimplementar `studio_ui` com Jaspr/HTML/CSS;
 - tokens, temas, primitives, controls, overlays e patterns;
 - testes de componente, foco, teclado, contraste, reflow e reduced motion.
 
@@ -148,10 +148,10 @@ componentes mínimos demonstrados.
 
 ### Fase J4 — Cutover do app e shell
 
-- trocar `apps/devex_studio/pubspec.yaml` e entrypoint;
+- trocar `apps/studio/pubspec.yaml` e entrypoint;
 - migrar bootstrap, Host Client, router, shell, Overview e capability gating;
 - manter nome, rotas públicas e identidade;
-- ajustar `devex dev` para hot reload/readiness Jaspr.
+- ajustar `workspace dev` para hot reload/readiness Jaspr.
 
 Gate: Host real abre o único Studio Jaspr, reconecta e não materializa token.
 Somente então remover a implementação Flutter da árvore atual.
@@ -202,4 +202,4 @@ três Variants/7 PNGs. O Target consumer-specific também foi comprovado com
 build Flutter web release pré-compilado, e o Gateway com seleção guiada de
 preset, target pelo origin do sidecar e TrafficEvents. Esses resultados não
 reescrevem o gate histórico; a evidência atual está em
-`devex-studio-reconstruction-results.md` e `studio-conformance-v1.md`.
+`studio-reconstruction-results.md` e `studio-conformance.md`.

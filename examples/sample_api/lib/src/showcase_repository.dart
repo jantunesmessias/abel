@@ -1,5 +1,7 @@
 enum ProjectHealth { onTrack, atRisk, blocked }
 
+enum DashboardState { ready, loading, empty, stale, unavailable, failure }
+
 final class ShowcaseTask {
   const ShowcaseTask({
     required this.id,
@@ -65,10 +67,6 @@ final class ShowcaseProject {
   };
 }
 
-/// Deterministic, in-memory state for a generic delivery workspace.
-///
-/// Mutations are intentional so the example can demonstrate Gateway traffic,
-/// Journey scenarios, resets and test evidence without an external database.
 final class ShowcaseRepository {
   ShowcaseRepository() {
     reset();

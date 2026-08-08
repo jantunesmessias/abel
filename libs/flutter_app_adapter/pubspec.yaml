@@ -1,0 +1,25 @@
+name: flutter_app_adapter
+version: 0.1.0-dev
+resolution: workspace
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  experience_contracts: ^0.1.0-dev
+  flutter:
+    sdk: flutter
+  http: ^1.6.0
+  web: ^1.1.1
+
+dev_dependencies:
+  execution_runtime: ^0.1.0-dev
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: io.github.jantunesmessias.flutter_app_adapter
+        pluginClass: AppAdapterPlugin

@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: VisualComparisonPolicy
+metadata:
+  id: dashboard-ready-pixel-v1
+spec:
+  maxChannelDelta: 8
+  maxChangedPixelRatio: 0.005

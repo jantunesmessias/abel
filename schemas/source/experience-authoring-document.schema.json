@@ -1,0 +1,1096 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/source/experience-authoring-document",
+  "title": "Experience authoring document for experience topology, scenario facets and Scenario Lab inputs",
+  "type": "object",
+  "required": ["schemaVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "schemaVersion": {"const": 2},
+    "kind": {
+      "enum": [
+        "Board",
+        "ExperienceProjection",
+        "NodeInstance",
+        "EdgeInstance",
+        "ProjectionLayout",
+        "ScenarioKindDefinition",
+        "ExperienceSurface",
+        "ScenarioState",
+        "OwnershipArea",
+        "ScenarioTag",
+        "ExperienceComponent",
+        "ScenarioFixture",
+        "FormFactor",
+        "PresentationFrame",
+        "ScenarioFacet",
+        "AppAdapterCapability",
+        "ScenarioControl",
+        "ScenarioLabOperation",
+        "ScenarioScript",
+        "AutomatedAcceptanceCriterion",
+        "RequiredEvidence",
+        "ScenarioComparisonBinding",
+        "VisualComparisonPolicy",
+        "SemanticComparisonPolicy",
+        "HumanApprovalRequirement",
+        "SupplementalArtifact",
+        "ScenarioLabPlan",
+        "MotionSequence"
+      ]
+    },
+    "metadata": {"$ref": "#/$defs/metadata"},
+    "spec": {"type": "object"}
+  },
+  "additionalProperties": false,
+  "oneOf": [
+    {
+      "properties": {
+        "kind": {"const": "Board"},
+        "spec": {"$ref": "#/$defs/boardSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "ExperienceProjection"},
+        "spec": {"$ref": "#/$defs/projectionSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "NodeInstance"},
+        "spec": {"$ref": "#/$defs/nodeSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "EdgeInstance"},
+        "spec": {"$ref": "#/$defs/edgeSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "ProjectionLayout"},
+        "spec": {"$ref": "#/$defs/layoutSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "ScenarioKindDefinition"},
+        "spec": {"$ref": "#/$defs/namedDefinitionSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "ExperienceSurface"},
+        "spec": {"$ref": "#/$defs/applicationDefinitionSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "ScenarioState"},
+        "spec": {"$ref": "#/$defs/stateDefinitionSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "OwnershipArea"},
+        "spec": {"$ref": "#/$defs/namedDefinitionSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "ScenarioTag"},
+        "spec": {"$ref": "#/$defs/namedDefinitionSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "ExperienceComponent"},
+        "spec": {"$ref": "#/$defs/applicationDefinitionSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "ScenarioFixture"},
+        "spec": {"$ref": "#/$defs/applicationDefinitionSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "FormFactor"},
+        "spec": {"$ref": "#/$defs/namedDefinitionSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "PresentationFrame"},
+        "spec": {"$ref": "#/$defs/frameDefinitionSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "ScenarioFacet"},
+        "spec": {"$ref": "#/$defs/scenarioFacetSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "AppAdapterCapability"},
+        "spec": {"$ref": "#/$defs/appAdapterCapabilitySpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "ScenarioControl"},
+        "spec": {"$ref": "#/$defs/scenarioControlSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "ScenarioLabOperation"},
+        "spec": {"$ref": "#/$defs/scenarioLabOperationSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "ScenarioScript"},
+        "spec": {"$ref": "#/$defs/scenarioScriptSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "AutomatedAcceptanceCriterion"},
+        "spec": {"$ref": "#/$defs/automatedAcceptanceCriterionSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "RequiredEvidence"},
+        "spec": {"$ref": "#/$defs/requiredEvidenceSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "ScenarioComparisonBinding"},
+        "spec": {"$ref": "#/$defs/scenarioComparisonBindingSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "VisualComparisonPolicy"},
+        "spec": {"$ref": "#/$defs/visualComparisonPolicySpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "SemanticComparisonPolicy"},
+        "spec": {"$ref": "#/$defs/semanticComparisonPolicySpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "HumanApprovalRequirement"},
+        "spec": {"$ref": "#/$defs/humanApprovalRequirementSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "SupplementalArtifact"},
+        "spec": {"$ref": "#/$defs/supplementalArtifactSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "ScenarioLabPlan"},
+        "spec": {"$ref": "#/$defs/scenarioLabPlanSpec"}
+      }
+    },
+    {
+      "properties": {
+        "kind": {"const": "MotionSequence"},
+        "spec": {"$ref": "#/$defs/motionSequenceSpec"}
+      }
+    }
+  ],
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "boundedText": {"type": "string", "minLength": 1, "maxLength": 2048},
+    "metadata": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {"id": {"$ref": "#/$defs/opaqueId"}},
+      "additionalProperties": false
+    },
+    "idArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 500000,
+      "items": {"$ref": "#/$defs/opaqueId"}
+    },
+    "nonEmptyIdArray": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/opaqueId"}
+    },
+    "namedDefinitionSpec": {
+      "type": "object",
+      "required": ["displayName"],
+      "properties": {
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 512}
+      },
+      "additionalProperties": false
+    },
+    "applicationDefinitionSpec": {
+      "type": "object",
+      "required": ["applicationId", "displayName"],
+      "properties": {
+        "applicationId": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 512}
+      },
+      "additionalProperties": false
+    },
+    "stateDefinitionSpec": {
+      "type": "object",
+      "required": ["surfaceId", "displayName"],
+      "properties": {
+        "surfaceId": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 512}
+      },
+      "additionalProperties": false
+    },
+    "frameDefinitionSpec": {
+      "type": "object",
+      "required": ["displayName", "frameKind"],
+      "properties": {
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 512},
+        "frameKind": {
+          "enum": ["device", "browser", "desktopWindow", "component", "none"]
+        },
+        "formFactorId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "properties": {"frameKind": {"const": "none"}},
+          "not": {"required": ["formFactorId"]}
+        },
+        {
+          "properties": {
+            "frameKind": {
+              "enum": ["device", "browser", "desktopWindow", "component"]
+            }
+          },
+          "required": ["formFactorId"]
+        }
+      ]
+    },
+    "previewDescriptorSource": {
+      "type": "object",
+      "required": ["kind", "previewId"],
+      "properties": {
+        "kind": {"const": "previewDescriptor"},
+        "previewId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "executionBindingSource": {
+      "type": "object",
+      "required": ["kind", "bindingId"],
+      "properties": {
+        "kind": {"const": "executionBinding"},
+        "bindingId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "externalHarnessSource": {
+      "type": "object",
+      "required": ["kind", "providerId", "harnessId"],
+      "properties": {
+        "kind": {"const": "externalHarness"},
+        "providerId": {"$ref": "#/$defs/opaqueId"},
+        "harnessId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "archiveArtifactSource": {
+      "type": "object",
+      "required": ["kind", "artifactDigest"],
+      "properties": {
+        "kind": {"const": "archiveArtifact"},
+        "artifactDigest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "renderSource": {
+      "oneOf": [
+        {"$ref": "#/$defs/previewDescriptorSource"},
+        {"$ref": "#/$defs/executionBindingSource"},
+        {"$ref": "#/$defs/externalHarnessSource"},
+        {"$ref": "#/$defs/archiveArtifactSource"}
+      ]
+    },
+    "scenarioFacetSpec": {
+      "type": "object",
+      "required": [
+        "scenarioId",
+        "lifecycle",
+        "scenarioKindId",
+        "surfaceId",
+        "stateId",
+        "ownershipAreaId",
+        "tagIds",
+        "componentIds",
+        "fixtureId",
+        "renderSource",
+        "presentationFrameIds",
+        "preferredPresentationFrameId"
+      ],
+      "properties": {
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "lifecycle": {"enum": ["concept", "current", "historical"]},
+        "scenarioKindId": {"$ref": "#/$defs/opaqueId"},
+        "surfaceId": {"$ref": "#/$defs/opaqueId"},
+        "stateId": {"$ref": "#/$defs/opaqueId"},
+        "ownershipAreaId": {"$ref": "#/$defs/opaqueId"},
+        "tagIds": {"$ref": "#/$defs/nonEmptyIdArray"},
+        "componentIds": {"$ref": "#/$defs/nonEmptyIdArray"},
+        "fixtureId": {"$ref": "#/$defs/opaqueId"},
+        "renderSource": {"$ref": "#/$defs/renderSource"},
+        "presentationFrameIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        },
+        "preferredPresentationFrameId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "appAdapterCapabilitySpec": {
+      "type": "object",
+      "required": ["version", "operations"],
+      "properties": {
+        "version": {"type": "integer", "minimum": 1, "maximum": 1000000},
+        "operations": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "scenarioControlCapabilityReference": {
+      "type": "object",
+      "required": ["id", "version"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "version": {"type": "integer", "minimum": 1, "maximum": 1000000}
+      },
+      "additionalProperties": false
+    },
+    "booleanControlValue": {
+      "type": "object",
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": {"const": "boolean"},
+        "value": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "choiceControlValue": {
+      "type": "object",
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": {"const": "choice"},
+        "value": {"$ref": "#/$defs/opaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "integerControlValue": {
+      "type": "object",
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": {"const": "integer"},
+        "value": {"type": "integer", "minimum": -1000000, "maximum": 1000000}
+      },
+      "additionalProperties": false
+    },
+    "scenarioControlValue": {
+      "oneOf": [
+        {"$ref": "#/$defs/booleanControlValue"},
+        {"$ref": "#/$defs/choiceControlValue"},
+        {"$ref": "#/$defs/integerControlValue"}
+      ]
+    },
+    "scenarioControlChoice": {
+      "type": "object",
+      "required": ["id", "displayName"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 512}
+      },
+      "additionalProperties": false
+    },
+    "booleanControlDomain": {
+      "type": "object",
+      "required": ["kind", "defaultValue"],
+      "properties": {
+        "kind": {"const": "boolean"},
+        "defaultValue": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "choiceControlDomain": {
+      "type": "object",
+      "required": ["kind", "defaultValue", "choices"],
+      "properties": {
+        "kind": {"const": "choice"},
+        "defaultValue": {"$ref": "#/$defs/opaqueId"},
+        "choices": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/scenarioControlChoice"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "integerRangeControlDomain": {
+      "type": "object",
+      "required": ["kind", "defaultValue", "minimum", "maximum", "step"],
+      "properties": {
+        "kind": {"const": "integerRange"},
+        "defaultValue": {"type": "integer", "minimum": -1000000, "maximum": 1000000},
+        "minimum": {"type": "integer", "minimum": -1000000, "maximum": 1000000},
+        "maximum": {"type": "integer", "minimum": -1000000, "maximum": 1000000},
+        "step": {"type": "integer", "minimum": 1, "maximum": 1000000}
+      },
+      "additionalProperties": false
+    },
+    "scenarioControlDomain": {
+      "oneOf": [
+        {"$ref": "#/$defs/booleanControlDomain"},
+        {"$ref": "#/$defs/choiceControlDomain"},
+        {"$ref": "#/$defs/integerRangeControlDomain"}
+      ]
+    },
+    "scenarioControlSpec": {
+      "type": "object",
+      "required": [
+        "scenarioId",
+        "displayName",
+        "capability",
+        "readOperationId",
+        "writeOperationId",
+        "domain"
+      ],
+      "properties": {
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 512},
+        "capability": {"$ref": "#/$defs/scenarioControlCapabilityReference"},
+        "readOperationId": {"$ref": "#/$defs/opaqueId"},
+        "writeOperationId": {"$ref": "#/$defs/opaqueId"},
+        "resetOperationId": {"$ref": "#/$defs/opaqueId"},
+        "domain": {"$ref": "#/$defs/scenarioControlDomain"}
+      },
+      "additionalProperties": false
+    },
+    "assignControlOperationSpec": {
+      "type": "object",
+      "required": ["scenarioId", "kind", "controlId", "value"],
+      "properties": {
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "kind": {"const": "assignControl"},
+        "controlId": {"$ref": "#/$defs/opaqueId"},
+        "value": {"$ref": "#/$defs/scenarioControlValue"}
+      },
+      "additionalProperties": false
+    },
+    "resetControlOperationSpec": {
+      "type": "object",
+      "required": ["scenarioId", "kind", "controlId"],
+      "properties": {
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "kind": {"const": "resetControl"},
+        "controlId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "collectEvidenceOperationSpec": {
+      "type": "object",
+      "required": ["scenarioId", "kind", "evidenceRequirementId"],
+      "properties": {
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "kind": {"const": "collectEvidence"},
+        "evidenceRequirementId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "scenarioLabOperationSpec": {
+      "oneOf": [
+        {"$ref": "#/$defs/assignControlOperationSpec"},
+        {"$ref": "#/$defs/resetControlOperationSpec"},
+        {"$ref": "#/$defs/collectEvidenceOperationSpec"}
+      ]
+    },
+    "operationScriptStep": {
+      "type": "object",
+      "required": ["id", "kind", "operationId", "timeoutMs", "timeoutOutcome"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "kind": {"const": "operation"},
+        "operationId": {"$ref": "#/$defs/opaqueId"},
+        "timeoutMs": {"type": "integer", "minimum": 1, "maximum": 300000},
+        "timeoutOutcome": {"enum": ["fail", "cancel"]}
+      },
+      "additionalProperties": false
+    },
+    "executionBindingScriptStep": {
+      "type": "object",
+      "required": ["id", "kind", "bindingId", "timeoutMs", "timeoutOutcome"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "kind": {"const": "executionBinding"},
+        "bindingId": {"$ref": "#/$defs/opaqueId"},
+        "timeoutMs": {"type": "integer", "minimum": 1, "maximum": 300000},
+        "timeoutOutcome": {"enum": ["fail", "cancel"]}
+      },
+      "additionalProperties": false
+    },
+    "scenarioScriptStep": {
+      "oneOf": [
+        {"$ref": "#/$defs/operationScriptStep"},
+        {"$ref": "#/$defs/executionBindingScriptStep"}
+      ]
+    },
+    "scenarioScriptSpec": {
+      "type": "object",
+      "required": [
+        "scenarioId",
+        "displayName",
+        "timeoutMs",
+        "timeoutOutcome",
+        "cancellationPolicy",
+        "steps"
+      ],
+      "properties": {
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 512},
+        "timeoutMs": {"type": "integer", "minimum": 1, "maximum": 1800000},
+        "timeoutOutcome": {"enum": ["fail", "cancel"]},
+        "cancellationPolicy": {"enum": ["immediate", "afterCurrentStep"]},
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/scenarioScriptStep"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "scriptSucceededCriterionSpec": {
+      "type": "object",
+      "required": ["scenarioId", "displayName", "kind", "scriptId"],
+      "properties": {
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 512},
+        "kind": {"const": "scriptSucceeded"},
+        "scriptId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "evidenceAcceptedCriterionSpec": {
+      "type": "object",
+      "required": ["scenarioId", "displayName", "kind", "evidenceRequirementId"],
+      "properties": {
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 512},
+        "kind": {"const": "evidenceAccepted"},
+        "evidenceRequirementId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "controlEqualsCriterionSpec": {
+      "type": "object",
+      "required": ["scenarioId", "displayName", "kind", "controlId", "expectedValue"],
+      "properties": {
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 512},
+        "kind": {"const": "controlEquals"},
+        "controlId": {"$ref": "#/$defs/opaqueId"},
+        "expectedValue": {"$ref": "#/$defs/scenarioControlValue"}
+      },
+      "additionalProperties": false
+    },
+    "automatedAcceptanceCriterionSpec": {
+      "oneOf": [
+        {"$ref": "#/$defs/scriptSucceededCriterionSpec"},
+        {"$ref": "#/$defs/evidenceAcceptedCriterionSpec"},
+        {"$ref": "#/$defs/controlEqualsCriterionSpec"}
+      ]
+    },
+    "visualComparisonPolicyReference": {
+      "type": "object",
+      "required": ["kind", "policyId"],
+      "properties": {
+        "kind": {"const": "visual"},
+        "policyId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "semanticComparisonPolicyReference": {
+      "type": "object",
+      "required": ["kind", "policyId"],
+      "properties": {
+        "kind": {"const": "semantic"},
+        "policyId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "comparisonPolicyReference": {
+      "oneOf": [
+        {"$ref": "#/$defs/visualComparisonPolicyReference"},
+        {"$ref": "#/$defs/semanticComparisonPolicyReference"}
+      ]
+    },
+    "requiredEvidenceSpec": {
+      "type": "object",
+      "required": [
+        "scenarioId",
+        "providerId",
+        "fidelity",
+        "variantId",
+        "freshness",
+        "allowedClassifications",
+        "evidencePolicyId",
+        "comparisonPolicy"
+      ],
+      "properties": {
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "providerId": {"$ref": "#/$defs/opaqueId"},
+        "fidelity": {"enum": ["structural", "simulated", "hostNative", "deviceAttested"]},
+        "variantId": {"$ref": "#/$defs/opaqueId"},
+        "freshness": {"const": "fresh"},
+        "allowedClassifications": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {"enum": ["public", "internal", "sensitive"]}
+        },
+        "evidencePolicyId": {"$ref": "#/$defs/opaqueId"},
+        "comparisonPolicy": {"$ref": "#/$defs/comparisonPolicyReference"}
+      },
+      "additionalProperties": false
+    },
+    "artifactComparisonInput": {
+      "type": "object",
+      "required": ["kind", "artifactId"],
+      "properties": {
+        "kind": {"const": "artifact"},
+        "artifactId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "evidenceComparisonInput": {
+      "type": "object",
+      "required": ["kind", "evidenceDigest", "provenanceDigest", "classification"],
+      "properties": {
+        "kind": {"const": "evidence"},
+        "evidenceDigest": {"$ref": "#/$defs/digest"},
+        "provenanceDigest": {"$ref": "#/$defs/digest"},
+        "classification": {"enum": ["public", "internal", "sensitive"]}
+      },
+      "additionalProperties": false
+    },
+    "requiredEvidenceComparisonInput": {
+      "type": "object",
+      "required": ["kind", "requiredEvidenceId"],
+      "properties": {
+        "kind": {"const": "requiredEvidence"},
+        "requiredEvidenceId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "comparisonInput": {
+      "oneOf": [
+        {"$ref": "#/$defs/artifactComparisonInput"},
+        {"$ref": "#/$defs/evidenceComparisonInput"},
+        {"$ref": "#/$defs/requiredEvidenceComparisonInput"}
+      ]
+    },
+    "scenarioComparisonBindingSpec": {
+      "type": "object",
+      "required": ["scenarioId", "requiredEvidenceId", "baseline", "candidate"],
+      "properties": {
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "requiredEvidenceId": {"$ref": "#/$defs/opaqueId"},
+        "baseline": {"$ref": "#/$defs/comparisonInput"},
+        "candidate": {"$ref": "#/$defs/comparisonInput"}
+      },
+      "additionalProperties": false
+    },
+    "visualComparisonPolicySpec": {
+      "type": "object",
+      "required": ["maxChannelDelta", "maxChangedPixelRatio"],
+      "properties": {
+        "maxChannelDelta": {"type": "integer", "minimum": 0, "maximum": 255},
+        "maxChangedPixelRatio": {"type": "number", "minimum": 0, "maximum": 1}
+      },
+      "additionalProperties": false
+    },
+    "semanticComparisonPolicySpec": {
+      "type": "object",
+      "required": ["maxChangedNodes", "ignoreBounds"],
+      "properties": {
+        "maxChangedNodes": {"type": "integer", "minimum": 0, "maximum": 1000000},
+        "ignoreBounds": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "humanApprovalRequirementSpec": {
+      "type": "object",
+      "required": ["scenarioId", "reviewGuideId", "reviewGuideStepId", "scope"],
+      "properties": {
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "reviewGuideId": {"$ref": "#/$defs/opaqueId"},
+        "reviewGuideStepId": {"$ref": "#/$defs/opaqueId"},
+        "scope": {"enum": ["scenarioRun", "evidenceSet"]}
+      },
+      "additionalProperties": false
+    },
+    "supplementalArtifactSpec": {
+      "type": "object",
+      "required": [
+        "scenarioId",
+        "requiredEvidenceId",
+        "role",
+        "artifactDigest",
+        "provenanceDigest",
+        "classification"
+      ],
+      "properties": {
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "requiredEvidenceId": {"$ref": "#/$defs/opaqueId"},
+        "role": {
+          "enum": ["comparisonBaseline", "comparisonCandidate", "diagnostic"]
+        },
+        "artifactDigest": {"$ref": "#/$defs/digest"},
+        "provenanceDigest": {"$ref": "#/$defs/digest"},
+        "classification": {"enum": ["public", "internal", "sensitive"]}
+      },
+      "additionalProperties": false
+    },
+    "motionObservation": {
+      "type": "object",
+      "required": ["id", "label", "atFraction", "kind"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "label": {"type": "string", "minLength": 1, "maxLength": 512},
+        "atFraction": {"type": "number", "minimum": 0, "maximum": 1},
+        "kind": {
+          "enum": ["stateVisible", "transitionCompleted", "contentStable"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "motionStep": {
+      "type": "object",
+      "required": [
+        "id",
+        "transitionId",
+        "fromNodeId",
+        "toNodeId",
+        "startMs",
+        "fullDurationMs",
+        "reducedDurationMs",
+        "easing",
+        "observations"
+      ],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "transitionId": {"$ref": "#/$defs/opaqueId"},
+        "fromNodeId": {"$ref": "#/$defs/opaqueId"},
+        "toNodeId": {"$ref": "#/$defs/opaqueId"},
+        "startMs": {"type": "integer", "minimum": 0, "maximum": 600000},
+        "fullDurationMs": {"type": "integer", "minimum": 1, "maximum": 60000},
+        "reducedDurationMs": {"type": "integer", "minimum": 0, "maximum": 60000},
+        "easing": {"enum": ["linear", "easeInOut"]},
+        "observations": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {"$ref": "#/$defs/motionObservation"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "motionSequenceSpec": {
+      "type": "object",
+      "required": ["projectionId", "title", "staticSummary", "steps"],
+      "properties": {
+        "projectionId": {"$ref": "#/$defs/opaqueId"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 512},
+        "staticSummary": {"type": "string", "minLength": 1, "maxLength": 2048},
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "items": {"$ref": "#/$defs/motionStep"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "scenarioLabPlanSpec": {
+      "type": "object",
+      "required": [
+        "scenarioId",
+        "executionBindingIds",
+        "controlIds",
+        "operationIds",
+        "scriptIds",
+        "automatedAcceptanceCriterionIds",
+        "requiredEvidenceIds",
+        "comparisonBindingIds",
+        "humanApprovalRequirementIds",
+        "supplementalArtifactIds"
+      ],
+      "properties": {
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "executionBindingIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        },
+        "controlIds": {
+          "type": "array",
+          "maxItems": 256,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        },
+        "operationIds": {
+          "type": "array",
+          "maxItems": 10000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        },
+        "scriptIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        },
+        "automatedAcceptanceCriterionIds": {
+          "type": "array",
+          "maxItems": 10000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        },
+        "requiredEvidenceIds": {
+          "type": "array",
+          "maxItems": 1000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        },
+        "comparisonBindingIds": {
+          "type": "array",
+          "maxItems": 1000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        },
+        "humanApprovalRequirementIds": {
+          "type": "array",
+          "maxItems": 1000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        },
+        "supplementalArtifactIds": {
+          "type": "array",
+          "maxItems": 1000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "boardSpec": {
+      "type": "object",
+      "required": ["applicationId", "title", "projectionIds"],
+      "properties": {
+        "applicationId": {"$ref": "#/$defs/opaqueId"},
+        "title": {"$ref": "#/$defs/boundedText"},
+        "projectionIds": {"$ref": "#/$defs/idArray"}
+      },
+      "additionalProperties": false
+    },
+    "projectionSpec": {
+      "type": "object",
+      "required": [
+        "boardId",
+        "applicationId",
+        "title",
+        "projectionKind",
+        "nodeInstanceIds",
+        "edgeInstanceIds"
+      ],
+      "properties": {
+        "boardId": {"$ref": "#/$defs/opaqueId"},
+        "applicationId": {"$ref": "#/$defs/opaqueId"},
+        "title": {"$ref": "#/$defs/boundedText"},
+        "journeyId": {"$ref": "#/$defs/opaqueId"},
+        "projectionKind": {
+          "enum": ["journey", "inventory", "history", "comparison", "changeset"]
+        },
+        "nodeInstanceIds": {"$ref": "#/$defs/idArray"},
+        "edgeInstanceIds": {"$ref": "#/$defs/idArray"}
+      },
+      "additionalProperties": false,
+      "if": {"properties": {"projectionKind": {"const": "journey"}}},
+      "then": {"required": ["journeyId"]}
+    },
+    "nodeSpec": {
+      "type": "object",
+      "required": ["projectionId", "scenarioId"],
+      "properties": {
+        "projectionId": {"$ref": "#/$defs/opaqueId"},
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "comparisonRole": {"enum": ["canonical", "baseline", "candidate"]}
+      },
+      "additionalProperties": false
+    },
+    "edgeSpec": {
+      "type": "object",
+      "required": [
+        "projectionId",
+        "transitionId",
+        "fromNodeId",
+        "toNodeId"
+      ],
+      "properties": {
+        "projectionId": {"$ref": "#/$defs/opaqueId"},
+        "transitionId": {"$ref": "#/$defs/opaqueId"},
+        "fromNodeId": {"$ref": "#/$defs/opaqueId"},
+        "toNodeId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "coordinate": {
+      "type": "number",
+      "minimum": -1000000,
+      "maximum": 1000000
+    },
+    "extent": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1000000
+    },
+    "nodeFrame": {
+      "type": "object",
+      "required": ["nodeInstanceId", "x", "y", "width", "height"],
+      "properties": {
+        "nodeInstanceId": {"$ref": "#/$defs/opaqueId"},
+        "x": {"$ref": "#/$defs/coordinate"},
+        "y": {"$ref": "#/$defs/coordinate"},
+        "width": {"$ref": "#/$defs/extent"},
+        "height": {"$ref": "#/$defs/extent"},
+        "groupId": {"$ref": "#/$defs/opaqueId"},
+        "laneId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "region": {
+      "type": "object",
+      "required": ["id", "title", "x", "y", "width", "height"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "title": {"$ref": "#/$defs/boundedText"},
+        "x": {"$ref": "#/$defs/coordinate"},
+        "y": {"$ref": "#/$defs/coordinate"},
+        "width": {"$ref": "#/$defs/extent"},
+        "height": {"$ref": "#/$defs/extent"}
+      },
+      "additionalProperties": false
+    },
+    "annotation": {
+      "type": "object",
+      "required": ["id", "text", "x", "y", "width", "height"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "text": {"type": "string", "minLength": 1, "maxLength": 16384},
+        "x": {"$ref": "#/$defs/coordinate"},
+        "y": {"$ref": "#/$defs/coordinate"},
+        "width": {"$ref": "#/$defs/extent"},
+        "height": {"$ref": "#/$defs/extent"}
+      },
+      "additionalProperties": false
+    },
+    "camera": {
+      "type": "object",
+      "required": ["x", "y", "zoom"],
+      "properties": {
+        "x": {"$ref": "#/$defs/coordinate"},
+        "y": {"$ref": "#/$defs/coordinate"},
+        "zoom": {"type": "number", "minimum": 0.05, "maximum": 64}
+      },
+      "additionalProperties": false
+    },
+    "layoutSpec": {
+      "type": "object",
+      "required": [
+        "projectionId",
+        "nodeFrames",
+        "groups",
+        "lanes",
+        "annotations",
+        "camera"
+      ],
+      "properties": {
+        "projectionId": {"$ref": "#/$defs/opaqueId"},
+        "nodeFrames": {
+          "type": "array",
+          "maxItems": 500000,
+          "items": {"$ref": "#/$defs/nodeFrame"}
+        },
+        "groups": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": {"$ref": "#/$defs/region"}
+        },
+        "lanes": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": {"$ref": "#/$defs/region"}
+        },
+        "annotations": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": {"$ref": "#/$defs/annotation"}
+        },
+        "camera": {"$ref": "#/$defs/camera"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

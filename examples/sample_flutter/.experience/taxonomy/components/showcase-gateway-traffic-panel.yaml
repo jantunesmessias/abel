@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: ExperienceComponent
+metadata:
+  id: showcase-gateway-traffic-panel
+spec:
+  applicationId: sample
+  displayName: Showcase Gateway traffic panel

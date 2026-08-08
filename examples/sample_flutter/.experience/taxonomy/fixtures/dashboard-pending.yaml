@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: ScenarioFixture
+metadata:
+  id: sample.dashboard.pending
+spec:
+  applicationId: sample
+  displayName: Pending dashboard response

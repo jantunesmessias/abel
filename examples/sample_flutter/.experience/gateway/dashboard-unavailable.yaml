@@ -1,0 +1,11 @@
+schemaVersion: 1
+kind: GatewayRoute
+metadata:
+  id: dashboard-unavailable
+spec:
+  scopeId: showcase-api
+  method: GET
+  pathTemplate: /v1/dashboard
+  appliesTo: [showcase-unavailable]
+  policy: localOnly
+  fixtureId: dashboard-unavailable

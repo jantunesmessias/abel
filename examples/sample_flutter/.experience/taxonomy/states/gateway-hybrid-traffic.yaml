@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: ScenarioState
+metadata:
+  id: gateway.hybrid-traffic
+spec:
+  surfaceId: gateway-observability
+  displayName: Hybrid Gateway traffic

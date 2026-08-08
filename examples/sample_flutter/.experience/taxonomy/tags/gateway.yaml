@@ -1,0 +1,6 @@
+schemaVersion: 2
+kind: ScenarioTag
+metadata:
+  id: gateway
+spec:
+  displayName: Gateway

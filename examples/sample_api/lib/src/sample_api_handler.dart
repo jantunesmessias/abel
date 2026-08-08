@@ -24,6 +24,7 @@ final class SampleApiHandler {
     ..post('/v1/projects/<projectId>/tasks/<taskId>/toggle', _toggleTask)
     ..post('/v1/reset', _reset)
     ..get('/v1/runtime/configuration', _runtimeConfiguration)
+    ..get('/v1/unavailable', _unavailable)
     ..get('/v1/failure', _failure)
     ..options('/<ignored|.*>', _options);
 
@@ -34,7 +35,35 @@ final class SampleApiHandler {
     'revision': repository.revision,
   });
 
-  Response _dashboard(Request request) => _json(repository.dashboard());
+  Response _dashboard(Request request) {
+    final requestedState = request.url.queryParameters['state'];
+    final state = _dashboardState(requestedState);
+    if (state == null) {
+      return _json(const <String, Object?>{
+        'error': 'DASHBOARD_STATE_INVALID',
+      }, status: 400);
+    }
+    return switch (state) {
+      DashboardState.ready => _dashboardData(state),
+      DashboardState.loading => _json(const <String, Object?>{
+        'state': 'loading',
+        'retryAfterMs': 1000,
+      }, status: 202),
+      DashboardState.empty => _json(const <String, Object?>{'state': 'empty'}),
+      DashboardState.stale => _json(<String, Object?>{
+        'state': state.name,
+        'staleSince': '2026-08-13T12:00:00.000Z',
+        'dashboard': repository.dashboard(),
+      }),
+      DashboardState.unavailable => _unavailable(request),
+      DashboardState.failure => _failure(request),
+    };
+  }
+
+  Response _dashboardData(DashboardState state) => _json(<String, Object?>{
+    'state': state.name,
+    'dashboard': repository.dashboard(),
+  });
 
   Response _projects(Request request) => _json(<String, Object?>{
     'revision': repository.revision,
@@ -76,15 +105,30 @@ final class SampleApiHandler {
     'revision': repository.revision,
   });
 
-  Response _failure(Request request) => _json(const <String, Object?>{
+  Response _unavailable(Request request) => _json(const <String, Object?>{
+    'state': 'unavailable',
     'error': 'SAMPLE_DEPENDENCY_UNAVAILABLE',
     'recoverable': true,
   }, status: 503);
+
+  Response _failure(Request request) => _json(const <String, Object?>{
+    'state': 'failure',
+    'error': 'SAMPLE_API_FAILURE',
+    'recoverable': false,
+  }, status: 500);
 
   Response _options(Request request, String ignored) => Response(204);
 
   Response _notFound(String code) =>
       _json(<String, Object?>{'error': code}, status: 404);
+}
+
+DashboardState? _dashboardState(String? value) {
+  if (value == null) return DashboardState.ready;
+  for (final state in DashboardState.values) {
+    if (state.name == value) return state;
+  }
+  return null;
 }
 
 Middleware _errorMiddleware() =>

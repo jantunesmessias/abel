@@ -1,0 +1,9 @@
+schemaVersion: 1
+kind: ScenarioExecutionBinding
+metadata:
+  id: dashboard-unavailable-web
+spec:
+  scenarioId: dashboard-unavailable
+  targetId: sample-web
+  launchProfileId: sample-web
+  gatewayPresetId: showcase-unavailable

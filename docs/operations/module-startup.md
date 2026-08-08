@@ -1,6 +1,6 @@
 # Operação do startup modular
 
-Status: runbook ativo MC2–MC6.
+Status: runbook ativo configuração e resolver modular–composição do Studio.
 
 ## Pipeline canônico
 
@@ -10,7 +10,7 @@ Distribution/ModuleCatalog
           -> WorkspaceConfigurationLoader
           -> KitPlanResolver
           -> ResolvedKitPlan + digest
-          -> staging .dart_tool/devex/run/<run-id>/resolved-kit-plan.json
+          -> staging .dart_tool/workspace/run/<run-id>/resolved-kit-plan.json
           -> CLI/Host
           -> ModuleLifecycleCoordinator
           -> EffectiveKitManifest
@@ -25,15 +25,15 @@ de outro catálogo ou digest divergente.
 ## Inspeção
 
 ```bash
-devex modules list --profile journey-preview
-devex modules explain --profile journey-preview --module evidence.auto-preview
-devex modules doctor --profile journey-preview
-devex dev --profile journey-preview
+workspace modules list --profile journey-preview
+workspace modules explain --profile journey-preview --module evidence.auto-preview
+workspace modules doctor --profile journey-preview
+workspace dev --profile journey-preview
 ```
 
-Durante execução, o Host oferece `devex.kit.describe` e
-`devex.kit.health`. O manifest efetivo também é persistido em
-`.dart_tool/devex/effective-kit.json` para diagnóstico local. Settings e
+Durante execução, o Host oferece `composition.describe` e
+`composition.health`. O manifest efetivo também é persistido em
+`.dart_tool/workspace/effective-kit.json` para diagnóstico local. Settings e
 diagnósticos nunca devem conter secret literal.
 
 ## Lifecycle
@@ -65,13 +65,9 @@ Cleanup é best-effort e falhas aparecem em health; não são ocultadas.
 | rota Studio ausente | verificar contribution no EffectiveKitManifest; Grant não habilita Module |
 | processo/listener residual | coletar health/logs e tratar como falha de conformance/lifecycle |
 
-## Migração de configuração
+## Configuração canônica
 
-```bash
-devex config migrate --to 2 --dry-run
-devex config migrate --to 2 --apply
-```
-
-O preview é puro. `--apply` usa troca atômica e preserva
-`devex.yaml.v1.bak`. Leitura v1 continua disponível por
-`legacy-full-local-v1`; migração não é condição para rollback de Distribution.
+O arquivo principal `workspace.yaml` exige `schemaVersion: 2` e uma seleção
+`kit` explícita. Uma revisão anterior ao contrato publicado é recusada antes
+do plano e do lifecycle. Rollback de Distribution continua independente do
+arquivo autoral do consumer.

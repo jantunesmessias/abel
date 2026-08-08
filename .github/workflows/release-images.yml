@@ -55,16 +55,16 @@ jobs:
         env:
           INPUT_WEB_RUNTIME_IMAGE: ${{ inputs.web_runtime_image }}
           INPUT_ANDROID_RUNTIME_IMAGE: ${{ inputs.android_runtime_image }}
-          CONFIG_WEB_RUNTIME_IMAGE: ${{ vars.DEVEX_WEB_RUNTIME_IMAGE }}
-          CONFIG_ANDROID_RUNTIME_IMAGE: ${{ vars.DEVEX_ANDROID_RUNTIME_IMAGE }}
+          CONFIG_WEB_RUNTIME_IMAGE: ${{ vars.REMOTE_WEB_RUNTIME_IMAGE }}
+          CONFIG_ANDROID_RUNTIME_IMAGE: ${{ vars.ANDROID_RUNTIME_IMAGE }}
           INPUT_ANDROID_SCRCPY_SERVER_DIGEST: ${{ inputs.android_scrcpy_server_digest }}
-          CONFIG_ANDROID_SCRCPY_SERVER_DIGEST: ${{ vars.DEVEX_ANDROID_SCRCPY_SERVER_DIGEST }}
+          CONFIG_ANDROID_SCRCPY_SERVER_DIGEST: ${{ vars.ANDROID_SCRCPY_SERVER_DIGEST }}
           COMPONENT: ${{ matrix.component }}
           RUNTIME_KIND: ${{ matrix.runtime }}
         run: |
           set -euo pipefail
           owner="${GITHUB_REPOSITORY_OWNER,,}"
-          image="ghcr.io/${owner}/flutterdevexkit-${COMPONENT}"
+          image="ghcr.io/${owner}/${COMPONENT}"
           runtime_image=""
           scrcpy_server_digest=""
           case "$RUNTIME_KIND" in
@@ -91,11 +91,11 @@ jobs:
           {
             printf 'name=%s\n' "$image"
             printf 'tag=%s:sha-%s\n' "$image" "$GITHUB_SHA"
-            printf 'build_args<<DEVEX_BUILD_ARGS\n'
+            printf 'build_args<<OCI_BUILD_ARGS\n'
             printf 'RUNTIME_IMAGE=%s\n' "$runtime_image"
             printf 'RUNTIME_KIND=%s\n' "$RUNTIME_KIND"
             printf 'SCRCPY_SERVER_DIGEST=%s\n' "$scrcpy_server_digest"
-            printf 'DEVEX_BUILD_ARGS\n'
+            printf 'OCI_BUILD_ARGS\n'
           } >> "$GITHUB_OUTPUT"
 
       - uses: docker/setup-buildx-action@f7ce87c1d6bead3e36075b2ce75da1f6cc28aaca # v3.9.0

@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: ScenarioFixture
+metadata:
+  id: sample.dashboard.task-toggled
+spec:
+  applicationId: sample
+  displayName: Toggled delivery task

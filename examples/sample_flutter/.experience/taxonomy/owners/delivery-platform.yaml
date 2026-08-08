@@ -1,0 +1,6 @@
+schemaVersion: 2
+kind: OwnershipArea
+metadata:
+  id: delivery-platform
+spec:
+  displayName: Delivery platform

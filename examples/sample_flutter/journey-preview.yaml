@@ -1,0 +1,25 @@
+schemaVersion: 2
+
+content:
+  root: .experience
+
+workspace:
+  id: sample-flutter-preview
+  displayName: Sample Flutter AutoPreview consumer
+
+applications:
+  sample:
+    root: .
+    target: web
+    displayName: Sample Flutter
+
+kit:
+  profile: journey-preview
+  modules: {}
+  providerBindings:
+    - capability: {id: evidence.visual, version: 1}
+      providerModuleIds:
+        - evidence.auto-preview
+      selectionPolicy: orderedFirstAvailable
+      applicationId: sample
+  startupPolicy: fail-required-v1

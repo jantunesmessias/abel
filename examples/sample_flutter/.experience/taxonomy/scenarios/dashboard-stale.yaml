@@ -1,0 +1,19 @@
+schemaVersion: 2
+kind: ScenarioFacet
+metadata:
+  id: dashboard-stale
+spec:
+  scenarioId: dashboard-stale
+  lifecycle: current
+  scenarioKindId: observable-state
+  surfaceId: delivery-dashboard
+  stateId: dashboard.stale
+  ownershipAreaId: delivery-experience
+  tagIds: [dashboard, async-state, resilience, synthetic-data]
+  componentIds: [showcase-dashboard-page]
+  fixtureId: sample.dashboard.stale
+  renderSource:
+    kind: previewDescriptor
+    previewId: sample.dashboard.stale
+  presentationFrameIds: [desktop-browser]
+  preferredPresentationFrameId: desktop-browser

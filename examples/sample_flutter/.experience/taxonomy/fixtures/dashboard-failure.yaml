@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: ScenarioFixture
+metadata:
+  id: sample.dashboard.failure
+spec:
+  applicationId: sample
+  displayName: Unexpected dashboard failure

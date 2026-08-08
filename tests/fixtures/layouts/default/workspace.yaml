@@ -1,0 +1,6 @@
+schemaVersion: 2
+content: {root: .experience}
+workspace: {id: sample, displayName: Sample}
+applications:
+  app: {root: ., target: local}
+kit: {profile: full-local, modules: {}}

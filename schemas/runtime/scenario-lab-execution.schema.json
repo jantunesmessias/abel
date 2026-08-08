@@ -1,0 +1,382 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/runtime/scenario-lab-execution",
+  "title": "Scenario Lab execution contracts",
+  "oneOf": [
+    {"$ref": "#/$defs/startRequest"},
+    {"$ref": "#/$defs/runSnapshot"},
+    {"$ref": "#/$defs/runResult"},
+    {"$ref": "#/$defs/runReference"},
+    {"$ref": "#/$defs/observeRequest"},
+    {"$ref": "#/$defs/runObservation"}
+  ],
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "maxLength": 256
+    },
+    "time": {"type": "string", "format": "date-time", "maxLength": 64},
+    "controlValue": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": {"const": "boolean"},
+            "value": {"type": "boolean"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": {"const": "choice"},
+            "value": {"$ref": "#/$defs/id"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": {"const": "integer"},
+            "value": {"type": "integer", "minimum": -1000000, "maximum": 1000000}
+          }
+        }
+      ]
+    },
+    "failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cause"],
+      "properties": {
+        "cause": {
+          "enum": [
+            "adapterRejected",
+            "adapterDisconnected",
+            "invalidResponse",
+            "policyDenied",
+            "unsupported",
+            "timedOut",
+            "internalError"
+          ]
+        },
+        "diagnosticDigest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "stepSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stepId", "state"],
+      "properties": {
+        "stepId": {"$ref": "#/$defs/id"},
+        "state": {"enum": ["pending", "running", "succeeded", "failed", "cancelled", "skipped"]},
+        "startedAt": {"$ref": "#/$defs/time"},
+        "completedAt": {"$ref": "#/$defs/time"},
+        "terminalCause": {"enum": ["completed", "operationFailed", "timedOut", "cancelled", "skippedDependency"]}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"state": {"const": "pending"}}, "required": ["state"]},
+          "then": {"not": {"anyOf": [{"required": ["startedAt"]}, {"required": ["completedAt"]}, {"required": ["terminalCause"]}]}}
+        },
+        {
+          "if": {"properties": {"state": {"const": "running"}}, "required": ["state"]},
+          "then": {"required": ["startedAt"], "not": {"anyOf": [{"required": ["completedAt"]}, {"required": ["terminalCause"]}]}}
+        },
+        {
+          "if": {"properties": {"state": {"enum": ["succeeded", "failed", "cancelled", "skipped"]}}, "required": ["state"]},
+          "then": {"required": ["completedAt", "terminalCause"]}
+        }
+      ]
+    },
+    "controlResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["controlId", "source", "value"],
+      "properties": {
+        "controlId": {"$ref": "#/$defs/id"},
+        "source": {"enum": ["read", "write", "reset"]},
+        "value": {"$ref": "#/$defs/controlValue"}
+      }
+    },
+    "evidenceArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifactDigest", "provenanceDigest", "classification"],
+      "properties": {
+        "artifactDigest": {"$ref": "#/$defs/digest"},
+        "provenanceDigest": {"$ref": "#/$defs/digest"},
+        "classification": {"enum": ["public", "internal", "sensitive"]}
+      }
+    },
+    "requiredEvidenceResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requiredEvidenceId", "providerId", "fidelity", "variantId", "freshness", "state", "artifacts", "digest"],
+      "properties": {
+        "requiredEvidenceId": {"$ref": "#/$defs/id"},
+        "providerId": {"$ref": "#/$defs/id"},
+        "fidelity": {"enum": ["structural", "simulated", "hostNative", "deviceAttested"]},
+        "variantId": {"$ref": "#/$defs/id"},
+        "freshness": {"enum": ["missing", "fresh", "stale", "invalid"]},
+        "state": {"enum": ["pending", "collected", "missing", "failed", "unsupported", "policyDenied", "cancelled"]},
+        "evidenceDigest": {"$ref": "#/$defs/digest"},
+        "artifacts": {"type": "array", "maxItems": 64, "uniqueItems": true, "items": {"$ref": "#/$defs/evidenceArtifact"}},
+        "failure": {"$ref": "#/$defs/failure"},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"state": {"const": "collected"}}, "required": ["state"]},
+          "then": {"required": ["evidenceDigest"], "properties": {"freshness": {"const": "fresh"}, "artifacts": {"minItems": 1}}, "not": {"required": ["failure"]}},
+          "else": {"properties": {"freshness": {"not": {"const": "fresh"}}, "artifacts": {"maxItems": 0}}, "not": {"required": ["evidenceDigest"]}}
+        },
+        {
+          "if": {"properties": {"state": {"const": "failed"}}, "required": ["state"]},
+          "then": {"required": ["failure"]},
+          "else": {"not": {"required": ["failure"]}}
+        }
+      ]
+    },
+    "acceptanceResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["criterionId", "verificationState"],
+      "properties": {
+        "criterionId": {"$ref": "#/$defs/id"},
+        "verificationState": {"enum": ["notRun", "passed", "failed", "error"]},
+        "failure": {"$ref": "#/$defs/failure"}
+      },
+      "allOf": [{
+        "if": {"properties": {"verificationState": {"const": "error"}}, "required": ["verificationState"]},
+        "then": {"required": ["failure"]},
+        "else": {"not": {"required": ["failure"]}}
+      }]
+    },
+    "visualComparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resultKind", "bindingId", "requiredEvidenceId", "baselineDigest", "candidateDigest", "policyDigest", "verificationState", "digest"],
+      "properties": {
+        "resultKind": {"const": "visual"},
+        "bindingId": {"$ref": "#/$defs/id"},
+        "requiredEvidenceId": {"$ref": "#/$defs/id"},
+        "baselineDigest": {"$ref": "#/$defs/digest"},
+        "candidateDigest": {"$ref": "#/$defs/digest"},
+        "policyDigest": {"$ref": "#/$defs/digest"},
+        "verificationState": {"enum": ["notRun", "passed", "failed", "error"]},
+        "failure": {"$ref": "#/$defs/failure"},
+        "comparedPixels": {"type": "integer", "minimum": 1, "maximum": 1000000000},
+        "changedPixels": {"type": "integer", "minimum": 0, "maximum": 1000000000},
+        "maxChannelDeltaObserved": {"type": "integer", "minimum": 0, "maximum": 255},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"verificationState": {"enum": ["passed", "failed"]}}, "required": ["verificationState"]},
+          "then": {"required": ["comparedPixels", "changedPixels", "maxChannelDeltaObserved"], "not": {"required": ["failure"]}},
+          "else": {"not": {"anyOf": [{"required": ["comparedPixels"]}, {"required": ["changedPixels"]}, {"required": ["maxChannelDeltaObserved"]}]}}
+        },
+        {
+          "if": {"properties": {"verificationState": {"const": "error"}}, "required": ["verificationState"]},
+          "then": {"required": ["failure"]},
+          "else": {"not": {"required": ["failure"]}}
+        }
+      ]
+    },
+    "semanticComparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resultKind", "bindingId", "requiredEvidenceId", "baselineDigest", "candidateDigest", "policyDigest", "verificationState", "digest"],
+      "properties": {
+        "resultKind": {"const": "semantic"},
+        "bindingId": {"$ref": "#/$defs/id"},
+        "requiredEvidenceId": {"$ref": "#/$defs/id"},
+        "baselineDigest": {"$ref": "#/$defs/digest"},
+        "candidateDigest": {"$ref": "#/$defs/digest"},
+        "policyDigest": {"$ref": "#/$defs/digest"},
+        "verificationState": {"enum": ["notRun", "passed", "failed", "error"]},
+        "failure": {"$ref": "#/$defs/failure"},
+        "comparedNodes": {"type": "integer", "minimum": 1, "maximum": 1000000},
+        "changedNodes": {"type": "integer", "minimum": 0, "maximum": 1000000},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"verificationState": {"enum": ["passed", "failed"]}}, "required": ["verificationState"]},
+          "then": {"required": ["comparedNodes", "changedNodes"], "not": {"required": ["failure"]}},
+          "else": {"not": {"anyOf": [{"required": ["comparedNodes"]}, {"required": ["changedNodes"]}]}}
+        },
+        {
+          "if": {"properties": {"verificationState": {"const": "error"}}, "required": ["verificationState"]},
+          "then": {"required": ["failure"]},
+          "else": {"not": {"required": ["failure"]}}
+        }
+      ]
+    },
+    "comparisonResult": {
+      "oneOf": [
+        {"$ref": "#/$defs/visualComparison"},
+        {"$ref": "#/$defs/semanticComparison"}
+      ]
+    },
+    "cleanup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "resetControlIds"],
+      "properties": {
+        "state": {"enum": ["pending", "running", "succeeded", "failed", "notRequired"]},
+        "resetControlIds": {"type": "array", "maxItems": 10000, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "failure": {"$ref": "#/$defs/failure"}
+      },
+      "allOf": [{
+        "if": {"properties": {"state": {"const": "failed"}}, "required": ["state"]},
+        "then": {"required": ["failure"]},
+        "else": {"not": {"required": ["failure"]}}
+      }]
+    },
+    "runtimeInputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executionFingerprintDigest", "executionTargetId", "digest"],
+      "properties": {
+        "executionFingerprintDigest": {"$ref": "#/$defs/digest"},
+        "executionTargetId": {"$ref": "#/$defs/id"},
+        "gatewayPresetId": {"$ref": "#/$defs/id"},
+        "compiledGatewayPlanDigest": {"$ref": "#/$defs/digest"},
+        "routingTableDigest": {"$ref": "#/$defs/digest"},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [{
+        "if": {"required": ["gatewayPresetId"]},
+        "then": {"required": ["compiledGatewayPlanDigest", "routingTableDigest"]},
+        "else": {"not": {"anyOf": [{"required": ["compiledGatewayPlanDigest"]}, {"required": ["routingTableDigest"]}]}}
+      }]
+    },
+    "startRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "requestId", "expectedContentSetDigest", "expectedScenarioLabManifestDigest", "scenarioId", "scriptId", "requestedAt", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioLabRunStartRequest"},
+        "requestId": {"$ref": "#/$defs/id"},
+        "expectedContentSetDigest": {"$ref": "#/$defs/digest"},
+        "expectedScenarioLabManifestDigest": {"$ref": "#/$defs/digest"},
+        "scenarioId": {"$ref": "#/$defs/id"},
+        "scriptId": {"$ref": "#/$defs/id"},
+        "requestedAt": {"$ref": "#/$defs/time"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "runSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "runId", "startRequestDigest", "contentSetDigest", "catalogDigest", "scenarioLabManifestDigest", "scenarioId", "scriptId", "sequence", "observedAt", "state", "steps", "controls", "requiredEvidence", "automatedAcceptance", "comparisons", "cleanup", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioLabRunSnapshot"},
+        "runId": {"$ref": "#/$defs/id"},
+        "startRequestDigest": {"$ref": "#/$defs/digest"},
+        "contentSetDigest": {"$ref": "#/$defs/digest"},
+        "catalogDigest": {"$ref": "#/$defs/digest"},
+        "scenarioLabManifestDigest": {"$ref": "#/$defs/digest"},
+        "scenarioId": {"$ref": "#/$defs/id"},
+        "scriptId": {"$ref": "#/$defs/id"},
+        "sequence": {"type": "integer", "minimum": 0, "maximum": 9007199254740991},
+        "observedAt": {"$ref": "#/$defs/time"},
+        "state": {"enum": ["queued", "starting", "running", "cancelling", "succeeded", "failed", "cancelled"]},
+        "runtimeInputs": {"$ref": "#/$defs/runtimeInputs"},
+        "steps": {"type": "array", "minItems": 1, "maxItems": 1000, "items": {"$ref": "#/$defs/stepSnapshot"}},
+        "controls": {"type": "array", "maxItems": 10000, "items": {"$ref": "#/$defs/controlResult"}},
+        "requiredEvidence": {"type": "array", "maxItems": 10000, "items": {"$ref": "#/$defs/requiredEvidenceResult"}},
+        "automatedAcceptance": {"type": "array", "maxItems": 10000, "items": {"$ref": "#/$defs/acceptanceResult"}},
+        "comparisons": {"type": "array", "maxItems": 10000, "items": {"$ref": "#/$defs/comparisonResult"}},
+        "cleanup": {"$ref": "#/$defs/cleanup"},
+        "terminalCause": {"enum": ["completed", "acceptanceFailed", "stepFailed", "timedOut", "cancelledByUser", "hostShutdown", "adapterDisconnected", "cleanupFailed", "internalError"]},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"state": {"const": "queued"}}, "required": ["state"]},
+          "then": {"not": {"anyOf": [{"required": ["runtimeInputs"]}, {"required": ["terminalCause"]}]}},
+          "else": {"required": ["runtimeInputs"]}
+        },
+        {
+          "if": {"properties": {"state": {"enum": ["succeeded", "failed", "cancelled"]}}, "required": ["state"]},
+          "then": {"required": ["terminalCause"]},
+          "else": {"not": {"required": ["terminalCause"]}}
+        }
+      ]
+    },
+    "runResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "finalSnapshot", "startedAt", "completedAt", "verificationState", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioLabRunResult"},
+        "finalSnapshot": {"$ref": "#/$defs/runSnapshot"},
+        "startedAt": {"$ref": "#/$defs/time"},
+        "completedAt": {"$ref": "#/$defs/time"},
+        "verificationState": {"enum": ["notRun", "passed", "failed", "error"]},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "runReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "runId", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioLabRunReference"},
+        "runId": {"$ref": "#/$defs/id"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "observeRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "runId", "afterSequence", "limit", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioLabRunObserveRequest"},
+        "runId": {"$ref": "#/$defs/id"},
+        "afterSequence": {"type": "integer", "minimum": -1, "maximum": 9007199254740991},
+        "limit": {"type": "integer", "minimum": 1, "maximum": 100},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "runObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "runId", "disposition", "afterSequence", "current", "observations", "hasMore", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioLabRunObservation"},
+        "runId": {"$ref": "#/$defs/id"},
+        "disposition": {"enum": ["active", "terminal", "interrupted"]},
+        "afterSequence": {"type": "integer", "minimum": -1, "maximum": 9007199254740991},
+        "current": {"$ref": "#/$defs/runSnapshot"},
+        "observations": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {"$ref": "#/$defs/runSnapshot"}
+        },
+        "hasMore": {"type": "boolean"},
+        "result": {"$ref": "#/$defs/runResult"},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [{
+        "if": {"properties": {"disposition": {"const": "terminal"}}, "required": ["disposition"]},
+        "then": {"required": ["result"]},
+        "else": {"not": {"required": ["result"]}}
+      }]
+    }
+  }
+}

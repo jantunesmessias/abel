@@ -1,0 +1,677 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/evidence/scenario-quality",
+  "title": "Scenario Quality contracts",
+  "$comment": "This schema validates structural shape only. The public Dart codecs and constructors are the normative semantic validators for JCS digests, exact evidence-set coverage, resource bindings, and attribution fences.",
+  "oneOf": [
+    {"$ref": "#/$defs/qualitySnapshot"},
+    {"$ref": "#/$defs/humanDecisionRecord"},
+    {"$ref": "#/$defs/appAdapterCaptureReceipt"},
+    {"$ref": "#/$defs/decisionGrant"},
+    {"$ref": "#/$defs/describeRequest"},
+    {"$ref": "#/$defs/description"},
+    {"$ref": "#/$defs/reviewDescriptor"},
+    {"$ref": "#/$defs/describeResult"},
+    {"$ref": "#/$defs/openRequest"},
+    {"$ref": "#/$defs/openResult"},
+    {"$ref": "#/$defs/grantRequest"},
+    {"$ref": "#/$defs/appendRequest"},
+    {"$ref": "#/$defs/appendResult"},
+    {"$ref": "#/$defs/getRequest"},
+    {"$ref": "#/$defs/decisionView"},
+    {"$ref": "#/$defs/decisionError"}
+  ],
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "maxLength": 256
+    },
+    "time": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}(?:[0-9]{3})?Z$",
+      "maxLength": 64
+    },
+    "mediaType": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9.+-]*/[a-z0-9][a-z0-9.+-]*$",
+      "maxLength": 256
+    },
+    "humanDecisionProjection": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state"],
+          "properties": {"state": {"const": "unreviewed"}}
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "decisionDigest"],
+          "properties": {
+            "state": {"enum": ["approved", "rejected"]},
+            "decisionDigest": {"$ref": "#/$defs/digest"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "decisionDigest", "supersededByDecisionDigest"],
+          "properties": {
+            "state": {"const": "superseded"},
+            "decisionDigest": {"$ref": "#/$defs/digest"},
+            "supersededByDecisionDigest": {"$ref": "#/$defs/digest"}
+          }
+        }
+      ]
+    },
+    "requiredEvidenceVerification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requiredEvidenceId", "resultDigest", "verificationState"],
+      "properties": {
+        "requiredEvidenceId": {"$ref": "#/$defs/id"},
+        "resultDigest": {"$ref": "#/$defs/digest"},
+        "verificationState": {"enum": ["notRun", "passed", "failed", "error"]}
+      }
+    },
+    "qualitySnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "subjectDigest",
+        "runId",
+        "scenarioId",
+        "verificationState",
+        "humanDecision",
+        "requiredEvidence",
+        "comparisonResultDigests",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioQualitySnapshot"},
+        "subjectDigest": {"$ref": "#/$defs/digest"},
+        "runId": {"$ref": "#/$defs/id"},
+        "scenarioId": {"$ref": "#/$defs/id"},
+        "verificationState": {"enum": ["notRun", "passed", "failed", "error"]},
+        "humanDecision": {"$ref": "#/$defs/humanDecisionProjection"},
+        "requiredEvidence": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": {"$ref": "#/$defs/requiredEvidenceVerification"}
+        },
+        "comparisonResultDigests": {
+          "type": "array",
+          "maxItems": 10000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/digest"}
+        },
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "humanDecisionRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "subjectDigest",
+        "principalId",
+        "decision",
+        "decidedAt",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "HumanDecisionRecord"},
+        "id": {"$ref": "#/$defs/id"},
+        "subjectDigest": {"$ref": "#/$defs/digest"},
+        "principalId": {"$ref": "#/$defs/id"},
+        "decision": {"enum": ["approved", "rejected"]},
+        "decidedAt": {"$ref": "#/$defs/time"},
+        "supersedesDecisionDigest": {"$ref": "#/$defs/digest"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "rpcQualitySnapshot": {
+      "allOf": [
+        {"$ref": "#/$defs/qualitySnapshot"},
+        {
+          "properties": {
+            "requiredEvidence": {"maxItems": 32},
+            "comparisonResultDigests": {"maxItems": 32}
+          }
+        }
+      ]
+    },
+    "appAdapterCaptureReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "requestId",
+        "sessionId",
+        "artifactDigest",
+        "pixelDigest",
+        "size",
+        "width",
+        "height",
+        "mediaType",
+        "completedAt"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "requestId": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,256}$"},
+        "sessionId": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,256}$"},
+        "artifactDigest": {"$ref": "#/$defs/digest"},
+        "pixelDigest": {"$ref": "#/$defs/digest"},
+        "size": {"type": "integer", "minimum": 1, "maximum": 33554432},
+        "width": {"type": "integer", "minimum": 1, "maximum": 100000},
+        "height": {"type": "integer", "minimum": 1, "maximum": 100000},
+        "mediaType": {"const": "image/png"},
+        "completedAt": {"$ref": "#/$defs/time"}
+      }
+    },
+    "attribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "runId",
+        "runResultDigest",
+        "reviewDescriptorDigest",
+        "requirementId",
+        "requirementScope",
+        "reviewGuideId",
+        "reviewGuideStepId",
+        "authorityId",
+        "accessPolicyId",
+        "principalId",
+        "role",
+        "grantDigest",
+        "grantRequestDigest",
+        "decisionRequestDigest",
+        "digest"
+      ],
+      "properties": {
+        "runId": {"$ref": "#/$defs/id"},
+        "runResultDigest": {"$ref": "#/$defs/digest"},
+        "reviewDescriptorDigest": {"$ref": "#/$defs/digest"},
+        "requirementId": {"$ref": "#/$defs/id"},
+        "requirementScope": {"const": "evidenceSet"},
+        "reviewGuideId": {"$ref": "#/$defs/id"},
+        "reviewGuideStepId": {"$ref": "#/$defs/id"},
+        "authorityId": {"$ref": "#/$defs/id"},
+        "accessPolicyId": {"$ref": "#/$defs/id"},
+        "principalId": {"$ref": "#/$defs/id"},
+        "role": {"const": "reviewer"},
+        "grantDigest": {"$ref": "#/$defs/digest"},
+        "grantRequestDigest": {"$ref": "#/$defs/digest"},
+        "decisionRequestDigest": {"$ref": "#/$defs/digest"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "decisionGrant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "requestId",
+        "requestDigest",
+        "authorityId",
+        "accessPolicyId",
+        "principalId",
+        "role",
+        "runId",
+        "runResultDigest",
+        "qualityDigest",
+        "reviewDescriptorDigest",
+        "requirementId",
+        "requirementScope",
+        "reviewGuideId",
+        "reviewGuideStepId",
+        "decision",
+        "issuedAt",
+        "expiresAt",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioQualityDecisionGrant"},
+        "id": {"$ref": "#/$defs/id"},
+        "requestId": {"$ref": "#/$defs/id"},
+        "requestDigest": {"$ref": "#/$defs/digest"},
+        "authorityId": {"$ref": "#/$defs/id"},
+        "accessPolicyId": {"$ref": "#/$defs/id"},
+        "principalId": {"$ref": "#/$defs/id"},
+        "role": {"const": "reviewer"},
+        "runId": {"$ref": "#/$defs/id"},
+        "runResultDigest": {"$ref": "#/$defs/digest"},
+        "qualityDigest": {"$ref": "#/$defs/digest"},
+        "reviewDescriptorDigest": {"$ref": "#/$defs/digest"},
+        "requirementId": {"$ref": "#/$defs/id"},
+        "requirementScope": {"const": "evidenceSet"},
+        "reviewGuideId": {"$ref": "#/$defs/id"},
+        "reviewGuideStepId": {"$ref": "#/$defs/id"},
+        "expectedPreviousDecisionDigest": {"$ref": "#/$defs/digest"},
+        "decision": {"enum": ["approved", "rejected"]},
+        "issuedAt": {"$ref": "#/$defs/time"},
+        "expiresAt": {"$ref": "#/$defs/time"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "describeRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "runId", "expectedRunResultDigest", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioQualityDescribeRequest"},
+        "runId": {"$ref": "#/$defs/id"},
+        "expectedRunResultDigest": {"$ref": "#/$defs/digest"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "description": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "runId",
+        "runResultDigest",
+        "quality",
+        "availability",
+        "decisionCount",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioQualityDescription"},
+        "runId": {"$ref": "#/$defs/id"},
+        "runResultDigest": {"$ref": "#/$defs/digest"},
+        "quality": {"$ref": "#/$defs/rpcQualitySnapshot"},
+        "availability": {"enum": ["available", "unavailable", "unsupported", "policyDenied"]},
+        "requirementId": {"$ref": "#/$defs/id"},
+        "headDecisionDigest": {"$ref": "#/$defs/digest"},
+        "decisionCount": {"type": "integer", "minimum": 0, "maximum": 100},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"availability": {"const": "available"}}},
+          "then": {"required": ["requirementId"]}
+        },
+        {
+          "if": {"properties": {"decisionCount": {"const": 0}}, "required": ["decisionCount"]},
+          "then": {"not": {"required": ["headDecisionDigest"]}},
+          "else": {"required": ["headDecisionDigest"]}
+        }
+      ]
+    },
+    "reviewArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requiredEvidenceId",
+        "requiredEvidenceResultDigest",
+        "role",
+        "artifactDigest",
+        "provenanceDigest",
+        "provenanceKind",
+        "classification",
+        "mediaType",
+        "size",
+        "digest"
+      ],
+      "properties": {
+        "requiredEvidenceId": {"$ref": "#/$defs/id"},
+        "requiredEvidenceResultDigest": {"$ref": "#/$defs/digest"},
+        "role": {"enum": ["requiredEvidence", "comparisonBaseline", "comparisonCandidate"]},
+        "artifactDigest": {"$ref": "#/$defs/digest"},
+        "provenanceDigest": {"$ref": "#/$defs/digest"},
+        "provenanceKind": {"enum": ["appAdapterCaptureReceipt", "supplementalArtifactImport"]},
+        "classification": {"enum": ["public", "internal", "sensitive"]},
+        "mediaType": {"$ref": "#/$defs/mediaType"},
+        "size": {"type": "integer", "minimum": 1, "maximum": 33554432},
+        "comparisonResultDigest": {"$ref": "#/$defs/digest"},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"role": {"const": "requiredEvidence"}}},
+          "then": {"not": {"required": ["comparisonResultDigest"]}},
+          "else": {"required": ["comparisonResultDigest"]}
+        }
+      ]
+    },
+    "reviewDescriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "runId",
+        "runResultDigest",
+        "qualityDigest",
+        "requirementId",
+        "requirementScope",
+        "reviewGuideId",
+        "reviewGuideStepId",
+        "requiredEvidenceResultDigests",
+        "comparisonResultDigests",
+        "artifacts",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioQualityReviewDescriptor"},
+        "runId": {"$ref": "#/$defs/id"},
+        "runResultDigest": {"$ref": "#/$defs/digest"},
+        "qualityDigest": {"$ref": "#/$defs/digest"},
+        "requirementId": {"$ref": "#/$defs/id"},
+        "requirementScope": {"const": "evidenceSet"},
+        "reviewGuideId": {"$ref": "#/$defs/id"},
+        "reviewGuideStepId": {"$ref": "#/$defs/id"},
+        "requiredEvidenceResultDigests": {
+          "type": "array",
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/digest"}
+        },
+        "comparisonResultDigests": {
+          "type": "array",
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/digest"}
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/reviewArtifact"}
+        },
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "describeResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "description", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioQualityDescribeResult"},
+        "description": {"$ref": "#/$defs/description"},
+        "reviewDescriptor": {"$ref": "#/$defs/reviewDescriptor"},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "description": {
+                "properties": {"availability": {"const": "available"}}
+              }
+            }
+          },
+          "then": {"required": ["reviewDescriptor"]},
+          "else": {"not": {"required": ["reviewDescriptor"]}}
+        }
+      ]
+    },
+    "openRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "runId",
+        "expectedRunResultDigest",
+        "expectedQualityDigest",
+        "expectedReviewDescriptorDigest",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioQualityReviewOpenRequest"},
+        "runId": {"$ref": "#/$defs/id"},
+        "expectedRunResultDigest": {"$ref": "#/$defs/digest"},
+        "expectedQualityDigest": {"$ref": "#/$defs/digest"},
+        "expectedReviewDescriptorDigest": {"$ref": "#/$defs/digest"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "resourceHandle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uri", "digest", "mediaType", "size", "purpose", "expiresAt"],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "pattern": "^https?://(?![^/?#]*@)(?:\\[[0-9A-Fa-f:.]+\\]|[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?)(?::[0-9]{1,5})?/resources/[A-Za-z0-9_-]{32,}$",
+          "maxLength": 4096
+        },
+        "digest": {"$ref": "#/$defs/digest"},
+        "mediaType": {"$ref": "#/$defs/mediaType"},
+        "size": {"type": "integer", "minimum": 1, "maximum": 67108864},
+        "purpose": {"enum": ["scenario-quality-review-artifact", "scenario-quality-review-provenance"]},
+        "expiresAt": {"$ref": "#/$defs/time"}
+      }
+    },
+    "resourceBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifactDescriptorDigest", "artifact", "provenance"],
+      "properties": {
+        "artifactDescriptorDigest": {"$ref": "#/$defs/digest"},
+        "artifact": {
+          "allOf": [
+            {"$ref": "#/$defs/resourceHandle"},
+            {"properties": {"purpose": {"const": "scenario-quality-review-artifact"}}}
+          ]
+        },
+        "provenance": {
+          "allOf": [
+            {"$ref": "#/$defs/resourceHandle"},
+            {
+              "properties": {
+                "purpose": {"const": "scenario-quality-review-provenance"},
+                "mediaType": {"const": "application/json"}
+              }
+            }
+          ]
+        }
+      }
+    },
+    "openResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "reviewDescriptor", "resources"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioQualityReviewOpenResult"},
+        "reviewDescriptor": {"$ref": "#/$defs/reviewDescriptor"},
+        "resources": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/resourceBinding"}
+        }
+      }
+    },
+    "grantRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "runId",
+        "expectedRunResultDigest",
+        "expectedQualityDigest",
+        "expectedReviewDescriptorDigest",
+        "decision",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioQualityDecisionGrantRequest"},
+        "requestId": {"$ref": "#/$defs/id"},
+        "runId": {"$ref": "#/$defs/id"},
+        "expectedRunResultDigest": {"$ref": "#/$defs/digest"},
+        "expectedQualityDigest": {"$ref": "#/$defs/digest"},
+        "expectedReviewDescriptorDigest": {"$ref": "#/$defs/digest"},
+        "expectedPreviousDecisionDigest": {"$ref": "#/$defs/digest"},
+        "decision": {"enum": ["approved", "rejected"]},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "appendRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "runId",
+        "expectedRunResultDigest",
+        "expectedQualityDigest",
+        "expectedReviewDescriptorDigest",
+        "grantId",
+        "grantDigest",
+        "decision",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioQualityDecisionAppendRequest"},
+        "requestId": {"$ref": "#/$defs/id"},
+        "runId": {"$ref": "#/$defs/id"},
+        "expectedRunResultDigest": {"$ref": "#/$defs/digest"},
+        "expectedQualityDigest": {"$ref": "#/$defs/digest"},
+        "expectedReviewDescriptorDigest": {"$ref": "#/$defs/digest"},
+        "grantId": {"$ref": "#/$defs/id"},
+        "grantDigest": {"$ref": "#/$defs/digest"},
+        "decision": {"enum": ["approved", "rejected"]},
+        "expectedPreviousDecisionDigest": {"$ref": "#/$defs/digest"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "appendResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "requestDigest",
+        "attribution",
+        "record",
+        "quality",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioQualityDecisionAppendResult"},
+        "requestId": {"$ref": "#/$defs/id"},
+        "requestDigest": {"$ref": "#/$defs/digest"},
+        "attribution": {"$ref": "#/$defs/attribution"},
+        "record": {"$ref": "#/$defs/humanDecisionRecord"},
+        "quality": {"$ref": "#/$defs/rpcQualitySnapshot"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "getRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "runId", "expectedRunResultDigest", "decisionDigest", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioQualityDecisionGetRequest"},
+        "runId": {"$ref": "#/$defs/id"},
+        "expectedRunResultDigest": {"$ref": "#/$defs/digest"},
+        "decisionDigest": {"$ref": "#/$defs/digest"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "decisionView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "kind", "record", "projection", "attribution", "reviewDescriptor", "digest"],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioQualityDecisionView"},
+        "record": {"$ref": "#/$defs/humanDecisionRecord"},
+        "projection": {
+          "allOf": [
+            {"$ref": "#/$defs/humanDecisionProjection"},
+            {"not": {"properties": {"state": {"const": "unreviewed"}}, "required": ["state"]}}
+          ]
+        },
+        "attribution": {"$ref": "#/$defs/attribution"},
+        "reviewDescriptor": {"$ref": "#/$defs/reviewDescriptor"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "decisionError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "operation",
+        "code",
+        "runId",
+        "expectedRunResultDigest",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioQualityDecisionError"},
+        "operation": {"enum": ["describe", "open", "grant", "append", "get"]},
+        "code": {
+          "enum": [
+            "unavailable",
+            "policyDenied",
+            "requestConflict",
+            "staleQuality",
+            "stalePreviousDecision",
+            "grantMismatch",
+            "grantExpired",
+            "grantRevoked",
+            "grantConsumed",
+            "decisionDenied",
+            "unsupported",
+            "quotaExceeded",
+            "notFound",
+            "runNotTerminal",
+            "subjectMismatch"
+          ]
+        },
+        "runId": {"$ref": "#/$defs/id"},
+        "expectedRunResultDigest": {"$ref": "#/$defs/digest"},
+        "requestId": {"$ref": "#/$defs/id"},
+        "currentQualityDigest": {"$ref": "#/$defs/digest"},
+        "currentDecisionDigest": {"$ref": "#/$defs/digest"},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"operation": {"enum": ["grant", "append"]}}},
+          "then": {"required": ["requestId"]},
+          "else": {"not": {"required": ["requestId"]}}
+        }
+      ]
+    }
+  }
+}

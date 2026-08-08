@@ -1,0 +1,12 @@
+name: testing_support
+version: 0.1.0-dev
+resolution: workspace
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  experience_engine: ^0.1.0-dev
+
+dev_dependencies:
+  test: ^1.26.3

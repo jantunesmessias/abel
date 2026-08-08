@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: NodeInstance
+metadata:
+  id: inventory-dashboard-failed
+spec:
+  projectionId: delivery-inventory
+  scenarioId: dashboard-failed

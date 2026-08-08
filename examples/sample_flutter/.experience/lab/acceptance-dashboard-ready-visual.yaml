@@ -1,0 +1,9 @@
+schemaVersion: 2
+kind: AutomatedAcceptanceCriterion
+metadata:
+  id: dashboard-ready-visual-accepted
+spec:
+  scenarioId: dashboard-ready
+  displayName: Fresh dashboard visual Evidence is accepted
+  kind: evidenceAccepted
+  evidenceRequirementId: dashboard-ready-visual

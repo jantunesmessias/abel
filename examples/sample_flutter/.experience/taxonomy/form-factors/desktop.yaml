@@ -1,0 +1,6 @@
+schemaVersion: 2
+kind: FormFactor
+metadata:
+  id: desktop
+spec:
+  displayName: Desktop

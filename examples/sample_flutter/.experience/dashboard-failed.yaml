@@ -1,0 +1,12 @@
+schemaVersion: 1
+kind: Scenario
+metadata:
+  id: dashboard-failed
+spec:
+  applicationId: sample
+  title: Diagnose an unexpected dashboard failure
+  description: Keep an unexpected non-recoverable API failure distinct from dependency unavailability.
+  sourceReferences:
+    - repository: workspace
+      path: lib/app_factory.dart
+      symbol: _FailureState

@@ -1,0 +1,12 @@
+schemaVersion: 1
+kind: Scenario
+metadata:
+  id: dashboard-stale
+spec:
+  applicationId: sample
+  title: Review a stale delivery snapshot
+  description: Keep usable dashboard data visible while identifying its deterministic stale timestamp.
+  sourceReferences:
+    - repository: workspace
+      path: lib/app_factory.dart
+      symbol: _StaleNotice

@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:devex_contracts/devex_contracts.dart';
-import 'package:devex_remote_worker/remote_worker.dart';
-import 'package:devex_runtime/devex_runtime.dart';
+import 'package:execution_runtime/execution_runtime.dart';
+import 'package:experience_contracts/experience_contracts.dart';
 import 'package:jose/jose.dart';
+import 'package:remote_worker/remote_worker.dart';
 
 Future<void> main(List<String> arguments) async {
   final options = <String, String>{};
@@ -44,7 +44,7 @@ Future<void> main(List<String> arguments) async {
   final verifier = RemoteWorkerTokenVerifier(
     trustedKeys: JsonWebKeySet.fromJson(jwksDocument),
     allowedAlgorithms:
-        (Platform.environment['DEVEX_REMOTE_ALGORITHMS'] ?? 'ES256')
+        (Platform.environment['REMOTE_SESSION_ALGORITHMS'] ?? 'ES256')
             .split(',')
             .map((value) => value.trim())
             .where((value) => value.isNotEmpty)
@@ -52,49 +52,43 @@ Future<void> main(List<String> arguments) async {
     clock: clock,
   );
   final client = RemoteWorkerHttpClient(
-    controlOrigin: Uri.parse(environment('DEVEX_CONTROL_ORIGIN')),
-    artifactOrigin: Uri.parse(environment('DEVEX_ARTIFACT_ORIGIN')),
+    controlOrigin: Uri.parse(environment('CONTROL_PLANE_ORIGIN')),
+    artifactOrigin: Uri.parse(environment('ARTIFACT_ORIGIN')),
     capabilityToken: capabilityToken,
   );
-  final configuredAndroidImage = optionalEnvironment(
-    'DEVEX_ANDROID_IMAGE_DIGEST',
-  );
-  final streamEndpoint = optionalEnvironment('DEVEX_SESSION_GATEWAY_URL');
+  final configuredAndroidImage = optionalEnvironment('ANDROID_IMAGE_DIGEST');
+  final streamEndpoint = optionalEnvironment('SESSION_GATEWAY_URL');
   final stream = streamEndpoint == null
       ? null
       : LoopbackRemoteWorkerStreamClient(Uri.parse(streamEndpoint));
-  final scrcpyServerDigest = optionalEnvironment('DEVEX_SCRCPY_SERVER_DIGEST');
+  final scrcpyServerDigest = optionalEnvironment('SCRCPY_SERVER_DIGEST');
   final service = RemoteWorkerService(
     verifier: verifier,
     artifacts: client,
     control: client,
     backend: SystemRemoteWorkerBackend(
       SystemRemoteWorkerConfiguration(
-        chromiumExecutable: optionalEnvironment('DEVEX_CHROMIUM_PATH'),
+        chromiumExecutable: optionalEnvironment('CHROMIUM_PATH'),
         androidSdkRoot: optionalEnvironment('ANDROID_SDK_ROOT'),
-        androidAvdName: optionalEnvironment('DEVEX_ANDROID_AVD'),
+        androidAvdName: optionalEnvironment('ANDROID_AVD'),
         androidImageDigest: configuredAndroidImage == null
             ? null
             : Digest(configuredAndroidImage),
-        gatewayPort: int.parse(
-          optionalEnvironment('DEVEX_GATEWAY_PORT') ?? '8443',
-        ),
+        gatewayPort: int.parse(optionalEnvironment('GATEWAY_PORT') ?? '8443'),
         webInteractivePort: int.parse(
-          optionalEnvironment('DEVEX_WEB_INTERACTIVE_PORT') ?? '27184',
+          optionalEnvironment('REMOTE_WEB_INTERACTIVE_PORT') ?? '27184',
         ),
-        scrcpyServerPath: optionalEnvironment('DEVEX_SCRCPY_SERVER_PATH'),
+        scrcpyServerPath: optionalEnvironment('SCRCPY_SERVER_PATH'),
         scrcpyServerDigest: scrcpyServerDigest == null
             ? null
             : Digest(scrcpyServerDigest),
-        scrcpyVersion: optionalEnvironment('DEVEX_SCRCPY_VERSION') ?? '4.0',
-        scrcpyPort: int.parse(
-          optionalEnvironment('DEVEX_SCRCPY_PORT') ?? '27185',
-        ),
+        scrcpyVersion: optionalEnvironment('SCRCPY_VERSION') ?? '4.0',
+        scrcpyPort: int.parse(optionalEnvironment('SCRCPY_PORT') ?? '27185'),
       ),
     ),
     clock: clock,
     workspaceRoot: Directory('/work'),
-    namespace: environment('DEVEX_NAMESPACE'),
+    namespace: environment('REMOTE_WORKER_NAMESPACE'),
     serviceAccount: 'worker',
     stream: stream,
   );
@@ -102,7 +96,7 @@ Future<void> main(List<String> arguments) async {
     final outcome = await service.run(
       signedPlan: planToken,
       capabilityToken: capabilityToken,
-      workerId: environment('DEVEX_WORKER_ID'),
+      workerId: environment('REMOTE_WORKER_ID'),
     );
     stdout.writeln(
       jsonEncode(<String, Object?>{

@@ -1,8 +1,8 @@
-import 'package:devex_preview/devex_preview.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_preview/flutter_preview.dart';
 import 'package:sample_flutter/app_factory.dart';
-import 'package:sample_flutter/showcase_api.dart';
 import 'package:sample_flutter/showcase_fixture_api.dart';
+import 'package:sample_flutter/showcase_models.dart';
 
 @AutoPreview(
   id: 'sample.dashboard.loading',
@@ -20,7 +20,9 @@ Widget dashboardLoadingPreview() => createSampleApp(
     apiBaseUrl: 'https://example.invalid',
     environment: 'preview-loading',
   ),
-  api: PendingShowcaseApi(),
+  api: SyntheticShowcaseApi(
+    result: syntheticDashboardResult(ShowcaseDashboardState.loading),
+  ),
 );
 
 @AutoMultiPreview(
@@ -64,6 +66,69 @@ Widget dashboardReadyPreviews() => createSampleApp(
 );
 
 @AutoPreview(
+  id: 'sample.dashboard.empty',
+  scenarioId: 'dashboard-empty',
+  variantId: 'phone.light.en-us',
+  name: 'Empty · phone light',
+  size: Size(390, 844),
+  devicePixelRatio: 3,
+  localeTag: 'en-US',
+  brightness: Brightness.light,
+  fixtureRef: 'sample.dashboard.empty',
+)
+Widget dashboardEmptyPreview() => createSampleApp(
+  const SampleAppConfig(
+    apiBaseUrl: 'https://example.invalid',
+    environment: 'preview-empty',
+  ),
+  api: SyntheticShowcaseApi(
+    result: syntheticDashboardResult(ShowcaseDashboardState.empty),
+  ),
+);
+
+@AutoPreview(
+  id: 'sample.dashboard.stale',
+  scenarioId: 'dashboard-stale',
+  variantId: 'desktop.light.en-us',
+  name: 'Stale snapshot · desktop light',
+  size: Size(1280, 900),
+  devicePixelRatio: 1,
+  localeTag: 'en-US',
+  brightness: Brightness.light,
+  fixtureRef: 'sample.dashboard.stale',
+)
+Widget dashboardStalePreview() => createSampleApp(
+  const SampleAppConfig(
+    apiBaseUrl: 'https://example.invalid',
+    environment: 'preview-stale',
+  ),
+  api: SyntheticShowcaseApi(
+    result: syntheticDashboardResult(ShowcaseDashboardState.stale),
+  ),
+);
+
+@AutoPreview(
+  id: 'sample.dashboard.unavailable',
+  scenarioId: 'dashboard-unavailable',
+  variantId: 'phone.light.en-us',
+  name: 'Dependency unavailable · phone light',
+  size: Size(390, 844),
+  devicePixelRatio: 3,
+  localeTag: 'en-US',
+  brightness: Brightness.light,
+  fixtureRef: 'sample.dashboard.unavailable',
+)
+Widget dashboardUnavailablePreview() => createSampleApp(
+  const SampleAppConfig(
+    apiBaseUrl: 'https://example.invalid',
+    environment: 'preview-unavailable',
+  ),
+  api: SyntheticShowcaseApi(
+    result: syntheticDashboardResult(ShowcaseDashboardState.unavailable),
+  ),
+);
+
+@AutoPreview(
   id: 'sample.dashboard.task-toggled',
   scenarioId: 'toggle-delivery-task',
   variantId: 'phone.light.en-us',
@@ -80,7 +145,9 @@ Widget dashboardTaskToggledPreview() => createSampleApp(
     environment: 'preview-task-toggled',
   ),
   api: SyntheticShowcaseApi(
-    dashboard: syntheticDashboard(deliveryTaskCompleted: true),
+    result: ShowcaseDashboardResult.ready(
+      syntheticDashboard(deliveryTaskCompleted: true),
+    ),
   ),
 );
 
@@ -101,7 +168,9 @@ Widget dashboardGatewayTrafficPreview() => createSampleApp(
     environment: 'preview-gateway-hybrid',
   ),
   api: SyntheticShowcaseApi(
-    dashboard: syntheticDashboard(gatewayTrafficObserved: true),
+    result: ShowcaseDashboardResult.ready(
+      syntheticDashboard(gatewayTrafficObserved: true),
+    ),
   ),
 );
 
@@ -122,6 +191,6 @@ Widget dashboardFailedPreview() => createSampleApp(
     environment: 'preview-failure',
   ),
   api: SyntheticShowcaseApi(
-    failure: const ShowcaseApiException(statusCode: 503, code: 'FIXTURE_503'),
+    result: syntheticDashboardResult(ShowcaseDashboardState.failure),
   ),
 );

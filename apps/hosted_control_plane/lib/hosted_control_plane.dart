@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:devex_contracts/devex_contracts.dart';
-import 'package:devex_engine/devex_engine.dart';
-import 'package:devex_runtime/devex_runtime.dart';
+import 'package:execution_runtime/execution_runtime.dart';
+import 'package:experience_contracts/experience_contracts.dart';
+import 'package:experience_engine/experience_engine.dart';
 import 'package:postgres/postgres.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
@@ -50,13 +50,15 @@ final class PostgresHostedPrincipalDirectory
     required String subject,
   }) => _database.runTx((session) async {
     await session.execute(
-      Sql.named("SELECT set_config('devex.tenant_id', @tenant:text, true)"),
+      Sql.named(
+        "SELECT set_config('control_plane.tenant_id', @tenant:text, true)",
+      ),
       parameters: <String, Object?>{'tenant': tenantId},
     );
     final rows = await session.execute(
       Sql.named('''
         SELECT principal_id
-        FROM devex_hosted.principals
+        FROM control_plane.principals
         WHERE tenant_id = @tenant:text
           AND issuer = @issuer:text
           AND subject = @subject:text
@@ -158,7 +160,7 @@ final class HostedControlPlaneApplication {
 
   Response _health(Request request) => _json(200, <String, Object?>{
     'ok': true,
-    'service': 'devex-hosted-control-plane',
+    'service': 'control-plane-control-plane',
   });
 
   Future<Response> _push(Request request, String workspaceId) =>
@@ -178,7 +180,7 @@ final class HostedControlPlaneApplication {
           }),
           final WorkspacePushRejected rejected => _json(409, <String, Object?>{
             'ok': false,
-            'code': 'DEVEX_HOSTED_CONFLICT',
+            'code': 'CONTROL_PLANE_CONFLICT',
             'conflict': rejected.conflict.toJson(),
           }),
         };
@@ -219,7 +221,7 @@ final class HostedControlPlaneApplication {
             workspaceId: workspaceId,
             afterSequence: after,
           ),
-          protocols: const <String>['devex.collaboration.v1'],
+          protocols: const <String>['workspace.collaboration.v1'],
           allowedOrigins: _allowedWebSocketOrigins,
           pingInterval: const Duration(seconds: 20),
         );
@@ -703,20 +705,18 @@ final class HostedControlPlaneApplication {
       );
       return await operation(scheduler, lease, capability);
     } on OidcAuthenticationException catch (error) {
-      return _error(401, 'DEVEX_AUTH_INVALID', error.message);
+      return _error(401, 'AUTHENTICATION_INVALID', error.message);
     } on HostedAuthorizationException catch (error) {
-      return _error(403, 'DEVEX_POLICY_DENIED', error.message);
+      return _error(403, 'POLICY_DENIED', error.message);
     } on RemoteStateException catch (error) {
-      return _error(409, 'DEVEX_REMOTE_STATE', error.message);
+      return _error(409, 'REMOTE_STATE', error.message);
     } on FormatException catch (error) {
-      return _error(400, 'DEVEX_INPUT_INVALID', error.message);
+      return _error(400, 'INPUT_INVALID', error.message);
     }
   }
 
-  Response _notFound(Request request, String ignored) => _json(
-    404,
-    const <String, Object?>{'ok': false, 'code': 'DEVEX_NOT_FOUND'},
-  );
+  Response _notFound(Request request, String ignored) =>
+      _json(404, const <String, Object?>{'ok': false, 'code': 'NOT_FOUND'});
 
   Future<Response> _guard(
     Request request,
@@ -725,25 +725,25 @@ final class HostedControlPlaneApplication {
     try {
       return await operation(await _authenticate(request));
     } on OidcAuthenticationException catch (error) {
-      return _error(401, 'DEVEX_AUTH_INVALID', error.message);
+      return _error(401, 'AUTHENTICATION_INVALID', error.message);
     } on HostedAuthorizationException catch (error) {
-      return _error(403, 'DEVEX_POLICY_DENIED', error.message);
+      return _error(403, 'POLICY_DENIED', error.message);
     } on HostedIdempotencyException catch (error) {
-      return _error(409, 'DEVEX_IDEMPOTENCY_CONFLICT', error.message);
+      return _error(409, 'IDEMPOTENCY_CONFLICT', error.message);
     } on HostedConcurrencyException catch (error) {
       return _json(409, <String, Object?>{
         'ok': false,
-        'code': 'DEVEX_HOSTED_CONFLICT',
+        'code': 'CONTROL_PLANE_CONFLICT',
         'conflict': error.conflict.toJson(),
       });
     } on FormatException catch (error) {
-      return _error(400, 'DEVEX_INPUT_INVALID', error.message);
+      return _error(400, 'INPUT_INVALID', error.message);
     } on ArgumentError catch (error) {
-      return _error(400, 'DEVEX_INPUT_INVALID', '$error');
+      return _error(400, 'INPUT_INVALID', '$error');
     } on RemoteQuotaException catch (error) {
-      return _error(429, 'DEVEX_REMOTE_QUOTA', error.message);
+      return _error(429, 'REMOTE_QUOTA', error.message);
     } on RemoteStateException catch (error) {
-      return _error(409, 'DEVEX_REMOTE_STATE', error.message);
+      return _error(409, 'REMOTE_STATE', error.message);
     }
   }
 
@@ -752,7 +752,7 @@ final class HostedControlPlaneApplication {
     if (authorization == null || !authorization.startsWith('Bearer ')) {
       throw const OidcAuthenticationException('bearer token is required');
     }
-    final tenantId = request.headers['x-devex-tenant'];
+    final tenantId = request.headers['x-workspace-tenant'];
     if (tenantId == null || tenantId.isEmpty) {
       throw const OidcAuthenticationException('tenant header is required');
     }
@@ -815,8 +815,6 @@ final class HostedControlPlaneApplication {
   );
 
   void _safeLog(String message, bool isError) {
-    // Shelf's request log contains method/path/status only. Authorization and
-    // payloads are never handed to this callback.
     if (isError) {
       Zone.current.print('hosted-control-plane error: $message');
     }

@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:devex_contracts/devex_contracts.dart';
-import 'package:devex_engine/devex_engine.dart';
-import 'package:devex_hosted_control_plane/hosted_control_plane.dart';
-import 'package:devex_runtime/devex_runtime.dart';
+import 'package:execution_runtime/execution_runtime.dart';
+import 'package:experience_contracts/experience_contracts.dart';
+import 'package:experience_engine/experience_engine.dart';
+import 'package:hosted_control_plane/hosted_control_plane.dart';
 import 'package:jose/jose.dart';
 import 'package:postgres/postgres.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
@@ -21,7 +21,7 @@ Future<void> main() async {
   }
 
   final database = Pool<String>.withUrl(requiredValue('DATABASE_URL'));
-  final remoteEnabled = environment['DEVEX_REMOTE_ENABLED'] == 'true';
+  final remoteEnabled = environment['REMOTE_EXECUTION_ENABLED'] == 'true';
   Pool<String>? schedulerDatabase;
   RemoteSchedulerService? remoteScheduler;
   RemoteWorkerTokenVerifier? remoteVerifier;
@@ -63,9 +63,7 @@ Future<void> main() async {
       algorithm: algorithm,
     );
     remoteSessionTickets = security;
-    remoteSessionGatewayOrigin = Uri.parse(
-      requiredValue('DEVEX_GATEWAY_ORIGIN'),
-    );
+    remoteSessionGatewayOrigin = Uri.parse(requiredValue('GATEWAY_ORIGIN'));
     remoteVerifier = RemoteWorkerTokenVerifier(
       trustedKeys: JsonWebKeySet.fromJson(<String, Object?>{
         'keys': <Object?>[
@@ -104,22 +102,19 @@ Future<void> main() async {
         KubernetesRemoteJobConfiguration(
           webWorkerImage: requiredValue('REMOTE_WEB_WORKER_IMAGE'),
           androidWorkerImage: requiredValue('REMOTE_ANDROID_WORKER_IMAGE'),
-          controlPlaneOrigin: Uri.parse(
-            requiredValue('DEVEX_CONTROL_PLANE_ORIGIN'),
-          ),
+          controlPlaneOrigin: Uri.parse(requiredValue('CONTROL_PLANE_ORIGIN')),
           artifactOrigin: Uri.parse(requiredValue('S3_ENDPOINT')),
-          gatewayOrigin: Uri.parse(requiredValue('DEVEX_GATEWAY_ORIGIN')),
+          gatewayOrigin: Uri.parse(requiredValue('GATEWAY_ORIGIN')),
           trustedJwksJson: trustedJwksJson,
           androidImageDigest: androidImage.imageDigest,
           androidScrcpyServerDigest: Digest(
             requiredValue('REMOTE_ANDROID_SCRCPY_SERVER_DIGEST'),
           ),
-          allowedStudioOrigins:
-              (environment['DEVEX_ALLOWED_STUDIO_ORIGINS'] ?? '')
-                  .split(',')
-                  .map((value) => value.trim())
-                  .where((value) => value.isNotEmpty)
-                  .toList(growable: false),
+          allowedStudioOrigins: (environment['STUDIO_ALLOWED_ORIGINS'] ?? '')
+              .split(',')
+              .map((value) => value.trim())
+              .where((value) => value.isNotEmpty)
+              .toList(growable: false),
           allowedEgressCidrs: requiredValue('REMOTE_ALLOWED_EGRESS_CIDRS')
               .split(',')
               .map((value) => value.trim())
@@ -129,7 +124,8 @@ Future<void> main() async {
               environment['REMOTE_CHROMIUM_PATH'] ?? '/usr/bin/chromium',
           androidSdkRoot:
               environment['REMOTE_ANDROID_SDK_ROOT'] ?? '/opt/android-sdk',
-          androidAvdName: environment['REMOTE_ANDROID_AVD'] ?? 'devex-api-35',
+          androidAvdName:
+              environment['REMOTE_ANDROID_AVD'] ?? 'workspace-api-35',
           androidScrcpyServerPath:
               environment['REMOTE_ANDROID_SCRCPY_SERVER_PATH'] ??
               '/opt/scrcpy/scrcpy-server.jar',
@@ -137,9 +133,10 @@ Future<void> main() async {
               environment['REMOTE_ANDROID_SCRCPY_VERSION'] ?? '4.0',
           gatewayPort: int.parse(environment['REMOTE_GATEWAY_PORT'] ?? '8443'),
           sessionGatewayName:
-              environment['REMOTE_SESSION_GATEWAY_NAME'] ?? 'devex-public',
+              environment['REMOTE_SESSION_GATEWAY_NAME'] ?? 'workspace-public',
           sessionGatewayNamespace:
-              environment['REMOTE_SESSION_GATEWAY_NAMESPACE'] ?? 'devex-system',
+              environment['REMOTE_SESSION_GATEWAY_NAMESPACE'] ??
+              'workspace-system',
         ),
       ),
       launcher: remoteLauncher,
@@ -213,9 +210,10 @@ Future<void> main() async {
       ? const NoopHostedTelemetry()
       : OpenTelemetryHostedTelemetry(
           collectorEndpoint: Uri.parse(telemetryEndpoint),
-          serviceVersion: environment['DEVEX_SERVICE_VERSION'] ?? '0.1.0-dev',
+          serviceVersion:
+              environment['CONTROL_PLANE_SERVICE_VERSION'] ?? '0.1.0-dev',
           deploymentEnvironment:
-              environment['DEVEX_DEPLOYMENT_ENVIRONMENT'] ?? 'development',
+              environment['CONTROL_PLANE_ENVIRONMENT'] ?? 'development',
         );
   final application = HostedControlPlaneApplication(
     collaboration: HostedCollaborationService(
@@ -227,7 +225,7 @@ Future<void> main() async {
     identities: OidcHostedIdentityVerifier(oidc),
     principals: PostgresHostedPrincipalDirectory(database),
     ids: SecureIdGenerator(),
-    allowedWebSocketOrigins: (environment['DEVEX_ALLOWED_STUDIO_ORIGINS'] ?? '')
+    allowedWebSocketOrigins: (environment['STUDIO_ALLOWED_ORIGINS'] ?? '')
         .split(',')
         .map((value) => value.trim())
         .where((value) => value.isNotEmpty)
@@ -249,7 +247,7 @@ Future<void> main() async {
     port,
     poweredByHeader: null,
   );
-  stdout.writeln('devex hosted control plane listening on ${server.port}');
+  stdout.writeln('workspace hosted control plane listening on ${server.port}');
 
   final stopping = Completer<void>();
   late final StreamSubscription<ProcessSignal> term;

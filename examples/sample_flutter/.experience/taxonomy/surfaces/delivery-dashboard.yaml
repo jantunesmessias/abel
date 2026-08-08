@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: ExperienceSurface
+metadata:
+  id: delivery-dashboard
+spec:
+  applicationId: sample
+  displayName: Delivery dashboard

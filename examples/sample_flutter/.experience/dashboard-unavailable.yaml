@@ -1,0 +1,12 @@
+schemaVersion: 1
+kind: Scenario
+metadata:
+  id: dashboard-unavailable
+spec:
+  applicationId: sample
+  title: Recover from an unavailable dependency
+  description: Show a recoverable 503 dependency outage without collapsing it into an unexpected failure.
+  sourceReferences:
+    - repository: workspace
+      path: lib/app_factory.dart
+      symbol: _UnavailableState

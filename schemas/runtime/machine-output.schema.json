@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/runtime/machine-output",
+  "type": "object",
+  "required": ["schemaVersion", "command", "ok", "correlationId", "effectiveContext", "result", "failures", "diagnostics"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "command": {"type": "string"},
+    "ok": {"type": "boolean"},
+    "correlationId": {"type": ["string", "null"]},
+    "effectiveContext": {"type": "object"},
+    "result": {},
+    "failures": {"type": "array", "items": {"type": "object"}},
+    "diagnostics": {"type": "array", "items": {"type": "object"}}
+  },
+  "additionalProperties": false
+}

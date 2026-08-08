@@ -1,0 +1,245 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/catalog/scenario-facet-manifest",
+  "title": "ScenarioFacetManifest",
+  "$ref": "#/$defs/manifest",
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "displayName"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"$ref": "#/$defs/displayName"}
+      }
+    },
+    "applicationDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "applicationId", "displayName"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "applicationId": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"$ref": "#/$defs/displayName"}
+      }
+    },
+    "stateDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "surfaceId", "displayName"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "surfaceId": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"$ref": "#/$defs/displayName"}
+      }
+    },
+    "frameDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "displayName", "kind"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"$ref": "#/$defs/displayName"},
+        "kind": {
+          "enum": ["device", "browser", "desktopWindow", "component", "none"]
+        },
+        "formFactorId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "oneOf": [
+        {
+          "properties": {"kind": {"const": "none"}},
+          "not": {"required": ["formFactorId"]}
+        },
+        {
+          "properties": {
+            "kind": {
+              "enum": ["device", "browser", "desktopWindow", "component"]
+            }
+          },
+          "required": ["formFactorId"]
+        }
+      ]
+    },
+    "previewDescriptorSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "previewId"],
+      "properties": {
+        "kind": {"const": "previewDescriptor"},
+        "previewId": {"$ref": "#/$defs/opaqueId"}
+      }
+    },
+    "executionBindingSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "bindingId"],
+      "properties": {
+        "kind": {"const": "executionBinding"},
+        "bindingId": {"$ref": "#/$defs/opaqueId"}
+      }
+    },
+    "externalHarnessSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "providerId", "harnessId"],
+      "properties": {
+        "kind": {"const": "externalHarness"},
+        "providerId": {"$ref": "#/$defs/opaqueId"},
+        "harnessId": {"$ref": "#/$defs/opaqueId"}
+      }
+    },
+    "archiveArtifactSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "artifactDigest"],
+      "properties": {
+        "kind": {"const": "archiveArtifact"},
+        "artifactDigest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "renderSource": {
+      "oneOf": [
+        {"$ref": "#/$defs/previewDescriptorSource"},
+        {"$ref": "#/$defs/executionBindingSource"},
+        {"$ref": "#/$defs/externalHarnessSource"},
+        {"$ref": "#/$defs/archiveArtifactSource"}
+      ]
+    },
+    "nonEmptyIdArray": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/opaqueId"}
+    },
+    "scenarioFacet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scenarioId",
+        "lifecycle",
+        "scenarioKindId",
+        "surfaceId",
+        "stateId",
+        "ownershipAreaId",
+        "tagIds",
+        "componentIds",
+        "fixtureId",
+        "renderSource",
+        "presentationFrameIds",
+        "preferredPresentationFrameId"
+      ],
+      "properties": {
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "lifecycle": {"enum": ["concept", "current", "historical"]},
+        "scenarioKindId": {"$ref": "#/$defs/opaqueId"},
+        "surfaceId": {"$ref": "#/$defs/opaqueId"},
+        "stateId": {"$ref": "#/$defs/opaqueId"},
+        "ownershipAreaId": {"$ref": "#/$defs/opaqueId"},
+        "tagIds": {"$ref": "#/$defs/nonEmptyIdArray"},
+        "componentIds": {"$ref": "#/$defs/nonEmptyIdArray"},
+        "fixtureId": {"$ref": "#/$defs/opaqueId"},
+        "renderSource": {"$ref": "#/$defs/renderSource"},
+        "presentationFrameIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        },
+        "preferredPresentationFrameId": {"$ref": "#/$defs/opaqueId"}
+      }
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "catalogDigest",
+        "scenarioKinds",
+        "surfaces",
+        "states",
+        "ownershipAreas",
+        "tags",
+        "components",
+        "fixtures",
+        "formFactors",
+        "presentationFrames",
+        "scenarioFacets",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioFacetManifest"},
+        "catalogDigest": {"$ref": "#/$defs/digest"},
+        "scenarioKinds": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": {"$ref": "#/$defs/definition"}
+        },
+        "surfaces": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": {"$ref": "#/$defs/applicationDefinition"}
+        },
+        "states": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": {"$ref": "#/$defs/stateDefinition"}
+        },
+        "ownershipAreas": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": {"$ref": "#/$defs/definition"}
+        },
+        "tags": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": {"$ref": "#/$defs/definition"}
+        },
+        "components": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": {"$ref": "#/$defs/applicationDefinition"}
+        },
+        "fixtures": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": {"$ref": "#/$defs/applicationDefinition"}
+        },
+        "formFactors": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": {"$ref": "#/$defs/definition"}
+        },
+        "presentationFrames": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": {"$ref": "#/$defs/frameDefinition"}
+        },
+        "scenarioFacets": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": {"$ref": "#/$defs/scenarioFacet"}
+        },
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    }
+  }
+}

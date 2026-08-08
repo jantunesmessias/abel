@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: NodeInstance
+metadata:
+  id: inventory-dashboard-loading
+spec:
+  projectionId: delivery-inventory
+  scenarioId: dashboard-loading

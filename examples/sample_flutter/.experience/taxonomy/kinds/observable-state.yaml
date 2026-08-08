@@ -1,0 +1,6 @@
+schemaVersion: 2
+kind: ScenarioKindDefinition
+metadata:
+  id: observable-state
+spec:
+  displayName: Observable state

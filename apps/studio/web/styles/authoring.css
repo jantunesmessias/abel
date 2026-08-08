@@ -1,0 +1,186 @@
+.authoring-page {
+  min-width: 0;
+}
+
+.authoring-page .studio-ui-page-header__actions,
+.authoring-page .studio-ui-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--studio-ui-space-2);
+}
+
+.authoring-layout__hint {
+  margin-bottom: var(--studio-ui-space-4);
+  color: var(--studio-ui-text-muted);
+}
+
+.authoring-node-grid,
+.authoring-review-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: var(--studio-ui-space-4);
+}
+
+.authoring-node {
+  display: grid;
+  min-width: 0;
+  gap: var(--studio-ui-space-4);
+  padding: var(--studio-ui-space-4);
+  border: 1px solid var(--studio-ui-border);
+  border-radius: var(--studio-ui-radius-md);
+  background: var(--studio-ui-surface-raised);
+}
+
+.authoring-node.is-changed {
+  border-color: var(--studio-ui-warning);
+  box-shadow: inset 0.2rem 0 var(--studio-ui-warning);
+}
+
+.authoring-node > header {
+  display: flex;
+  min-width: 0;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--studio-ui-space-3);
+}
+
+.authoring-node > header > div,
+.authoring-node > header strong,
+.authoring-node > header small {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.authoring-node > header small {
+  margin-top: var(--studio-ui-space-1);
+  color: var(--studio-ui-text-subtle);
+}
+
+.authoring-direction-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--studio-ui-space-2);
+}
+
+.authoring-direction-controls .studio-ui-button {
+  width: 100%;
+}
+
+.authoring-coordinate-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: var(--studio-ui-space-3);
+}
+
+.authoring-coordinate-form > .studio-ui-button {
+  grid-column: 1 / -1;
+}
+
+.authoring-review-form .studio-ui-panel__body {
+  display: grid;
+  align-content: start;
+  gap: var(--studio-ui-space-4);
+}
+
+.authoring-review-guide .studio-ui-panel__body,
+.authoring-review-record .studio-ui-panel__body,
+.authoring-automated-acceptance .studio-ui-panel__body,
+.authoring-human-decisions .studio-ui-panel__body,
+.authoring-promotion-history .studio-ui-panel__body {
+  display: grid;
+  gap: var(--studio-ui-space-3);
+}
+
+.authoring-review-record ol,
+.authoring-decision-list,
+.authoring-promotion-history ol {
+  display: grid;
+  gap: var(--studio-ui-space-3);
+  padding-inline-start: 1.5rem;
+}
+
+.authoring-review-record li,
+.authoring-decision-list li,
+.authoring-promotion-history li {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.authoring-decision-list li {
+  padding: var(--studio-ui-space-3);
+  border: 1px solid var(--studio-ui-border);
+  border-radius: var(--studio-ui-radius-sm);
+}
+
+.authoring-decision-list li.is-head {
+  border-color: var(--studio-ui-accent);
+}
+
+.authoring-decision-list li.is-superseded {
+  color: var(--studio-ui-text-muted);
+}
+
+.authoring-decision-list .studio-ui-status-pill {
+  margin-inline-start: var(--studio-ui-space-2);
+}
+
+.authoring-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.authoring-table-scroll table {
+  width: 100%;
+  min-width: 32rem;
+  border-collapse: collapse;
+}
+
+.authoring-table-scroll th,
+.authoring-table-scroll td {
+  padding: var(--studio-ui-space-3);
+  border-bottom: 1px solid var(--studio-ui-border);
+  text-align: left;
+}
+
+@media (max-width: 36rem) {
+  .authoring-coordinate-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .authoring-coordinate-form > .studio-ui-button {
+    grid-column: auto;
+  }
+
+  .authoring-page .studio-ui-page-header__actions,
+  .authoring-page .studio-ui-panel__actions,
+  .authoring-page .studio-ui-page-header__actions > *,
+  .authoring-page .studio-ui-panel__actions > * {
+    width: 100%;
+  }
+}
+
+@media (forced-colors: active) {
+  .authoring-node,
+  .authoring-decision-list li,
+  .authoring-table-scroll th,
+  .authoring-table-scroll td {
+    border-color: CanvasText;
+  }
+
+  .authoring-node.is-changed,
+  .authoring-decision-list li.is-head {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .authoring-page *,
+  .authoring-page *::before,
+  .authoring-page *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,11 @@
+schemaVersion: 2
+kind: SupplementalArtifact
+metadata:
+  id: dashboard-ready-synthetic-baseline
+spec:
+  scenarioId: dashboard-ready
+  requiredEvidenceId: dashboard-ready-visual
+  role: comparisonBaseline
+  artifactDigest: sha256:545700e983724de6acf0afda331ce881f9eb1332e358a88fcfa937b43b06a60b
+  provenanceDigest: sha256:ce9b73a9435a6ab0c2409f0ac557baa79e386caf50d699175df3b231363d916a
+  classification: internal

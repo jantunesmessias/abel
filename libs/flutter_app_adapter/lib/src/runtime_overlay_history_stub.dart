@@ -1,0 +1,1 @@
+void replaceCurrentLocation(Uri uri) {}

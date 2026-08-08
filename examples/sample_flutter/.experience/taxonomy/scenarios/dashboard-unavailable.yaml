@@ -1,0 +1,19 @@
+schemaVersion: 2
+kind: ScenarioFacet
+metadata:
+  id: dashboard-unavailable
+spec:
+  scenarioId: dashboard-unavailable
+  lifecycle: current
+  scenarioKindId: observable-state
+  surfaceId: delivery-dashboard
+  stateId: dashboard.unavailable
+  ownershipAreaId: delivery-experience
+  tagIds: [dashboard, async-state, resilience]
+  componentIds: [showcase-dashboard-page]
+  fixtureId: sample.dashboard.unavailable
+  renderSource:
+    kind: previewDescriptor
+    previewId: sample.dashboard.unavailable
+  presentationFrameIds: [phone-device]
+  preferredPresentationFrameId: phone-device

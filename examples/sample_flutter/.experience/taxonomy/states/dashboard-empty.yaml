@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: ScenarioState
+metadata:
+  id: dashboard.empty
+spec:
+  surfaceId: delivery-dashboard
+  displayName: Empty

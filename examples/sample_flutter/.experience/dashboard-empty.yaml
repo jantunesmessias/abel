@@ -1,0 +1,12 @@
+schemaVersion: 1
+kind: Scenario
+metadata:
+  id: dashboard-empty
+spec:
+  applicationId: sample
+  title: Review an empty delivery workspace
+  description: Show a successful empty result without treating it as loading or failure.
+  sourceReferences:
+    - repository: workspace
+      path: lib/app_factory.dart
+      symbol: _EmptyState

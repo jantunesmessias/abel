@@ -1,0 +1,6 @@
+schemaVersion: 2
+kind: ScenarioKindDefinition
+metadata:
+  id: diagnostic
+spec:
+  displayName: Diagnostic

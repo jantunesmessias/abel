@@ -1,0 +1,6 @@
+schemaVersion: 2
+kind: ScenarioTag
+metadata:
+  id: async-state
+spec:
+  displayName: Async state

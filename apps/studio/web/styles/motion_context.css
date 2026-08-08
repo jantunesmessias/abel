@@ -1,0 +1,85 @@
+.motion-mode-group,
+.context-inclusions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--studio-ui-space-3);
+}
+
+.motion-script {
+  display: grid;
+  gap: var(--studio-ui-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.motion-step,
+.motion-static-equivalent,
+.context-result {
+  overflow-wrap: anywhere;
+}
+
+.motion-comprehension-proof {
+  color: var(--studio-ui-color-success-text);
+  font-weight: 700;
+}
+
+.context-selection,
+.context-budget .studio-ui-panel__body,
+.context-result .studio-ui-panel__body {
+  display: grid;
+  gap: var(--studio-ui-space-3);
+}
+
+.context-budget-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--studio-ui-space-4);
+}
+
+.context-toggle {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  gap: var(--studio-ui-space-2);
+  cursor: pointer;
+}
+
+.context-toggle input {
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+}
+
+.context-items,
+.context-omissions,
+.motion-observations {
+  padding-inline-start: var(--studio-ui-space-5);
+}
+
+@media (max-width: 360px) {
+  .motion-mode-group > *,
+  .context-inclusions > * {
+    inline-size: 100%;
+  }
+}
+
+@media (forced-colors: active) {
+  .motion-comprehension-proof,
+  .context-result {
+    border: 1px solid CanvasText;
+  }
+
+  .context-toggle input {
+    forced-color-adjust: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-page *,
+  .context-page * {
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+  }
+}

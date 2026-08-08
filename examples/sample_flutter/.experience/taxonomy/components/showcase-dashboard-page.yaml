@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: ExperienceComponent
+metadata:
+  id: showcase-dashboard-page
+spec:
+  applicationId: sample
+  displayName: Showcase dashboard page

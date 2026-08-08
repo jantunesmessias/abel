@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/catalog/projection-layout-manifest",
+  "title": "ProjectionLayoutManifest",
+  "$ref": "#/$defs/manifest",
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "coordinate": {
+      "type": "number",
+      "minimum": -1000000,
+      "maximum": 1000000
+    },
+    "extent": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1000000
+    },
+    "nodeFrame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodeInstanceId", "x", "y", "width", "height"],
+      "properties": {
+        "nodeInstanceId": {"$ref": "#/$defs/opaqueId"},
+        "x": {"$ref": "#/$defs/coordinate"},
+        "y": {"$ref": "#/$defs/coordinate"},
+        "width": {"$ref": "#/$defs/extent"},
+        "height": {"$ref": "#/$defs/extent"},
+        "groupId": {"$ref": "#/$defs/opaqueId"},
+        "laneId": {"$ref": "#/$defs/opaqueId"}
+      }
+    },
+    "group": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "x", "y", "width", "height"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "title": {"$ref": "#/$defs/title"},
+        "x": {"$ref": "#/$defs/coordinate"},
+        "y": {"$ref": "#/$defs/coordinate"},
+        "width": {"$ref": "#/$defs/extent"},
+        "height": {"$ref": "#/$defs/extent"}
+      }
+    },
+    "lane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "x", "y", "width", "height"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "title": {"$ref": "#/$defs/title"},
+        "x": {"$ref": "#/$defs/coordinate"},
+        "y": {"$ref": "#/$defs/coordinate"},
+        "width": {"$ref": "#/$defs/extent"},
+        "height": {"$ref": "#/$defs/extent"}
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text", "x", "y", "width", "height"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "text": {"type": "string", "minLength": 1, "maxLength": 16384},
+        "x": {"$ref": "#/$defs/coordinate"},
+        "y": {"$ref": "#/$defs/coordinate"},
+        "width": {"$ref": "#/$defs/extent"},
+        "height": {"$ref": "#/$defs/extent"}
+      }
+    },
+    "camera": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "zoom"],
+      "properties": {
+        "x": {"$ref": "#/$defs/coordinate"},
+        "y": {"$ref": "#/$defs/coordinate"},
+        "zoom": {"type": "number", "minimum": 0.05, "maximum": 64}
+      }
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "topologyDigest",
+        "projectionId",
+        "nodeFrames",
+        "groups",
+        "lanes",
+        "annotations",
+        "camera",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ProjectionLayoutManifest"},
+        "topologyDigest": {"$ref": "#/$defs/digest"},
+        "projectionId": {"$ref": "#/$defs/opaqueId"},
+        "nodeFrames": {
+          "type": "array",
+          "maxItems": 500000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/nodeFrame"}
+        },
+        "groups": {
+          "type": "array",
+          "maxItems": 100000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/group"}
+        },
+        "lanes": {
+          "type": "array",
+          "maxItems": 100000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/lane"}
+        },
+        "annotations": {
+          "type": "array",
+          "maxItems": 100000,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/annotation"}
+        },
+        "camera": {"$ref": "#/$defs/camera"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    }
+  }
+}

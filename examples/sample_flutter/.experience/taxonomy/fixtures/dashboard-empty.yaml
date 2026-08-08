@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: ScenarioFixture
+metadata:
+  id: sample.dashboard.empty
+spec:
+  applicationId: sample
+  displayName: Empty delivery dashboard

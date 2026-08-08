@@ -1,4 +1,4 @@
-# Threat model do DevEx Studio Jaspr
+# Threat model do Abel Studio Jaspr
 
 Status: ativo; controles locais revalidados em 2026-08-11. Decisão: ADR-0016.
 
@@ -23,7 +23,7 @@ client-side; não existe SSR com acesso adicional a segredos.
 
 1. token existe somente no bootstrap `no-store` e memória volátil;
 2. token não entra em URL, HTML, JS gerado, defines, logs, storage ou cookie;
-3. primeiro frame RPC é `devex.initialize`;
+3. primeiro frame RPC é `workspace.initialize`;
 4. Origin é exato em bootstrap, WebSocket e resources;
 5. handles são opacos, purpose/TTL/size/media/digest-bound;
 6. Studio não recebe path CAS, não importa `dart:io` e não inicia processo;

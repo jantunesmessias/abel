@@ -1,0 +1,401 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/distribution/kit-composition",
+  "title": "Module composition",
+  "oneOf": [
+    {"$ref": "#/$defs/moduleDescriptor"},
+    {"$ref": "#/$defs/kitProfile"},
+    {"$ref": "#/$defs/moduleCatalog"},
+    {"$ref": "#/$defs/resolvedKitPlan"},
+    {"$ref": "#/$defs/effectiveKitManifest"}
+  ],
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"
+    },
+    "semanticVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "coreCompatibility": {
+      "type": "string",
+      "pattern": "^\\^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "version": {"type": "integer", "minimum": 1}
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capability", "cardinality"],
+      "properties": {
+        "capability": {"$ref": "#/$defs/capability"},
+        "cardinality": {"enum": ["single", "multiple"]}
+      }
+    },
+    "settings": {
+      "type": "object"
+    },
+    "moduleSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["moduleId", "enabled", "settings"],
+      "properties": {
+        "moduleId": {"$ref": "#/$defs/opaqueId"},
+        "enabled": {"type": "boolean"},
+        "settings": {"$ref": "#/$defs/settings"}
+      }
+    },
+    "providerBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capability",
+        "providerModuleIds",
+        "selectionPolicy",
+        "settings"
+      ],
+      "properties": {
+        "capability": {"$ref": "#/$defs/capability"},
+        "providerModuleIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        },
+        "selectionPolicy": {"enum": ["orderedFirstAvailable", "all"]},
+        "applicationId": {"$ref": "#/$defs/opaqueId"},
+        "settings": {"$ref": "#/$defs/settings"}
+      }
+    },
+    "kitSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["modules", "providerBindings"],
+      "properties": {
+        "modules": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/moduleSelection"}
+        },
+        "providerBindings": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/providerBinding"}
+        }
+      }
+    },
+    "moduleDescriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "version",
+        "coreCompatibility",
+        "provides",
+        "requires",
+        "optionalRequires",
+        "conflicts",
+        "supportedPlatforms",
+        "surfaces",
+        "effects",
+        "resourceRequirements",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ModuleDescriptor"},
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "version": {"$ref": "#/$defs/semanticVersion"},
+        "coreCompatibility": {"$ref": "#/$defs/coreCompatibility"},
+        "provides": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/capability"}
+        },
+        "requires": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/requirement"}
+        },
+        "optionalRequires": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/requirement"}
+        },
+        "conflicts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        },
+        "supportedPlatforms": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^(?:any|[a-z0-9]+(?:-[a-z0-9]+)*)$"
+          }
+        },
+        "surfaces": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "cli",
+              "host",
+              "studio",
+              "gateway",
+              "hostedControlPlane",
+              "remoteWorker"
+            ]
+          }
+        },
+        "effects": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "query",
+              "ephemeral",
+              "authoring",
+              "infrastructure",
+              "decision"
+            ]
+          }
+        },
+        "resourceRequirements": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "filesystemRead",
+              "filesystemWrite",
+              "process",
+              "network",
+              "listener",
+              "device"
+            ]
+          }
+        },
+        "configurationSchema": {
+          "type": "string",
+          "minLength": 1,
+          "format": "uri"
+        },
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "kitProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "displayName",
+        "selection",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "KitProfile"},
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"type": "string", "minLength": 1},
+        "selection": {"$ref": "#/$defs/kitSelection"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "moduleCatalog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "distributionId",
+        "coreVersion",
+        "platform",
+        "modules",
+        "profiles",
+        "defaultProfileId",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ModuleCatalog"},
+        "distributionId": {"$ref": "#/$defs/opaqueId"},
+        "coreVersion": {"$ref": "#/$defs/semanticVersion"},
+        "platform": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "modules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/moduleDescriptor"}
+        },
+        "profiles": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/kitProfile"}
+        },
+        "defaultProfileId": {"$ref": "#/$defs/opaqueId"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "severity", "message"],
+      "properties": {
+        "moduleId": {"$ref": "#/$defs/opaqueId"},
+        "code": {"$ref": "#/$defs/opaqueId"},
+        "severity": {"enum": ["info", "warning", "error"]},
+        "message": {"type": "string", "minLength": 1, "maxLength": 2048}
+      }
+    },
+    "resolvedModule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["moduleId", "descriptorDigest", "settings"],
+      "properties": {
+        "moduleId": {"$ref": "#/$defs/opaqueId"},
+        "descriptorDigest": {"$ref": "#/$defs/digest"},
+        "settings": {"$ref": "#/$defs/settings"}
+      }
+    },
+    "resolvedKitPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "distributionDigest",
+        "profileId",
+        "enabledModules",
+        "providerBindings",
+        "dependencyOrder",
+        "startupPolicy",
+        "diagnostics",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ResolvedKitPlan"},
+        "distributionDigest": {"$ref": "#/$defs/digest"},
+        "profileId": {"$ref": "#/$defs/opaqueId"},
+        "enabledModules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/resolvedModule"}
+        },
+        "providerBindings": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/providerBinding"}
+        },
+        "dependencyOrder": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        },
+        "startupPolicy": {"$ref": "#/$defs/opaqueId"},
+        "diagnostics": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/diagnostic"}
+        },
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "effectiveModuleState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "moduleId",
+        "state",
+        "health",
+        "effectiveCapabilities",
+        "diagnostics"
+      ],
+      "properties": {
+        "moduleId": {"$ref": "#/$defs/opaqueId"},
+        "state": {
+          "enum": [
+            "disabled",
+            "notPackaged",
+            "unsupported",
+            "dependencyMissing",
+            "policyDenied",
+            "starting",
+            "ready",
+            "degraded",
+            "failed",
+            "stopping",
+            "stopped"
+          ]
+        },
+        "health": {
+          "enum": ["notApplicable", "unknown", "healthy", "degraded", "unhealthy"]
+        },
+        "effectiveCapabilities": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/capability"}
+        },
+        "diagnostics": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/diagnostic"}
+        }
+      }
+    },
+    "effectiveKitManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "resolvedPlanDigest",
+        "modules",
+        "commands",
+        "rpcMethods",
+        "studioContributions",
+        "generatedAt",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "EffectiveKitManifest"},
+        "resolvedPlanDigest": {"$ref": "#/$defs/digest"},
+        "modules": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/effectiveModuleState"}
+        },
+        "commands": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 256}
+        },
+        "rpcMethods": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 256}
+        },
+        "studioContributions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 256}
+        },
+        "generatedAt": {"type": "string", "format": "date-time"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    }
+  }
+}

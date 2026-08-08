@@ -1,0 +1,9 @@
+schemaVersion: 2
+kind: EdgeInstance
+metadata:
+  id: journey-ready-to-failed
+spec:
+  projectionId: delivery-journey
+  transitionId: ready-to-failed
+  fromNodeId: journey-dashboard-ready
+  toNodeId: journey-dashboard-failed

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/source/catalog-authoring-document",
+  "title": "Catalog authoring document",
+  "type": "object",
+  "required": ["schemaVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "kind": {
+      "enum": [
+        "Workspace",
+        "Application",
+        "Journey",
+        "Scenario",
+        "Transition",
+        "GatewayScope",
+        "GatewayPreset",
+        "GatewayRoute",
+        "GatewayFixture",
+        "ScenarioExecutionBinding",
+        "ReviewGuide"
+      ]
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"}
+      },
+      "additionalProperties": false
+    },
+    "spec": {"type": "object"}
+  },
+  "additionalProperties": false
+}

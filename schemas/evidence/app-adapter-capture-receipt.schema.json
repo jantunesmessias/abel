@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/evidence/app-adapter-capture-receipt",
+  "title": "App Adapter capture receipt",
+  "$comment": "Structural validation only. AppAdapterCaptureReceipt.fromJson with the expected CAS digest is the normative semantic and canonical-byte validator.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "requestId",
+    "sessionId",
+    "artifactDigest",
+    "pixelDigest",
+    "size",
+    "width",
+    "height",
+    "mediaType",
+    "completedAt"
+  ],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "requestId": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,256}$"},
+    "sessionId": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,256}$"},
+    "artifactDigest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "pixelDigest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "size": {"type": "integer", "minimum": 1, "maximum": 33554432},
+    "width": {"type": "integer", "minimum": 1, "maximum": 100000},
+    "height": {"type": "integer", "minimum": 1, "maximum": 100000},
+    "mediaType": {"const": "image/png"},
+    "completedAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}(?:[0-9]{3})?Z$",
+      "maxLength": 64
+    }
+  }
+}

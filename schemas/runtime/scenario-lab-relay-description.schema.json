@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/runtime/scenario-lab-relay-description",
+  "title": "Scenario Lab relay description documents",
+  "oneOf": [
+    {"$ref": "#/$defs/describeRequest"},
+    {"$ref": "#/$defs/description"}
+  ],
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "maxLength": 256
+    },
+    "launchAttemptId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{16,128}$"
+    },
+    "nonce": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{22,128}$"
+    },
+    "describeRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runId", "expectedStartRequestDigest"],
+      "properties": {
+        "runId": {"$ref": "#/$defs/id"},
+        "expectedStartRequestDigest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "descriptorV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "runId",
+        "targetId",
+        "launchProfileId",
+        "launchAttemptId",
+        "origin",
+        "nonce",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ScenarioLabRelayTargetDescriptor"},
+        "runId": {"$ref": "#/$defs/id"},
+        "targetId": {"$ref": "#/$defs/id"},
+        "launchProfileId": {"$ref": "#/$defs/id"},
+        "launchAttemptId": {"$ref": "#/$defs/launchAttemptId"},
+        "origin": {"type": "string", "format": "uri", "maxLength": 2048},
+        "nonce": {"$ref": "#/$defs/nonce"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "runtimeInputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executionFingerprintDigest",
+        "executionTargetId",
+        "digest"
+      ],
+      "properties": {
+        "executionFingerprintDigest": {"$ref": "#/$defs/digest"},
+        "executionTargetId": {"$ref": "#/$defs/id"},
+        "gatewayPresetId": {"$ref": "#/$defs/id"},
+        "compiledGatewayPlanDigest": {"$ref": "#/$defs/digest"},
+        "routingTableDigest": {"$ref": "#/$defs/digest"},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {
+          "if": {"required": ["gatewayPresetId"]},
+          "then": {
+            "required": ["compiledGatewayPlanDigest", "routingTableDigest"]
+          },
+          "else": {
+            "not": {
+              "anyOf": [
+                {"required": ["compiledGatewayPlanDigest"]},
+                {"required": ["routingTableDigest"]}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "description": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "runId",
+        "startRequestDigest",
+        "status",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 2},
+        "kind": {"const": "ScenarioLabRelayDescription"},
+        "runId": {"$ref": "#/$defs/id"},
+        "startRequestDigest": {"$ref": "#/$defs/digest"},
+        "status": {"enum": ["pending", "ready", "closed"]},
+        "descriptor": {"$ref": "#/$defs/descriptorV1"},
+        "runtimeInputs": {"$ref": "#/$defs/runtimeInputs"},
+        "gatewayDataOrigin": {
+          "type": "string",
+          "pattern": "^http://(?:127\\.0\\.0\\.1|localhost|\\[::1\\]):(?:[1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$",
+          "maxLength": 64
+        },
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"status": {"const": "ready"}},
+            "required": ["status"]
+          },
+          "then": {"required": ["descriptor", "runtimeInputs"]},
+          "else": {
+            "not": {
+              "anyOf": [
+                {"required": ["descriptor"]},
+                {"required": ["runtimeInputs"]},
+                {"required": ["gatewayDataOrigin"]}
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "required": ["runtimeInputs"],
+            "properties": {
+              "runtimeInputs": {"required": ["gatewayPresetId"]}
+            }
+          },
+          "then": {"required": ["gatewayDataOrigin"]},
+          "else": {"not": {"required": ["gatewayDataOrigin"]}}
+        }
+      ]
+    }
+  }
+}

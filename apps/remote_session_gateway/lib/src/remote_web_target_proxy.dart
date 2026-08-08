@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:devex_contracts/devex_contracts.dart';
-import 'package:devex_engine/devex_engine.dart';
+import 'package:experience_contracts/experience_contracts.dart';
+import 'package:experience_engine/experience_engine.dart';
 import 'package:shelf/shelf.dart';
 
 final class RemoteWebBootstrapNotice {
@@ -58,7 +58,7 @@ final class RemoteWebTargetProxy {
     }
   }
 
-  static const String cookieName = '__Secure-DevExWebSession';
+  static const String cookieName = '__Secure-WorkspaceSession';
   static const int _maximumBootstrapBytes = 4096;
   static const int _maximumIndexBytes = 4 * 1024 * 1024;
   static const int _maximumAssetBytes = 512 * 1024 * 1024;

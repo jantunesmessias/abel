@@ -1,0 +1,3754 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/runtime/experience-authoring",
+  "title": "Experience Authoring contracts",
+  "$comment": "Closed structural profile. Public Dart constructors, codecs, result validators and engine validators are normative for JCS digests, UTF-8 byte limits, exact variant fields, CAS chains and cross-document semantic fences. JSON Schema maxLength is structural character length only; opaque IDs are ASCII.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "digest"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "kind": {
+      "enum": [
+        "AuthoringCapability",
+        "AuthoringActionGrant",
+        "LayoutDraft",
+        "LayoutComparison",
+        "ExperienceChangeSet",
+        "ExperienceReviewPacket",
+        "LayoutDraftAbandonReceipt",
+        "ExperiencePromotionReceipt",
+        "ExperienceAuthoringDescribeRequest",
+        "ExperienceAuthoringDescription",
+        "ExperienceAuthoringSubjectHeadRequest",
+        "ExperienceAuthoringSubjectHeadResult",
+        "LayoutDraftOpenRequest",
+        "LayoutDraftOpenResult",
+        "LayoutDraftGetRequest",
+        "LayoutDraftGetResult",
+        "AuthoringGrantRequest",
+        "AuthoringGrantResult",
+        "LayoutDraftMutationRequest",
+        "LayoutDraftMutationResult",
+        "ExperienceReviewPrepareRequest",
+        "ExperienceReviewPrepareResult",
+        "ExperienceChangeSetGetRequest",
+        "ExperienceChangeSetGetResult",
+        "ExperienceReviewGetRequest",
+        "ExperienceReviewGetResult",
+        "ExperienceReviewActionRequest",
+        "ExperienceReviewActionResult",
+        "ExperienceReviewDecisionGrantRequest",
+        "LayoutDraftAbandonRequest",
+        "LayoutDraftAbandonResult",
+        "ExperiencePromotionGrantRequest",
+        "ExperiencePromotionApplyRequest",
+        "ExperiencePromotionApplyResult",
+        "ExperiencePromotionGetRequest",
+        "ExperiencePromotionGetResult",
+        "ExperiencePromotionHistoryRequest",
+        "ExperiencePromotionHistoryResult",
+        "ExperienceAuthoringError"
+      ]
+    },
+    "digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "requestId": {
+      "$ref": "#/$defs/id"
+    },
+    "subject": {
+      "$ref": "#/$defs/subject"
+    },
+    "capability": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/moduleCapabilityRef"
+        },
+        {
+          "$ref": "#/$defs/authoringCapability"
+        }
+      ]
+    },
+    "moduleId": {
+      "$ref": "#/$defs/id"
+    },
+    "resolvedPlanDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "effects": {
+      "$ref": "#/$defs/effects"
+    },
+    "operations": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/operations"
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/moveOperation"
+          }
+        }
+      ]
+    },
+    "authorityId": {
+      "$ref": "#/$defs/id"
+    },
+    "policyId": {
+      "$ref": "#/$defs/id"
+    },
+    "principalId": {
+      "$ref": "#/$defs/id"
+    },
+    "capabilityDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "requestDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "payloadDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "effect": {
+      "enum": [
+        "query",
+        "authoring",
+        "decision"
+      ]
+    },
+    "operation": {
+      "$ref": "#/$defs/operation"
+    },
+    "expectedDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "expectedSourceDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "issuedAt": {
+      "$ref": "#/$defs/time"
+    },
+    "expiresAt": {
+      "$ref": "#/$defs/time"
+    },
+    "singleUse": {
+      "const": true
+    },
+    "draft": {
+      "$ref": "#/$defs/layoutDraft"
+    },
+    "head": {
+      "$ref": "#/$defs/subjectHead"
+    },
+    "resumed": {
+      "type": "boolean"
+    },
+    "draftId": {
+      "$ref": "#/$defs/id"
+    },
+    "baseLayoutDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "candidateLayoutDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "baseSourceDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "topologyDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "contentSetDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "history": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "$ref": "#/$defs/moveOperation"
+      }
+    },
+    "cursor": {
+      "$ref": "#/$defs/safeInteger"
+    },
+    "revision": {
+      "$ref": "#/$defs/safeInteger"
+    },
+    "previousDraftDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "projectionId": {
+      "$ref": "#/$defs/id"
+    },
+    "beforeLayoutDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "afterLayoutDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "changedFrames": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {
+        "$ref": "#/$defs/frameChange"
+      }
+    },
+    "expectedContentSetDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "draftDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "draftRevision": {
+      "$ref": "#/$defs/safeInteger"
+    },
+    "comparison": {
+      "$ref": "#/$defs/layoutComparison"
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "$ref": "#/$defs/findingRecord"
+      }
+    },
+    "concepts": {
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "$ref": "#/$defs/conceptRecord"
+      }
+    },
+    "comments": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "$ref": "#/$defs/commentRecord"
+      }
+    },
+    "reviewGuideBinding": {
+      "$ref": "#/$defs/reviewGuideBinding"
+    },
+    "automatedAcceptance": {
+      "$ref": "#/$defs/acceptance"
+    },
+    "humanDecisions": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "$ref": "#/$defs/decisionRecord"
+      }
+    },
+    "previousReviewPacketDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "changeSetId": {
+      "$ref": "#/$defs/id"
+    },
+    "changeSetDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "comparisonDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "reviewPacketId": {
+      "$ref": "#/$defs/id"
+    },
+    "reviewPacketDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "sequence": {
+      "$ref": "#/$defs/positiveSafeInteger"
+    },
+    "previousReceiptDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "sourceDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "resultSourceDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "previousContentSetDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "resultContentSetDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "layoutDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "promotedAt": {
+      "$ref": "#/$defs/time"
+    },
+    "finalDraftDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "finalDraftRevision": {
+      "$ref": "#/$defs/safeInteger"
+    },
+    "abandonedAt": {
+      "$ref": "#/$defs/time"
+    },
+    "availability": {
+      "enum": [
+        "available",
+        "policyDenied",
+        "unsupported"
+      ]
+    },
+    "allowedEffects": {
+      "$ref": "#/$defs/effects"
+    },
+    "allowedOperations": {
+      "$ref": "#/$defs/operations"
+    },
+    "currentContentSetDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "currentSourceDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "currentTopologyDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "currentLayoutDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "maxFrameBytes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65536
+    },
+    "grantId": {
+      "$ref": "#/$defs/id"
+    },
+    "grantDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "grant": {
+      "$ref": "#/$defs/actionGrant"
+    },
+    "expectedDraftDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "expectedDraftRevision": {
+      "$ref": "#/$defs/safeInteger"
+    },
+    "expectedChangeSetDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "expectedReviewPacketDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "mutation": {
+      "enum": [
+        "applyMove",
+        "undo",
+        "redo",
+        "reset"
+      ]
+    },
+    "move": {
+      "$ref": "#/$defs/moveInput"
+    },
+    "changeSet": {
+      "$ref": "#/$defs/changeSet"
+    },
+    "reviewPacket": {
+      "$ref": "#/$defs/reviewPacket"
+    },
+    "reviewGuideId": {
+      "$ref": "#/$defs/id"
+    },
+    "reviewGuideStepId": {
+      "$ref": "#/$defs/id"
+    },
+    "fence": {
+      "$ref": "#/$defs/reviewFence"
+    },
+    "finding": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/findingInput"
+        },
+        {
+          "$ref": "#/$defs/findingRecord"
+        }
+      ]
+    },
+    "concept": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/conceptInput"
+        },
+        {
+          "$ref": "#/$defs/conceptRecord"
+        }
+      ]
+    },
+    "comment": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/commentInput"
+        },
+        {
+          "$ref": "#/$defs/commentRecord"
+        }
+      ]
+    },
+    "decision": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/decisionInput"
+        },
+        {
+          "$ref": "#/$defs/decisionRecord"
+        }
+      ]
+    },
+    "expectedAutomatedAcceptanceDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "automatedAcceptanceDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "receipt": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/abandonReceipt"
+        },
+        {
+          "$ref": "#/$defs/promotionReceipt"
+        }
+      ]
+    },
+    "receiptId": {
+      "$ref": "#/$defs/id"
+    },
+    "expectedReceiptDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "offset": {
+      "$ref": "#/$defs/safeInteger"
+    },
+    "limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 16
+    },
+    "totalCount": {
+      "$ref": "#/$defs/safeInteger"
+    },
+    "previousPageReceiptDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "receipts": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "$ref": "#/$defs/promotionReceipt"
+      }
+    },
+    "code": {
+      "enum": [
+        "stale",
+        "policyDenied",
+        "ownerDenied",
+        "capabilityUnavailable",
+        "grantExpired",
+        "grantRevoked",
+        "grantConsumed",
+        "grantMismatch",
+        "requestConflict",
+        "unsupported",
+        "quotaExceeded",
+        "unavailable",
+        "invalidRequest"
+      ]
+    },
+    "currentDraftDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "currentReviewPacketDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "currentChangeSetDigest": {
+      "$ref": "#/$defs/digest"
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "kind": {
+          "const": "AuthoringCapability"
+        },
+        "capability": {
+          "$ref": "#/$defs/moduleCapabilityRef"
+        },
+        "operations": {
+          "$ref": "#/$defs/operations"
+        },
+        "moduleId": {
+          "const": "authoring.local"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "capability",
+        "moduleId",
+        "resolvedPlanDigest",
+        "subject",
+        "effects",
+        "operations",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "capability",
+          "moduleId",
+          "resolvedPlanDigest",
+          "subject",
+          "effects",
+          "operations",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "AuthoringActionGrant"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "requestId",
+        "requestDigest",
+        "payloadDigest",
+        "authorityId",
+        "policyId",
+        "principalId",
+        "capabilityDigest",
+        "subject",
+        "effect",
+        "operation",
+        "expectedDigest",
+        "expectedSourceDigest",
+        "issuedAt",
+        "expiresAt",
+        "singleUse",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "id",
+          "requestId",
+          "requestDigest",
+          "payloadDigest",
+          "authorityId",
+          "policyId",
+          "principalId",
+          "capabilityDigest",
+          "subject",
+          "effect",
+          "operation",
+          "expectedDigest",
+          "expectedSourceDigest",
+          "issuedAt",
+          "expiresAt",
+          "singleUse",
+          "digest"
+        ]
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "effect": {
+              "const": "authoring"
+            },
+            "operation": {
+              "enum": [
+                "openDraft",
+                "abandonDraft",
+                "moveNode",
+                "undo",
+                "redo",
+                "reset",
+                "proposeConcept",
+                "prepareReview",
+                "promote"
+              ]
+            }
+          }
+        },
+        {
+          "properties": {
+            "effect": {
+              "const": "decision"
+            },
+            "operation": {
+              "enum": [
+                "appendFinding",
+                "appendComment",
+                "evaluateAutomatedAcceptance",
+                "decideReview"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "LayoutDraft"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "subject",
+        "baseLayoutDigest",
+        "candidateLayoutDigest",
+        "baseSourceDigest",
+        "topologyDigest",
+        "contentSetDigest",
+        "history",
+        "cursor",
+        "revision",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "id",
+          "subject",
+          "baseLayoutDigest",
+          "candidateLayoutDigest",
+          "baseSourceDigest",
+          "topologyDigest",
+          "contentSetDigest",
+          "history",
+          "cursor",
+          "revision",
+          "digest",
+          "previousDraftDigest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "LayoutComparison"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "topologyDigest",
+        "projectionId",
+        "beforeLayoutDigest",
+        "afterLayoutDigest",
+        "changedFrames",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "topologyDigest",
+          "projectionId",
+          "beforeLayoutDigest",
+          "afterLayoutDigest",
+          "changedFrames",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperienceChangeSet"
+        },
+        "operations": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/moveOperation"
+          }
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "subject",
+        "baseSourceDigest",
+        "expectedContentSetDigest",
+        "draftDigest",
+        "draftRevision",
+        "comparison",
+        "operations",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "id",
+          "subject",
+          "baseSourceDigest",
+          "expectedContentSetDigest",
+          "draftDigest",
+          "draftRevision",
+          "comparison",
+          "operations",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperienceReviewPacket"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "subject",
+        "changeSetId",
+        "changeSetDigest",
+        "comparisonDigest",
+        "baseSourceDigest",
+        "findings",
+        "concepts",
+        "comments",
+        "reviewGuideBinding",
+        "humanDecisions",
+        "revision",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "id",
+          "subject",
+          "changeSetId",
+          "changeSetDigest",
+          "comparisonDigest",
+          "baseSourceDigest",
+          "findings",
+          "concepts",
+          "comments",
+          "reviewGuideBinding",
+          "humanDecisions",
+          "revision",
+          "digest",
+          "automatedAcceptance",
+          "previousReviewPacketDigest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "LayoutDraftAbandonReceipt"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "requestId",
+        "subject",
+        "draftId",
+        "finalDraftDigest",
+        "finalDraftRevision",
+        "sourceDigest",
+        "abandonedAt",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "id",
+          "requestId",
+          "subject",
+          "draftId",
+          "finalDraftDigest",
+          "finalDraftRevision",
+          "sourceDigest",
+          "abandonedAt",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperiencePromotionReceipt"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "sequence",
+        "subject",
+        "draftId",
+        "draftDigest",
+        "draftRevision",
+        "sourceDigest",
+        "resultSourceDigest",
+        "previousContentSetDigest",
+        "resultContentSetDigest",
+        "layoutDigest",
+        "changeSetId",
+        "changeSetDigest",
+        "reviewPacketId",
+        "reviewPacketDigest",
+        "promotedAt",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "id",
+          "sequence",
+          "subject",
+          "draftId",
+          "draftDigest",
+          "draftRevision",
+          "sourceDigest",
+          "resultSourceDigest",
+          "previousContentSetDigest",
+          "resultContentSetDigest",
+          "layoutDigest",
+          "changeSetId",
+          "changeSetDigest",
+          "reviewPacketId",
+          "reviewPacketDigest",
+          "promotedAt",
+          "digest",
+          "previousReceiptDigest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperienceAuthoringDescribeRequest"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "subject",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "subject",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperienceAuthoringDescription"
+        },
+        "capability": {
+          "$ref": "#/$defs/authoringCapability"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "subject",
+        "availability",
+        "allowedEffects",
+        "allowedOperations",
+        "currentContentSetDigest",
+        "currentTopologyDigest",
+        "currentLayoutDigest",
+        "maxFrameBytes",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "subject",
+          "availability",
+          "allowedEffects",
+          "allowedOperations",
+          "currentContentSetDigest",
+          "currentTopologyDigest",
+          "currentLayoutDigest",
+          "maxFrameBytes",
+          "digest",
+          "capability",
+          "currentSourceDigest"
+        ]
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "availability": {
+              "const": "unsupported"
+            },
+            "allowedEffects": {
+              "maxItems": 0
+            },
+            "allowedOperations": {
+              "maxItems": 0
+            }
+          },
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "capability"
+                ]
+              },
+              {
+                "required": [
+                  "currentSourceDigest"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "availability": {
+              "const": "policyDenied"
+            },
+            "allowedEffects": {
+              "const": [
+                "query"
+              ]
+            },
+            "allowedOperations": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "describe",
+                  "getSubjectHead",
+                  "getDraft",
+                  "getChangeSet",
+                  "getReview",
+                  "getPromotion",
+                  "getPromotionHistory"
+                ]
+              }
+            }
+          },
+          "required": [
+            "capability",
+            "currentSourceDigest"
+          ]
+        },
+        {
+          "properties": {
+            "availability": {
+              "const": "available"
+            },
+            "allowedEffects": {
+              "contains": {
+                "enum": [
+                  "authoring",
+                  "decision"
+                ]
+              }
+            },
+            "allowedOperations": {
+              "contains": {
+                "enum": [
+                  "openDraft",
+                  "abandonDraft",
+                  "moveNode",
+                  "undo",
+                  "redo",
+                  "reset",
+                  "appendFinding",
+                  "proposeConcept",
+                  "appendComment",
+                  "prepareReview",
+                  "evaluateAutomatedAcceptance",
+                  "decideReview",
+                  "promote"
+                ]
+              }
+            }
+          },
+          "required": [
+            "capability",
+            "currentSourceDigest"
+          ]
+        }
+      ]
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperienceAuthoringSubjectHeadRequest"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "subject",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "subject",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperienceAuthoringSubjectHeadResult"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "head",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "head",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "LayoutDraftOpenRequest"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "subject",
+        "expectedContentSetDigest",
+        "expectedSourceDigest",
+        "grantId",
+        "grantDigest",
+        "payloadDigest",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "subject",
+          "expectedContentSetDigest",
+          "expectedSourceDigest",
+          "grantId",
+          "grantDigest",
+          "payloadDigest",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "LayoutDraftOpenResult"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "draft",
+        "resumed",
+        "head",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "draft",
+          "resumed",
+          "head",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "LayoutDraftGetRequest"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "subject",
+        "draftId",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "subject",
+          "draftId",
+          "digest",
+          "expectedDraftDigest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "LayoutDraftGetResult"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "draft",
+        "head",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "draft",
+          "head",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "AuthoringGrantRequest"
+        },
+        "operation": {
+          "enum": [
+            "openDraft",
+            "abandonDraft",
+            "moveNode",
+            "undo",
+            "redo",
+            "reset",
+            "appendFinding",
+            "proposeConcept",
+            "appendComment",
+            "prepareReview",
+            "evaluateAutomatedAcceptance"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "capabilityDigest",
+        "subject",
+        "effect",
+        "operation",
+        "expectedDigest",
+        "expectedSourceDigest",
+        "payloadDigest",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "capabilityDigest",
+          "subject",
+          "effect",
+          "operation",
+          "expectedDigest",
+          "expectedSourceDigest",
+          "payloadDigest",
+          "digest"
+        ]
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "effect": {
+              "const": "authoring"
+            },
+            "operation": {
+              "enum": [
+                "openDraft",
+                "abandonDraft",
+                "moveNode",
+                "undo",
+                "redo",
+                "reset",
+                "proposeConcept",
+                "prepareReview"
+              ]
+            }
+          }
+        },
+        {
+          "properties": {
+            "effect": {
+              "const": "decision"
+            },
+            "operation": {
+              "enum": [
+                "appendFinding",
+                "appendComment",
+                "evaluateAutomatedAcceptance"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "AuthoringGrantResult"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "grant",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "grant",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "LayoutDraftMutationRequest"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "draftId",
+        "expectedDraftDigest",
+        "expectedDraftRevision",
+        "grantId",
+        "grantDigest",
+        "mutation",
+        "payloadDigest",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "draftId",
+          "expectedDraftDigest",
+          "expectedDraftRevision",
+          "grantId",
+          "grantDigest",
+          "mutation",
+          "payloadDigest",
+          "digest",
+          "move"
+        ]
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "mutation": {
+              "const": "applyMove"
+            }
+          },
+          "required": [
+            "move"
+          ]
+        },
+        {
+          "properties": {
+            "mutation": {
+              "enum": [
+                "undo",
+                "redo",
+                "reset"
+              ]
+            }
+          },
+          "not": {
+            "required": [
+              "move"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "LayoutDraftMutationResult"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "draft",
+        "head",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "draft",
+          "head",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperienceReviewPrepareRequest"
+        },
+        "expectedDraftRevision": {
+          "$ref": "#/$defs/positiveSafeInteger"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "subject",
+        "draftId",
+        "expectedDraftDigest",
+        "expectedDraftRevision",
+        "expectedContentSetDigest",
+        "expectedSourceDigest",
+        "reviewGuideId",
+        "reviewGuideStepId",
+        "grantId",
+        "grantDigest",
+        "payloadDigest",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "subject",
+          "draftId",
+          "expectedDraftDigest",
+          "expectedDraftRevision",
+          "expectedContentSetDigest",
+          "expectedSourceDigest",
+          "reviewGuideId",
+          "reviewGuideStepId",
+          "grantId",
+          "grantDigest",
+          "payloadDigest",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperienceReviewPrepareResult"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "changeSet",
+        "reviewPacket",
+        "head",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "changeSet",
+          "reviewPacket",
+          "head",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperienceChangeSetGetRequest"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "subject",
+        "changeSetId",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "subject",
+          "changeSetId",
+          "digest",
+          "expectedChangeSetDigest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperienceChangeSetGetResult"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "changeSet",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "changeSet",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperienceReviewGetRequest"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "subject",
+        "reviewPacketId",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "subject",
+          "reviewPacketId",
+          "digest",
+          "expectedReviewPacketDigest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperienceReviewGetResult"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "reviewPacket",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "reviewPacket",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperienceReviewActionRequest"
+        },
+        "finding": {
+          "$ref": "#/$defs/findingInput"
+        },
+        "concept": {
+          "$ref": "#/$defs/conceptInput"
+        },
+        "comment": {
+          "$ref": "#/$defs/commentInput"
+        },
+        "decision": {
+          "$ref": "#/$defs/decisionInput"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "fence",
+        "operation",
+        "grantId",
+        "grantDigest",
+        "payloadDigest",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "fence",
+          "operation",
+          "grantId",
+          "grantDigest",
+          "payloadDigest",
+          "digest",
+          "finding",
+          "concept",
+          "comment",
+          "decision",
+          "expectedAutomatedAcceptanceDigest"
+        ]
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "operation": {
+              "const": "appendFinding"
+            }
+          },
+          "required": [
+            "finding"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "concept"
+                ]
+              },
+              {
+                "required": [
+                  "comment"
+                ]
+              },
+              {
+                "required": [
+                  "decision"
+                ]
+              },
+              {
+                "required": [
+                  "expectedAutomatedAcceptanceDigest"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "proposeConcept"
+            }
+          },
+          "required": [
+            "concept"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "finding"
+                ]
+              },
+              {
+                "required": [
+                  "comment"
+                ]
+              },
+              {
+                "required": [
+                  "decision"
+                ]
+              },
+              {
+                "required": [
+                  "expectedAutomatedAcceptanceDigest"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "appendComment"
+            }
+          },
+          "required": [
+            "comment"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "finding"
+                ]
+              },
+              {
+                "required": [
+                  "concept"
+                ]
+              },
+              {
+                "required": [
+                  "decision"
+                ]
+              },
+              {
+                "required": [
+                  "expectedAutomatedAcceptanceDigest"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "evaluateAutomatedAcceptance"
+            }
+          },
+          "required": [],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "finding"
+                ]
+              },
+              {
+                "required": [
+                  "concept"
+                ]
+              },
+              {
+                "required": [
+                  "comment"
+                ]
+              },
+              {
+                "required": [
+                  "decision"
+                ]
+              },
+              {
+                "required": [
+                  "expectedAutomatedAcceptanceDigest"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "decideReview"
+            }
+          },
+          "required": [
+            "decision",
+            "expectedAutomatedAcceptanceDigest"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "finding"
+                ]
+              },
+              {
+                "required": [
+                  "concept"
+                ]
+              },
+              {
+                "required": [
+                  "comment"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperienceReviewActionResult"
+        },
+        "finding": {
+          "$ref": "#/$defs/findingRecord"
+        },
+        "concept": {
+          "$ref": "#/$defs/conceptRecord"
+        },
+        "comment": {
+          "$ref": "#/$defs/commentRecord"
+        },
+        "decision": {
+          "$ref": "#/$defs/decisionRecord"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "operation",
+        "reviewPacket",
+        "head",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "operation",
+          "reviewPacket",
+          "head",
+          "digest",
+          "finding",
+          "concept",
+          "comment",
+          "automatedAcceptance",
+          "decision"
+        ]
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "operation": {
+              "const": "appendFinding"
+            }
+          },
+          "required": [
+            "finding"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "concept"
+                ]
+              },
+              {
+                "required": [
+                  "comment"
+                ]
+              },
+              {
+                "required": [
+                  "automatedAcceptance"
+                ]
+              },
+              {
+                "required": [
+                  "decision"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "proposeConcept"
+            }
+          },
+          "required": [
+            "concept"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "finding"
+                ]
+              },
+              {
+                "required": [
+                  "comment"
+                ]
+              },
+              {
+                "required": [
+                  "automatedAcceptance"
+                ]
+              },
+              {
+                "required": [
+                  "decision"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "appendComment"
+            }
+          },
+          "required": [
+            "comment"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "finding"
+                ]
+              },
+              {
+                "required": [
+                  "concept"
+                ]
+              },
+              {
+                "required": [
+                  "automatedAcceptance"
+                ]
+              },
+              {
+                "required": [
+                  "decision"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "evaluateAutomatedAcceptance"
+            }
+          },
+          "required": [
+            "automatedAcceptance"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "finding"
+                ]
+              },
+              {
+                "required": [
+                  "concept"
+                ]
+              },
+              {
+                "required": [
+                  "comment"
+                ]
+              },
+              {
+                "required": [
+                  "decision"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "operation": {
+              "const": "decideReview"
+            }
+          },
+          "required": [
+            "decision"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "finding"
+                ]
+              },
+              {
+                "required": [
+                  "concept"
+                ]
+              },
+              {
+                "required": [
+                  "comment"
+                ]
+              },
+              {
+                "required": [
+                  "automatedAcceptance"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperienceReviewDecisionGrantRequest"
+        },
+        "decision": {
+          "$ref": "#/$defs/decisionInput"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "capabilityDigest",
+        "fence",
+        "decision",
+        "automatedAcceptanceDigest",
+        "payloadDigest",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "capabilityDigest",
+          "fence",
+          "decision",
+          "automatedAcceptanceDigest",
+          "payloadDigest",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "LayoutDraftAbandonRequest"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "subject",
+        "draftId",
+        "expectedDraftDigest",
+        "expectedDraftRevision",
+        "expectedSourceDigest",
+        "grantId",
+        "grantDigest",
+        "payloadDigest",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "subject",
+          "draftId",
+          "expectedDraftDigest",
+          "expectedDraftRevision",
+          "expectedSourceDigest",
+          "grantId",
+          "grantDigest",
+          "payloadDigest",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "LayoutDraftAbandonResult"
+        },
+        "receipt": {
+          "$ref": "#/$defs/abandonReceipt"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "receipt",
+        "head",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "receipt",
+          "head",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperiencePromotionGrantRequest"
+        },
+        "draftRevision": {
+          "$ref": "#/$defs/positiveSafeInteger"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "capabilityDigest",
+        "subject",
+        "draftId",
+        "draftDigest",
+        "draftRevision",
+        "changeSetId",
+        "changeSetDigest",
+        "reviewPacketId",
+        "reviewPacketDigest",
+        "expectedSourceDigest",
+        "expectedContentSetDigest",
+        "candidateLayoutDigest",
+        "payloadDigest",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "capabilityDigest",
+          "subject",
+          "draftId",
+          "draftDigest",
+          "draftRevision",
+          "changeSetId",
+          "changeSetDigest",
+          "reviewPacketId",
+          "reviewPacketDigest",
+          "expectedSourceDigest",
+          "expectedContentSetDigest",
+          "candidateLayoutDigest",
+          "payloadDigest",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperiencePromotionApplyRequest"
+        },
+        "draftRevision": {
+          "$ref": "#/$defs/positiveSafeInteger"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "subject",
+        "draftId",
+        "draftDigest",
+        "draftRevision",
+        "changeSetId",
+        "changeSetDigest",
+        "reviewPacketId",
+        "reviewPacketDigest",
+        "expectedSourceDigest",
+        "expectedContentSetDigest",
+        "candidateLayoutDigest",
+        "grantId",
+        "grantDigest",
+        "payloadDigest",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "subject",
+          "draftId",
+          "draftDigest",
+          "draftRevision",
+          "changeSetId",
+          "changeSetDigest",
+          "reviewPacketId",
+          "reviewPacketDigest",
+          "expectedSourceDigest",
+          "expectedContentSetDigest",
+          "candidateLayoutDigest",
+          "grantId",
+          "grantDigest",
+          "payloadDigest",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperiencePromotionApplyResult"
+        },
+        "receipt": {
+          "$ref": "#/$defs/promotionReceipt"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "receipt",
+        "head",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "receipt",
+          "head",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperiencePromotionGetRequest"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "subject",
+        "receiptId",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "subject",
+          "receiptId",
+          "digest",
+          "expectedReceiptDigest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperiencePromotionGetResult"
+        },
+        "receipt": {
+          "$ref": "#/$defs/promotionReceipt"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "receipt",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "receipt",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperiencePromotionHistoryRequest"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "subject",
+        "offset",
+        "limit",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "subject",
+          "offset",
+          "limit",
+          "digest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperiencePromotionHistoryResult"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "requestId",
+        "subject",
+        "offset",
+        "limit",
+        "totalCount",
+        "receipts",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "requestId",
+          "subject",
+          "offset",
+          "limit",
+          "totalCount",
+          "receipts",
+          "digest",
+          "previousPageReceiptDigest"
+        ]
+      }
+    },
+    {
+      "properties": {
+        "kind": {
+          "const": "ExperienceAuthoringError"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "kind",
+        "code",
+        "requestId",
+        "subject",
+        "digest"
+      ],
+      "propertyNames": {
+        "enum": [
+          "schemaVersion",
+          "kind",
+          "code",
+          "requestId",
+          "subject",
+          "digest",
+          "operation",
+          "mutation",
+          "draftId",
+          "changeSetId",
+          "reviewPacketId",
+          "expectedDigest",
+          "currentDraftDigest",
+          "currentChangeSetDigest",
+          "currentContentSetDigest",
+          "currentSourceDigest",
+          "currentReviewPacketDigest"
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "maxLength": 71
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$",
+      "maxLength": 128
+    },
+    "safeInteger": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "positiveSafeInteger": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "coordinate": {
+      "type": "number",
+      "minimum": -1000000,
+      "maximum": 1000000
+    },
+    "time": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}(?:[0-9]{3})?Z$",
+      "maxLength": 40
+    },
+    "operation": {
+      "enum": [
+        "describe",
+        "getSubjectHead",
+        "openDraft",
+        "getDraft",
+        "abandonDraft",
+        "moveNode",
+        "undo",
+        "redo",
+        "reset",
+        "getChangeSet",
+        "getReview",
+        "getPromotion",
+        "getPromotionHistory",
+        "appendFinding",
+        "proposeConcept",
+        "appendComment",
+        "prepareReview",
+        "evaluateAutomatedAcceptance",
+        "decideReview",
+        "promote"
+      ]
+    },
+    "operations": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 20,
+      "items": {
+        "$ref": "#/$defs/operation"
+      }
+    },
+    "effects": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 3,
+      "items": {
+        "enum": [
+          "query",
+          "authoring",
+          "decision"
+        ]
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workspaceId",
+        "applicationId",
+        "projectionId"
+      ],
+      "properties": {
+        "workspaceId": {
+          "$ref": "#/$defs/id"
+        },
+        "applicationId": {
+          "$ref": "#/$defs/id"
+        },
+        "projectionId": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "moduleCapabilityRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version"
+      ],
+      "properties": {
+        "id": {
+          "const": "experience.authoring"
+        },
+        "version": {
+          "const": 1
+        }
+      }
+    },
+    "authoringCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "capability",
+        "moduleId",
+        "resolvedPlanDigest",
+        "subject",
+        "effects",
+        "operations",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "kind": {
+          "const": "AuthoringCapability"
+        },
+        "capability": {
+          "$ref": "#/$defs/moduleCapabilityRef"
+        },
+        "moduleId": {
+          "const": "authoring.local"
+        },
+        "resolvedPlanDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "subject": {
+          "$ref": "#/$defs/subject"
+        },
+        "effects": {
+          "$ref": "#/$defs/effects"
+        },
+        "operations": {
+          "$ref": "#/$defs/operations"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "actionGrant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "requestId",
+        "requestDigest",
+        "payloadDigest",
+        "authorityId",
+        "policyId",
+        "principalId",
+        "capabilityDigest",
+        "subject",
+        "effect",
+        "operation",
+        "expectedDigest",
+        "expectedSourceDigest",
+        "issuedAt",
+        "expiresAt",
+        "singleUse",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "kind": {
+          "const": "AuthoringActionGrant"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "requestId": {
+          "$ref": "#/$defs/id"
+        },
+        "requestDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "payloadDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "authorityId": {
+          "$ref": "#/$defs/id"
+        },
+        "policyId": {
+          "$ref": "#/$defs/id"
+        },
+        "principalId": {
+          "$ref": "#/$defs/id"
+        },
+        "capabilityDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "subject": {
+          "$ref": "#/$defs/subject"
+        },
+        "effect": {
+          "enum": [
+            "authoring",
+            "decision"
+          ]
+        },
+        "operation": {
+          "$ref": "#/$defs/operation"
+        },
+        "expectedDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "expectedSourceDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "issuedAt": {
+          "$ref": "#/$defs/time"
+        },
+        "expiresAt": {
+          "$ref": "#/$defs/time"
+        },
+        "singleUse": {
+          "const": true
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "effect": {
+              "const": "authoring"
+            },
+            "operation": {
+              "enum": [
+                "openDraft",
+                "abandonDraft",
+                "moveNode",
+                "undo",
+                "redo",
+                "reset",
+                "proposeConcept",
+                "prepareReview",
+                "promote"
+              ]
+            }
+          }
+        },
+        {
+          "properties": {
+            "effect": {
+              "const": "decision"
+            },
+            "operation": {
+              "enum": [
+                "appendFinding",
+                "appendComment",
+                "evaluateAutomatedAcceptance",
+                "decideReview"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "moveInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeInstanceId",
+        "toX",
+        "toY"
+      ],
+      "properties": {
+        "nodeInstanceId": {
+          "$ref": "#/$defs/id"
+        },
+        "toX": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "toY": {
+          "$ref": "#/$defs/coordinate"
+        }
+      }
+    },
+    "moveOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "nodeInstanceId",
+        "fromX",
+        "fromY",
+        "toX",
+        "toY",
+        "digest"
+      ],
+      "properties": {
+        "kind": {
+          "const": "moveNode"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "nodeInstanceId": {
+          "$ref": "#/$defs/id"
+        },
+        "fromX": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "fromY": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "toX": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "toY": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "layoutDraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "subject",
+        "baseLayoutDigest",
+        "candidateLayoutDigest",
+        "baseSourceDigest",
+        "topologyDigest",
+        "contentSetDigest",
+        "history",
+        "cursor",
+        "revision",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "kind": {
+          "const": "LayoutDraft"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "subject": {
+          "$ref": "#/$defs/subject"
+        },
+        "baseLayoutDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "candidateLayoutDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "baseSourceDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "topologyDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "contentSetDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "history": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/moveOperation"
+          }
+        },
+        "cursor": {
+          "$ref": "#/$defs/safeInteger"
+        },
+        "revision": {
+          "$ref": "#/$defs/safeInteger"
+        },
+        "previousDraftDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "frameChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeInstanceId",
+        "beforeX",
+        "beforeY",
+        "afterX",
+        "afterY"
+      ],
+      "properties": {
+        "nodeInstanceId": {
+          "$ref": "#/$defs/id"
+        },
+        "beforeX": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "beforeY": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "afterX": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "afterY": {
+          "$ref": "#/$defs/coordinate"
+        }
+      }
+    },
+    "layoutComparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "topologyDigest",
+        "projectionId",
+        "beforeLayoutDigest",
+        "afterLayoutDigest",
+        "changedFrames",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "kind": {
+          "const": "LayoutComparison"
+        },
+        "topologyDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "projectionId": {
+          "$ref": "#/$defs/id"
+        },
+        "beforeLayoutDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "afterLayoutDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "changedFrames": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/frameChange"
+          }
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "changeSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "subject",
+        "baseSourceDigest",
+        "expectedContentSetDigest",
+        "draftDigest",
+        "draftRevision",
+        "comparison",
+        "operations",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "kind": {
+          "const": "ExperienceChangeSet"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "subject": {
+          "$ref": "#/$defs/subject"
+        },
+        "baseSourceDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "expectedContentSetDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "draftDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "draftRevision": {
+          "$ref": "#/$defs/positiveSafeInteger"
+        },
+        "comparison": {
+          "$ref": "#/$defs/layoutComparison"
+        },
+        "operations": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/moveOperation"
+          }
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "reviewSubject": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "scenarioId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "scenario"
+            },
+            "scenarioId": {
+              "$ref": "#/$defs/id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "transitionId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "transition"
+            },
+            "transitionId": {
+              "$ref": "#/$defs/id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "artifactDigest"
+          ],
+          "properties": {
+            "kind": {
+              "const": "artifact"
+            },
+            "artifactDigest": {
+              "$ref": "#/$defs/digest"
+            }
+          }
+        }
+      ]
+    },
+    "findingInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "severity",
+        "summary",
+        "detail"
+      ],
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/reviewSubject"
+        },
+        "severity": {
+          "enum": [
+            "info",
+            "warning",
+            "blocking"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        }
+      }
+    },
+    "findingRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "subject",
+        "severity",
+        "summary",
+        "detail",
+        "principalId",
+        "authorityId",
+        "grantDigest",
+        "recordedAt",
+        "digest"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "subject": {
+          "$ref": "#/$defs/reviewSubject"
+        },
+        "severity": {
+          "enum": [
+            "info",
+            "warning",
+            "blocking"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "principalId": {
+          "$ref": "#/$defs/id"
+        },
+        "authorityId": {
+          "$ref": "#/$defs/id"
+        },
+        "grantDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "recordedAt": {
+          "$ref": "#/$defs/time"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "conceptInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scenarioId",
+        "title",
+        "rationale"
+      ],
+      "properties": {
+        "scenarioId": {
+          "$ref": "#/$defs/id"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      }
+    },
+    "conceptRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "scenarioId",
+        "lifecycle",
+        "title",
+        "rationale",
+        "principalId",
+        "authorityId",
+        "grantDigest",
+        "recordedAt",
+        "digest"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "scenarioId": {
+          "$ref": "#/$defs/id"
+        },
+        "lifecycle": {
+          "const": "concept"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "principalId": {
+          "$ref": "#/$defs/id"
+        },
+        "authorityId": {
+          "$ref": "#/$defs/id"
+        },
+        "grantDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "recordedAt": {
+          "$ref": "#/$defs/time"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "commentInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "body"
+      ],
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/reviewSubject"
+        },
+        "body": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      }
+    },
+    "commentRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "sequence",
+        "subject",
+        "principalId",
+        "authorityId",
+        "grantDigest",
+        "body",
+        "recordedAt",
+        "digest"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "sequence": {
+          "$ref": "#/$defs/positiveSafeInteger"
+        },
+        "subject": {
+          "$ref": "#/$defs/reviewSubject"
+        },
+        "principalId": {
+          "$ref": "#/$defs/id"
+        },
+        "authorityId": {
+          "$ref": "#/$defs/id"
+        },
+        "grantDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "body": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "recordedAt": {
+          "$ref": "#/$defs/time"
+        },
+        "previousCommentDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "reviewGuideBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "catalogDigest",
+        "applicationId",
+        "reviewGuideId",
+        "stepId",
+        "scenarioId",
+        "bindingId",
+        "digest"
+      ],
+      "properties": {
+        "catalogDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "applicationId": {
+          "$ref": "#/$defs/id"
+        },
+        "reviewGuideId": {
+          "$ref": "#/$defs/id"
+        },
+        "stepId": {
+          "$ref": "#/$defs/id"
+        },
+        "scenarioId": {
+          "$ref": "#/$defs/id"
+        },
+        "bindingId": {
+          "$ref": "#/$defs/id"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "acceptance": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "changeSetDigest",
+            "evaluatorId",
+            "outcome",
+            "summary",
+            "recordedAt",
+            "digest"
+          ],
+          "properties": {
+            "changeSetDigest": {
+              "$ref": "#/$defs/digest"
+            },
+            "evaluatorId": {
+              "const": "projection-layout-safety.v1"
+            },
+            "outcome": {
+              "const": "passed"
+            },
+            "summary": {
+              "const": "Projection layout safety passed"
+            },
+            "recordedAt": {
+              "$ref": "#/$defs/time"
+            },
+            "digest": {
+              "$ref": "#/$defs/digest"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "changeSetDigest",
+            "evaluatorId",
+            "outcome",
+            "summary",
+            "recordedAt",
+            "digest"
+          ],
+          "properties": {
+            "changeSetDigest": {
+              "$ref": "#/$defs/digest"
+            },
+            "evaluatorId": {
+              "const": "projection-layout-safety.v1"
+            },
+            "outcome": {
+              "const": "failed"
+            },
+            "summary": {
+              "const": "Projection layout safety failed"
+            },
+            "recordedAt": {
+              "$ref": "#/$defs/time"
+            },
+            "digest": {
+              "$ref": "#/$defs/digest"
+            }
+          }
+        }
+      ]
+    },
+    "decisionInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision",
+        "rationale"
+      ],
+      "properties": {
+        "decision": {
+          "enum": [
+            "approve",
+            "reject"
+          ]
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      }
+    },
+    "decisionRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "sequence",
+        "changeSetDigest",
+        "reviewPacketDigest",
+        "principalId",
+        "authorityId",
+        "grantDigest",
+        "decision",
+        "rationale",
+        "recordedAt",
+        "digest"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "sequence": {
+          "$ref": "#/$defs/positiveSafeInteger"
+        },
+        "changeSetDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "reviewPacketDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "principalId": {
+          "$ref": "#/$defs/id"
+        },
+        "authorityId": {
+          "$ref": "#/$defs/id"
+        },
+        "grantDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "decision": {
+          "enum": [
+            "approve",
+            "reject"
+          ]
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        },
+        "recordedAt": {
+          "$ref": "#/$defs/time"
+        },
+        "previousDecisionDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "reviewPacket": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "subject",
+        "changeSetId",
+        "changeSetDigest",
+        "comparisonDigest",
+        "baseSourceDigest",
+        "findings",
+        "concepts",
+        "comments",
+        "reviewGuideBinding",
+        "humanDecisions",
+        "revision",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "kind": {
+          "const": "ExperienceReviewPacket"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "subject": {
+          "$ref": "#/$defs/subject"
+        },
+        "changeSetId": {
+          "$ref": "#/$defs/id"
+        },
+        "changeSetDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "comparisonDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "baseSourceDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "findings": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "$ref": "#/$defs/findingRecord"
+          }
+        },
+        "concepts": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "$ref": "#/$defs/conceptRecord"
+          }
+        },
+        "comments": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/commentRecord"
+          }
+        },
+        "reviewGuideBinding": {
+          "$ref": "#/$defs/reviewGuideBinding"
+        },
+        "automatedAcceptance": {
+          "$ref": "#/$defs/acceptance"
+        },
+        "humanDecisions": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/decisionRecord"
+          }
+        },
+        "revision": {
+          "$ref": "#/$defs/safeInteger"
+        },
+        "previousReviewPacketDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "draftHeadRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "digest",
+        "revision"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "revision": {
+          "$ref": "#/$defs/safeInteger"
+        }
+      }
+    },
+    "changeSetHeadRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "digest",
+        "draftDigest"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "draftDigest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "reviewHeadRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "digest",
+        "revision",
+        "changeSetId",
+        "changeSetDigest"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "revision": {
+          "$ref": "#/$defs/safeInteger"
+        },
+        "changeSetId": {
+          "$ref": "#/$defs/id"
+        },
+        "changeSetDigest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "promotionHeadRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "digest"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "subjectHead": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "digest"
+      ],
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/subject"
+        },
+        "draft": {
+          "$ref": "#/$defs/draftHeadRef"
+        },
+        "changeSet": {
+          "$ref": "#/$defs/changeSetHeadRef"
+        },
+        "review": {
+          "$ref": "#/$defs/reviewHeadRef"
+        },
+        "latestPromotion": {
+          "$ref": "#/$defs/promotionHeadRef"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "reviewFence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "changeSetId",
+        "changeSetDigest",
+        "reviewPacketId",
+        "reviewPacketDigest",
+        "reviewPacketRevision",
+        "expectedSourceDigest",
+        "expectedContentSetDigest"
+      ],
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/subject"
+        },
+        "changeSetId": {
+          "$ref": "#/$defs/id"
+        },
+        "changeSetDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "reviewPacketId": {
+          "$ref": "#/$defs/id"
+        },
+        "reviewPacketDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "reviewPacketRevision": {
+          "$ref": "#/$defs/safeInteger"
+        },
+        "expectedSourceDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "expectedContentSetDigest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "abandonReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "requestId",
+        "subject",
+        "draftId",
+        "finalDraftDigest",
+        "finalDraftRevision",
+        "sourceDigest",
+        "abandonedAt",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "kind": {
+          "const": "LayoutDraftAbandonReceipt"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "requestId": {
+          "$ref": "#/$defs/id"
+        },
+        "subject": {
+          "$ref": "#/$defs/subject"
+        },
+        "draftId": {
+          "$ref": "#/$defs/id"
+        },
+        "finalDraftDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "finalDraftRevision": {
+          "$ref": "#/$defs/safeInteger"
+        },
+        "sourceDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "abandonedAt": {
+          "$ref": "#/$defs/time"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "promotionReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "sequence",
+        "subject",
+        "draftId",
+        "draftDigest",
+        "draftRevision",
+        "sourceDigest",
+        "resultSourceDigest",
+        "previousContentSetDigest",
+        "resultContentSetDigest",
+        "layoutDigest",
+        "changeSetId",
+        "changeSetDigest",
+        "reviewPacketId",
+        "reviewPacketDigest",
+        "promotedAt",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "kind": {
+          "const": "ExperiencePromotionReceipt"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "sequence": {
+          "$ref": "#/$defs/positiveSafeInteger"
+        },
+        "previousReceiptDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "subject": {
+          "$ref": "#/$defs/subject"
+        },
+        "draftId": {
+          "$ref": "#/$defs/id"
+        },
+        "draftDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "draftRevision": {
+          "$ref": "#/$defs/positiveSafeInteger"
+        },
+        "sourceDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "resultSourceDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "previousContentSetDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "resultContentSetDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "layoutDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "changeSetId": {
+          "$ref": "#/$defs/id"
+        },
+        "changeSetDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "reviewPacketId": {
+          "$ref": "#/$defs/id"
+        },
+        "reviewPacketDigest": {
+          "$ref": "#/$defs/digest"
+        },
+        "promotedAt": {
+          "$ref": "#/$defs/time"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    }
+  }
+}

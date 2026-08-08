@@ -1,0 +1,9 @@
+schemaVersion: 2
+kind: EdgeInstance
+metadata:
+  id: journey-loading-to-ready
+spec:
+  projectionId: delivery-journey
+  transitionId: loading-to-ready
+  fromNodeId: journey-dashboard-loading
+  toNodeId: journey-dashboard-ready

@@ -1,0 +1,9 @@
+schemaVersion: 2
+kind: EdgeInstance
+metadata:
+  id: journey-toggle-to-gateway
+spec:
+  projectionId: delivery-journey
+  transitionId: toggle-to-gateway
+  fromNodeId: journey-toggle-delivery-task
+  toNodeId: journey-inspect-gateway-traffic

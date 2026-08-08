@@ -1,0 +1,28 @@
+schemaVersion: 2
+
+content:
+  root: .experience
+
+workspace:
+  id: sample-flutter
+  displayName: Sample Flutter consumer
+
+applications:
+  sample:
+    root: .
+    target: web
+    displayName: Sample Flutter
+
+kit:
+  profile: gateway-lab
+  modules:
+    artifact-store.local:
+      enabled: false
+    sessions.local:
+      enabled: false
+    gateway.interceptor:
+      enabled: false
+    studio.journey-map:
+      enabled: true
+    studio.inventory:
+      enabled: true

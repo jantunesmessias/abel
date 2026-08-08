@@ -1,0 +1,19 @@
+schemaVersion: 2
+kind: ScenarioFacet
+metadata:
+  id: dashboard-ready
+spec:
+  scenarioId: dashboard-ready
+  lifecycle: current
+  scenarioKindId: observable-state
+  surfaceId: delivery-dashboard
+  stateId: dashboard.ready
+  ownershipAreaId: delivery-experience
+  tagIds: [dashboard, synthetic-data]
+  componentIds: [showcase-dashboard-page]
+  fixtureId: sample.dashboard.synthetic
+  renderSource:
+    kind: previewDescriptor
+    previewId: sample.dashboard.ready
+  presentationFrameIds: [phone-device, desktop-browser]
+  preferredPresentationFrameId: phone-device

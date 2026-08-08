@@ -1,5 +1,5 @@
-CREATE SCHEMA IF NOT EXISTS devex_hosted;
-SET search_path = devex_hosted, pg_catalog;
+CREATE SCHEMA IF NOT EXISTS control_plane;
+SET search_path = control_plane, pg_catalog;
 
 CREATE TABLE organizations (
   tenant_id text PRIMARY KEY,
@@ -275,8 +275,8 @@ BEGIN
     EXECUTE format('ALTER TABLE %I FORCE ROW LEVEL SECURITY', table_name);
     EXECUTE format(
       'CREATE POLICY tenant_isolation ON %I USING '
-      '(tenant_id = nullif(current_setting(''devex.tenant_id'', true), '''')) '
-      'WITH CHECK (tenant_id = nullif(current_setting(''devex.tenant_id'', true), ''''))',
+      '(tenant_id = nullif(current_setting(''control_plane.tenant_id'', true), '''')) '
+      'WITH CHECK (tenant_id = nullif(current_setting(''control_plane.tenant_id'', true), ''''))',
       table_name
     );
   END LOOP;

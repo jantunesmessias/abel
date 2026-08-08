@@ -1,0 +1,19 @@
+schemaVersion: 2
+kind: ScenarioFacet
+metadata:
+  id: inspect-gateway-traffic
+spec:
+  scenarioId: inspect-gateway-traffic
+  lifecycle: current
+  scenarioKindId: diagnostic
+  surfaceId: gateway-observability
+  stateId: gateway.hybrid-traffic
+  ownershipAreaId: delivery-platform
+  tagIds: [gateway, synthetic-data]
+  componentIds: [showcase-gateway-traffic-panel]
+  fixtureId: sample.dashboard.gateway-hybrid
+  renderSource:
+    kind: previewDescriptor
+    previewId: sample.dashboard.gateway-traffic
+  presentationFrameIds: [desktop-browser]
+  preferredPresentationFrameId: desktop-browser

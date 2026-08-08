@@ -1,0 +1,80 @@
+replicaCount: 2
+
+image:
+  repository: registry.example.test/workspace/hosted-control-plane
+  digest: ""
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  annotations: {}
+
+service:
+  port: 8080
+
+ingress:
+  enabled: false
+  className: ""
+  host: workspace.example.test
+  tlsSecretName: control-plane-tls
+  annotations: {}
+
+existingSecret: control-plane-secrets
+config:
+  oidcIssuer: https://identity.example.test
+  oidcAuthorizationEndpoint: https://identity.example.test/oauth2/authorize
+  oidcTokenEndpoint: https://identity.example.test/oauth2/token
+  oidcJwksUri: https://identity.example.test/.well-known/jwks.json
+  oidcClientId: control-plane
+  oidcAllowedAlgorithms: RS256
+  s3Endpoint: https://objects.example.test
+  s3Bucket: workspace-artifacts
+  s3Region: us-test-1
+  allowedStudioOrigins: https://studio.example.test
+  otelEndpoint: http://otel-collector.observability.svc.cluster.local:4318/v1/traces
+  deploymentEnvironment: production
+
+remote:
+  enabled: false
+  webWorkerImage: ""
+  androidWorkerImage: ""
+  signingKeyId: remote-signing-v1
+  signingAlgorithm: ES256
+  kubernetesApiServer: https://kubernetes.default.svc
+  controlPlaneOrigin: https://workspace.example.test
+  gatewayOrigin: https://gateway.workspace.example.test
+  allowedEgressCidrs: []
+  webCapacity: 4
+  androidCapacity: 1
+  chromiumPath: /usr/bin/chromium
+  androidSdkRoot: /opt/android-sdk
+  androidAvd: workspace-api-35
+  androidScrcpyServerPath: /opt/scrcpy/scrcpy-server.jar
+  androidScrcpyServerVersion: "4.0"
+  androidScrcpyServerDigest: ""
+  gatewayPort: 8443
+  sessionGatewayName: workspace-public
+  sessionGatewayNamespace: workspace-system
+  androidImage:
+    id: android-api-35-x86-64
+    digest: ""
+    apiLevel: 35
+    abi: x86_64
+    renderer: swiftshader_indirect
+  signingJwkSecretKey: REMOTE_SIGNING_JWK
+
+networkPolicy:
+  ingressController:
+    namespaceLabels:
+      kubernetes.io/metadata.name: ingress-nginx
+    podLabels:
+      app.kubernetes.io/name: ingress-nginx
+  # Kubernetes NetworkPolicy is IP/CIDR based. Supply the resolved private
+  # service ranges for PostgreSQL, object storage, OIDC, DNS and OTel.
+  allowedEgressCidrs: []
+
+resources:
+  requests: {cpu: 100m, memory: 128Mi}
+  limits: {cpu: "1", memory: 512Mi}
+
+podDisruptionBudget:
+  minAvailable: 1

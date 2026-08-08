@@ -1,0 +1,19 @@
+schemaVersion: 2
+kind: ScenarioFacet
+metadata:
+  id: toggle-delivery-task
+spec:
+  scenarioId: toggle-delivery-task
+  lifecycle: current
+  scenarioKindId: user-operation
+  surfaceId: delivery-dashboard
+  stateId: dashboard.task-toggled
+  ownershipAreaId: delivery-experience
+  tagIds: [dashboard, interaction, synthetic-data]
+  componentIds: [showcase-dashboard-page, showcase-task-list]
+  fixtureId: sample.dashboard.task-toggled
+  renderSource:
+    kind: previewDescriptor
+    previewId: sample.dashboard.task-toggled
+  presentationFrameIds: [phone-device]
+  preferredPresentationFrameId: phone-device

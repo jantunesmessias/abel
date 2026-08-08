@@ -1,0 +1,10 @@
+schemaVersion: 2
+kind: Board
+metadata:
+  id: delivery-lab-board
+spec:
+  applicationId: sample
+  title: Delivery Lab experience board
+  projectionIds:
+    - delivery-journey
+    - delivery-inventory

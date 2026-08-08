@@ -1,0 +1,11 @@
+schemaVersion: 2
+kind: ScenarioLabOperation
+metadata:
+  id: enable-dashboard-ready-highlight
+spec:
+  scenarioId: dashboard-ready
+  kind: assignControl
+  controlId: dashboard-ready-highlight-enabled
+  value:
+    kind: boolean
+    value: true

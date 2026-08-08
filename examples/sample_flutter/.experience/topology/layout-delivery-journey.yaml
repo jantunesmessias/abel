@@ -1,0 +1,77 @@
+schemaVersion: 2
+kind: ProjectionLayout
+metadata:
+  id: delivery-journey
+spec:
+  projectionId: delivery-journey
+  nodeFrames:
+    - nodeInstanceId: journey-dashboard-loading
+      x: 60
+      y: 220
+      width: 220
+      height: 120
+      laneId: journey-direct-lane
+    - nodeInstanceId: journey-dashboard-ready
+      x: 360
+      y: 220
+      width: 220
+      height: 120
+      groupId: journey-branch-merge-group
+      laneId: journey-direct-lane
+    - nodeInstanceId: journey-toggle-delivery-task
+      x: 700
+      y: 40
+      width: 220
+      height: 120
+      groupId: journey-branch-merge-group
+      laneId: journey-task-lane
+    - nodeInstanceId: journey-dashboard-failed
+      x: 700
+      y: 460
+      width: 220
+      height: 120
+      laneId: journey-recovery-lane
+    - nodeInstanceId: journey-inspect-gateway-traffic
+      x: 1060
+      y: 220
+      width: 220
+      height: 120
+      groupId: journey-branch-merge-group
+      laneId: journey-direct-lane
+  groups:
+    - id: journey-branch-merge-group
+      title: Optional task branch and Gateway merge
+      x: 320
+      y: 20
+      width: 1000
+      height: 360
+  lanes:
+    - id: journey-task-lane
+      title: Optional task mutation
+      x: 320
+      y: 20
+      width: 1000
+      height: 160
+    - id: journey-direct-lane
+      title: Direct review path
+      x: 20
+      y: 200
+      width: 1300
+      height: 160
+    - id: journey-recovery-lane
+      title: Recoverable failure
+      x: 320
+      y: 440
+      width: 640
+      height: 160
+  annotations:
+    - id: journey-branch-merge-note
+      text: Ready can reach Gateway inspection directly or after toggling a task; both paths rejoin at the same Scenario.
+      x: 960
+      y: 420
+      width: 360
+      height: 120
+  camera:
+    x: 0
+    y: 0
+    zoom: 0.85

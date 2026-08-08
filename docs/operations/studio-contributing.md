@@ -1,11 +1,11 @@
-# Contribuindo no DevEx Studio Jaspr
+# Contribuindo no Abel Studio Jaspr
 
 Status: guia pós-cutover, 2026-08-11.
 
 ## Estrutura
 
 ```text
-apps/devex_studio/
+apps/studio/
   lib/main.client.dart
   lib/src/jaspr/             app, shell e capability pages
   lib/src/controllers/       estado/commands Dart puros
@@ -15,22 +15,22 @@ apps/devex_studio/
   lib/src/remote/            grant, machine, transport e surface web
   web/index.html
   web/styles/                tokens/reset/type/layout/components/a11y
-packages/devex_ui_system/    components Jaspr reutilizáveis
-packages/devex_ux_system/    policies Dart puras
+libs/studio_ui/    components Jaspr reutilizáveis
+libs/interaction_model/    policies Dart puras
 ```
 
-O archive Flutter em `.dart_tool/devex/migration` é recuperação histórica, não
+O archive Flutter em `.dart_tool/experience_platform/migration` é recuperação histórica, não
 fonte para copiar widgets de volta.
 
 ## Regras
 
-- não importar Flutter, Material, Cupertino, `dart:io`, `devex_engine` ou
-  `devex_runtime` no Studio/UI;
+- não importar Flutter, Material, Cupertino, `dart:io`, `experience_engine` ou
+  `execution_runtime` no Studio/UI;
 - não criar app ou renderer alternativo;
 - regras de domínio ficam em contracts/engine/Host;
 - controllers são Dart puros; APIs browser usam conditional exports;
 - usar HTML semântico e componentes do UI System;
-- usar Lucide via `DevExIconName`, sem SVG artesanal;
+- usar Lucide via `StudioIconName`, sem SVG artesanal;
 - iframe requer sandbox, no-referrer, origin separado e validação de mensagem;
 - resources Host viram Blob URL somente após type/size/expiry/digest;
 - ações/rotas dependem de contribution efetiva;
@@ -47,13 +47,13 @@ fonte para copiar widgets de volta.
 7. atualize conformance, threat model e matriz se a surface mudar.
 
 ```bash
-dart format apps/devex_studio packages/devex_ui_system packages/devex_ux_system
-dart analyze apps/devex_studio packages/devex_ui_system packages/devex_ux_system
-dart run tool/architecture_guard.dart
-dart test apps/devex_studio/test
-dart test packages/devex_ui_system
-dart test packages/devex_ux_system
-cd apps/devex_studio && jaspr build
+dart format apps/studio libs/studio_ui libs/interaction_model
+dart analyze apps/studio libs/studio_ui libs/interaction_model
+dart run tools/gates/architecture_guard.dart
+dart test apps/studio/test
+dart test libs/studio_ui
+dart test libs/interaction_model
+cd apps/studio && jaspr build
 ```
 
 Pare `jaspr serve` antes do build release no mesmo checkout.

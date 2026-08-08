@@ -1,0 +1,9 @@
+schemaVersion: 2
+kind: AutomatedAcceptanceCriterion
+metadata:
+  id: dashboard-ready-script-succeeds
+spec:
+  scenarioId: dashboard-ready
+  displayName: Synthetic dashboard Lab script succeeds
+  kind: scriptSucceeded
+  scriptId: exercise-dashboard-ready-lab

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:devex_hosted_control_plane/src/hosted_migration_runner.dart';
+import 'package:hosted_control_plane/src/hosted_migration_runner.dart';
 import 'package:postgres/postgres.dart';
 
 Future<void> main() async {

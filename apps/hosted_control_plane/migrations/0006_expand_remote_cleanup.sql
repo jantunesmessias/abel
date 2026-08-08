@@ -1,4 +1,4 @@
-SET search_path = devex_hosted, pg_catalog;
+SET search_path = control_plane, pg_catalog;
 
 CREATE TABLE remote_cleanup_tasks (
   tenant_id text NOT NULL,
@@ -31,10 +31,10 @@ ALTER TABLE remote_cleanup_tasks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE remote_cleanup_tasks FORCE ROW LEVEL SECURITY;
 CREATE POLICY tenant_isolation ON remote_cleanup_tasks
   USING (
-    tenant_id = nullif(current_setting('devex.tenant_id', true), '')
+    tenant_id = nullif(current_setting('control_plane.tenant_id', true), '')
   )
   WITH CHECK (
-    tenant_id = nullif(current_setting('devex.tenant_id', true), '')
+    tenant_id = nullif(current_setting('control_plane.tenant_id', true), '')
   );
 
 CREATE OR REPLACE FUNCTION scheduler_queued_tenants()
@@ -42,14 +42,14 @@ RETURNS TABLE (tenant_id text)
 LANGUAGE sql
 SECURITY DEFINER
 STABLE
-SET search_path = pg_catalog, devex_hosted
+SET search_path = pg_catalog, control_plane
 AS $function$
   SELECT DISTINCT run.tenant_id
-  FROM devex_hosted.remote_runs AS run
+  FROM control_plane.remote_runs AS run
   WHERE run.state = 'queued'
     AND NOT EXISTS (
       SELECT 1
-      FROM devex_hosted.remote_cleanup_tasks AS cleanup
+      FROM control_plane.remote_cleanup_tasks AS cleanup
       WHERE cleanup.tenant_id = run.tenant_id
         AND cleanup.run_id = run.run_id
     )
@@ -61,10 +61,10 @@ RETURNS TABLE (tenant_id text)
 LANGUAGE sql
 SECURITY DEFINER
 STABLE
-SET search_path = pg_catalog, devex_hosted
+SET search_path = pg_catalog, control_plane
 AS $function$
   SELECT DISTINCT cleanup.tenant_id
-  FROM devex_hosted.remote_cleanup_tasks AS cleanup
+  FROM control_plane.remote_cleanup_tasks AS cleanup
   WHERE cleanup.available_at <= reference_time
   ORDER BY cleanup.tenant_id
 $function$;

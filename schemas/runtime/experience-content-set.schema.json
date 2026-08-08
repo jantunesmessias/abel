@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jantunesmessias/abel/schemas/runtime/experience-content-set",
+  "title": "Experience Content Set",
+  "oneOf": [
+    {"$ref": "#/$defs/description"},
+    {"$ref": "#/$defs/openResult"}
+  ],
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "resourceHandle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "uri",
+        "digest",
+        "mediaType",
+        "size",
+        "purpose",
+        "expiresAt"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "pattern": "^https?://[^/]+/resources/[A-Za-z0-9_-]{32,}$",
+          "maxLength": 4096
+        },
+        "digest": {"$ref": "#/$defs/digest"},
+        "mediaType": {"const": "application/json"},
+        "size": {"type": "integer", "minimum": 1, "maximum": 67108864},
+        "purpose": {
+          "enum": [
+            "workspace-snapshot",
+            "experience-topology-bundle",
+            "scenario-facet-manifest",
+            "scenario-lab-manifest",
+            "motion-manifest"
+          ]
+        },
+        "expiresAt": {"type": "string", "format": "date-time"}
+      }
+    },
+    "workspaceSnapshotHandle": {
+      "allOf": [
+        {"$ref": "#/$defs/resourceHandle"},
+        {"properties": {"purpose": {"const": "workspace-snapshot"}}}
+      ]
+    },
+    "experienceTopologyBundleHandle": {
+      "allOf": [
+        {"$ref": "#/$defs/resourceHandle"},
+        {"properties": {"purpose": {"const": "experience-topology-bundle"}}}
+      ]
+    },
+    "scenarioFacetManifestHandle": {
+      "allOf": [
+        {"$ref": "#/$defs/resourceHandle"},
+        {"properties": {"purpose": {"const": "scenario-facet-manifest"}}}
+      ]
+    },
+    "scenarioLabManifestHandle": {
+      "allOf": [
+        {"$ref": "#/$defs/resourceHandle"},
+        {"properties": {"purpose": {"const": "scenario-lab-manifest"}}}
+      ]
+    },
+    "motionManifestHandle": {
+      "allOf": [
+        {"$ref": "#/$defs/resourceHandle"},
+        {"properties": {"purpose": {"const": "motion-manifest"}}}
+      ]
+    },
+    "description": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "status",
+        "revision",
+        "catalogDigest",
+        "workspaceSnapshotDigest",
+        "workspaceContentDigest",
+        "contentSetDigest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 2},
+        "kind": {"const": "ExperienceContentSetDescription"},
+        "status": {"const": "ready"},
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "catalogDigest": {"$ref": "#/$defs/digest"},
+        "workspaceSnapshotDigest": {"$ref": "#/$defs/digest"},
+        "workspaceContentDigest": {"$ref": "#/$defs/digest"},
+        "experienceTopologyBundleDigest": {"$ref": "#/$defs/digest"},
+        "scenarioFacetManifestDigest": {"$ref": "#/$defs/digest"},
+        "scenarioLabManifestDigest": {"$ref": "#/$defs/digest"},
+        "motionManifestDigest": {"$ref": "#/$defs/digest"},
+        "contentSetDigest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workspaceSnapshot"],
+      "properties": {
+        "workspaceSnapshot": {"$ref": "#/$defs/workspaceSnapshotHandle"},
+        "experienceTopologyBundle": {
+          "$ref": "#/$defs/experienceTopologyBundleHandle"
+        },
+        "scenarioFacetManifest": {
+          "$ref": "#/$defs/scenarioFacetManifestHandle"
+        },
+        "scenarioLabManifest": {"$ref": "#/$defs/scenarioLabManifestHandle"},
+        "motionManifest": {"$ref": "#/$defs/motionManifestHandle"}
+      }
+    },
+    "openResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "revision",
+        "catalogDigest",
+        "workspaceSnapshotDigest",
+        "workspaceContentDigest",
+        "contentSetDigest",
+        "resources"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 2},
+        "kind": {"const": "ExperienceContentSetOpenResult"},
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "catalogDigest": {"$ref": "#/$defs/digest"},
+        "workspaceSnapshotDigest": {"$ref": "#/$defs/digest"},
+        "workspaceContentDigest": {"$ref": "#/$defs/digest"},
+        "experienceTopologyBundleDigest": {"$ref": "#/$defs/digest"},
+        "scenarioFacetManifestDigest": {"$ref": "#/$defs/digest"},
+        "scenarioLabManifestDigest": {"$ref": "#/$defs/digest"},
+        "motionManifestDigest": {"$ref": "#/$defs/digest"},
+        "contentSetDigest": {"$ref": "#/$defs/digest"},
+        "resources": {"$ref": "#/$defs/resources"}
+      },
+      "allOf": [
+        {
+          "if": {"required": ["experienceTopologyBundleDigest"]},
+          "then": {"properties": {"resources": {"required": ["experienceTopologyBundle"]}}},
+          "else": {"properties": {"resources": {"not": {"required": ["experienceTopologyBundle"]}}}}
+        },
+        {
+          "if": {"required": ["scenarioFacetManifestDigest"]},
+          "then": {"properties": {"resources": {"required": ["scenarioFacetManifest"]}}},
+          "else": {"properties": {"resources": {"not": {"required": ["scenarioFacetManifest"]}}}}
+        },
+        {
+          "if": {"required": ["scenarioLabManifestDigest"]},
+          "then": {"properties": {"resources": {"required": ["scenarioLabManifest"]}}},
+          "else": {"properties": {"resources": {"not": {"required": ["scenarioLabManifest"]}}}}
+        },
+        {
+          "if": {"required": ["motionManifestDigest"]},
+          "then": {"properties": {"resources": {"required": ["motionManifest"]}}},
+          "else": {"properties": {"resources": {"not": {"required": ["motionManifest"]}}}}
+        }
+      ]
+    }
+  }
+}

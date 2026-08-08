@@ -1,0 +1,7 @@
+apiVersion: v2
+name: control-plane
+description: Portable Abel hosted collaboration control plane
+type: application
+version: 0.1.0
+appVersion: "0.1.0-dev"
+kubeVersion: ">=1.30.0-0"

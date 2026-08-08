@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:devex_contracts/devex_contracts.dart';
-import 'package:devex_runtime/devex_runtime.dart';
+import 'package:execution_runtime/execution_runtime.dart';
+import 'package:experience_contracts/experience_contracts.dart';
 
 final class RemoteWorkerHttpClient
     implements RemoteWorkerArtifactClient, RemoteWorkerControlClient {
@@ -316,7 +316,7 @@ final class LoopbackRemoteWorkerStreamClient
       StreamController<RemoteStreamFrame>();
   final Completer<void> _done = Completer<void>();
   WebSocket? _socket;
-  // The client owns this subscription and cancels it in [close].
+
   // ignore: cancel_subscriptions
   StreamSubscription<Object?>? _subscription;
   Completer<void>? _authentication;

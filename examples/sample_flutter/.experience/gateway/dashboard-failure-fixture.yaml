@@ -1,0 +1,10 @@
+schemaVersion: 1
+kind: GatewayFixture
+metadata:
+  id: dashboard-failure-response
+spec:
+  status: 500
+  headers:
+    content-type: application/json
+  bodyFile: fixtures/dashboard-failure.body
+  mediaType: application/json

@@ -14,8 +14,7 @@ capability por nome de profile, grant ou presença de dados.
 | `journey-android` | shell, Journey Map, Target | sem AutoPreview e sem Gateway; Android Evidence é provider independente |
 | `gateway-lab` | shell, Target, Gateway | sem Journey Map/Evidence por default |
 | `gateway-lab-headless` | nenhuma | sem assets, route, browser, bootstrap ou listener do Studio |
-| `full-local` | shell, Journey Map, Target, Gateway, Remote, Hosted | integrações externas ainda dependem de ambiente/grant |
-| `legacy-full-local-v1` | igual a `full-local` após tradução | nenhuma semântica paralela de renderer |
+| `full-local` | shell, Journey, Inventory, Lab, Quality, Authoring, Motion, Context, Target, Gateway, Remote, Hosted | integrações externas ainda dependem de ambiente/grant |
 
 Overlays podem ligar/desligar Modules individualmente; a contribuição efetiva
 é sempre derivada do manifest pós-lifecycle.
@@ -26,6 +25,12 @@ Overlays podem ligar/desligar Modules individualmente; a contribuição efetiva
 |---|---|---|
 | `studio.shell` | `/` | bootstrap, reconnect, Overview |
 | `studio.journey-map` | `/journeys/:id[/scenarios/:id]` | mapa/lista/Inspector/visual Evidence |
+| `studio.inventory` | `/inventory` | consulta do catálogo/facets e deep link para occurrences |
+| `studio.lab` | `/lab/scenarios/:scenarioId/scripts/:scriptId` | execução fenced de Scenario Lab pelo relay tipado |
+| `studio.quality` | `/quality/:runId` | Evidence, comparison, currentness e decisão humana separada |
+| `studio.authoring` | `/authoring/:projectionId` | draft, layout, review e promoção capability-gated |
+| `studio.motion` | `/motion/:projectionId` | scripts, observações e modos full/reduced/none com equivalente estático |
+| `studio.context` | `/context/:projectionId` | seleção semântica e export sanitizado com budgets independentes |
 | `studio.target` | `/target` | Session start/reset/stop + readiness + iframe isolado |
 | `studio.gateway` | `/gateway` | presets do Host + start/status/traffic/reset/stop |
 | `CatalogManifest.reviewGuides` não vazio | `/reviews` | steps/criteria ligados a Scenario/binding |

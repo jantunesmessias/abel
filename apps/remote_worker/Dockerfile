@@ -12,8 +12,8 @@ COPY . .
 RUN printf '%s\n' "$RUNTIME_IMAGE" | \
       grep -Eq '^[^[:space:]@]+@sha256:[0-9a-f]{64}$' && \
     dart pub get --enforce-lockfile && \
-    dart compile exe apps/remote_worker/bin/remote_worker.dart -o /out/devex-remote-worker && \
-    dart compile exe apps/remote_session_gateway/bin/remote_session_gateway.dart -o /out/devex-remote-session-gateway
+    dart compile exe apps/remote_worker/bin/remote_worker.dart -o /out/workspace-remote-worker && \
+    dart compile exe apps/remote_session_gateway/bin/remote_session_gateway.dart -o /out/workspace-remote-session-gateway
 
 # RUNTIME_IMAGE must be an immutable OCI digest and contain Chromium. The
 # Android variant must additionally contain the pinned SDK, emulator, AVD and
@@ -33,7 +33,7 @@ RUN case "$RUNTIME_KIND" in \
         test "$(sha256sum "$SCRCPY_SERVER_PATH" | cut -d' ' -f1)" = "$expected" ;; \
       *) exit 64 ;; \
     esac
-COPY --from=build /out/devex-remote-worker /app/devex-remote-worker
-COPY --from=build /out/devex-remote-session-gateway /app/devex-remote-session-gateway
+COPY --from=build /out/workspace-remote-worker /app/workspace-remote-worker
+COPY --from=build /out/workspace-remote-session-gateway /app/workspace-remote-session-gateway
 USER 65532:65532
-ENTRYPOINT ["/app/devex-remote-worker"]
+ENTRYPOINT ["/app/workspace-remote-worker"]

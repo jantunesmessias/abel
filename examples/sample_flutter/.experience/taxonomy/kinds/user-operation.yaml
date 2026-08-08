@@ -1,0 +1,6 @@
+schemaVersion: 2
+kind: ScenarioKindDefinition
+metadata:
+  id: user-operation
+spec:
+  displayName: User operation

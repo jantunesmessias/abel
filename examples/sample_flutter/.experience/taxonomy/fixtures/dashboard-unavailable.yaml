@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: ScenarioFixture
+metadata:
+  id: sample.dashboard.unavailable
+spec:
+  applicationId: sample
+  displayName: Unavailable dependency

@@ -1,23 +1,23 @@
-# DevEx UX System
+# Studio UX System
 
 Status: implementação Dart pura ativa em 2026-08-11.
 
-`devex_ux_system` concentra políticas de experiência sem Jaspr, Flutter,
+`interaction_model` concentra políticas de experiência sem Jaspr, Flutter,
 browser ou I/O. Views consomem os resultados; não duplicam decisões de layout,
 motion ou windowing.
 
 ## Políticas implementadas
 
-- `DevExWorkspaceLayoutPolicy`: classe de viewport e apresentação de Explorer
+- `WorkspaceLayoutPolicy`: classe de viewport e apresentação de Explorer
   e Inspector. Os breakpoints canônicos são 576 px (`medium`), 832 px (`wide`),
   1.280 px (`expansive`), 1.072 px para Inspector em rail e 832 px para
   Inspector empilhado;
-- `DevExInteractionPolicy`: alvos mínimos por modalidade;
-- `DevExMotionPolicy`: durações e redução de motion;
-- `DevExZoomPolicy`: limites e nível de detalhe do Journey Map;
-- `DevExSequenceWindowPolicy`: limita o DOM visual do mapa a 24 Scenarios ao
+- `InteractionPolicy`: alvos mínimos por modalidade;
+- `MotionPolicy`: durações e redução de motion;
+- `ZoomPolicy`: limites e nível de detalhe do Journey Map;
+- `SequenceWindowPolicy`: limita o DOM visual do mapa a 24 Scenarios ao
   redor da seleção, preservando o Outline completo como navegação acessível;
-- `DevExTone`: vocabulário semântico canônico (`neutral`, `accent`, `info`,
+- `PresentationTone`: vocabulário semântico canônico (`neutral`, `accent`, `info`,
   `positive`, `warning` e `critical`) compartilhado com qualquer renderer;
 - vocabulário de ênfase, disclosure e feedback.
 
@@ -43,7 +43,7 @@ quantos Scenarios ficaram antes/depois e orientam a seleção pelo Outline.
 - grants Remote são efêmeros e consumidos uma única vez;
 - comportamento responsivo deriva de políticas e tokens compartilhados.
 
-As políticas são cobertas por `dart test packages/devex_ux_system`. CSS e DOM
+As políticas são cobertas por `dart test libs/interaction_model`. CSS e DOM
 responsivos são verificados separadamente no browser real; uma policy pura não
 é, sozinha, evidência de layout renderizado.
 

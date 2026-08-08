@@ -11,41 +11,22 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: subosito/flutter-action@1508160852fb97248640997f7cfb38da241df0ba # v2.9.1
         with:
           channel: stable
-          flutter-version: 3.44.8
+          flutter-version: 3.47.0
           cache: true
-      - name: Resolve workspace
-        run: flutter pub get
-      - name: Install Jaspr CLI
-        run: dart pub global activate jaspr_cli 0.23.3
-      - name: Standards conformance
-        run: ./tool/verify_standards.sh
-      - name: Supply-chain policy
-        run: ./tool/verify_supply_chain.sh
-      - name: Validate Helm and remote Job manifests
-        run: ./tool/verify_kubernetes_manifests.sh
-      - name: Verify
-        run: ./tool/check.sh
-      - name: Build Studio web
-        run: jaspr build
-        working-directory: apps/devex_studio
-      - name: Verify V0 consumer flow
-        run: ./tool/verify_v0_flow.sh
-      - name: Verify V0.1 Gateway budgets
-        run: ./tool/verify_v01_gateway.sh
-      - name: Verify V0.2 web containment
-        run: ./tool/verify_v02_containment.sh
-      - name: Verify V0.3 standalone distribution
-        run: ./tool/verify_v03_distribution.sh
-      - name: Verify AutoPreview vertical
-        run: ./tool/verify_auto_preview.sh
-      - name: Verify modular Distribution v2
-        run: ./tool/verify_modular_distribution.sh
+      - name: Install workspace tools
+        run: |
+          dart pub global activate melos 8.3.0
+          dart pub global activate jaspr_cli 0.23.3
+      - name: Bootstrap workspace
+        run: melos bootstrap
+      - name: Verify portable matrix
+        run: melos run ci
 
   hosted-postgres:
     runs-on: ubuntu-latest
@@ -54,7 +35,7 @@ jobs:
       postgres:
         image: postgres:16.10@sha256:21f6013073bc6b92830a2129570e2f5ec42a6c734b5a985a41e83aa58f54c3c1
         env:
-          POSTGRES_PASSWORD: devex-ci-only
+          POSTGRES_PASSWORD: workspace-ci-only
         ports:
           - 5432:5432
         options: >-
@@ -66,18 +47,20 @@ jobs:
       PGHOST: 127.0.0.1
       PGPORT: 5432
       PGUSER: postgres
-      PGPASSWORD: devex-ci-only
-      DEVEX_DATABASE_URL: postgresql://postgres:devex-ci-only@127.0.0.1:5432/postgres?sslmode=disable
-      DEVEX_APP_DATABASE_URL: postgresql://devex_app:devex-ci-app-only@127.0.0.1:5432/postgres?sslmode=disable
+      PGPASSWORD: workspace-ci-only
+      CONTROL_PLANE_DATABASE_URL: postgresql://postgres:workspace-ci-only@127.0.0.1:5432/postgres?sslmode=disable
+      REMOTE_SCHEDULER_DATABASE_URL: postgresql://control_plane_app:workspace-ci-app-only@127.0.0.1:5432/postgres?sslmode=disable
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: subosito/flutter-action@1508160852fb97248640997f7cfb38da241df0ba # v2.9.1
         with:
           channel: stable
-          flutter-version: 3.44.8
+          flutter-version: 3.47.0
           cache: true
-      - name: Resolve workspace
-        run: flutter pub get
+      - name: Install Melos
+        run: dart pub global activate melos 8.3.0
+      - name: Bootstrap workspace
+        run: melos bootstrap
       - name: Verify PostgreSQL client compatibility
         run: |
           set -euo pipefail
@@ -86,37 +69,35 @@ jobs:
           pg_restore --version
       - name: Create non-bypass application role
         run: >-
-          psql "$DEVEX_DATABASE_URL" --set=ON_ERROR_STOP=1
-          --command="CREATE ROLE devex_app LOGIN PASSWORD 'devex-ci-app-only' NOBYPASSRLS NOSUPERUSER;"
+          psql "$CONTROL_PLANE_DATABASE_URL" --set=ON_ERROR_STOP=1
+          --command="CREATE ROLE control_plane_app LOGIN PASSWORD 'workspace-ci-app-only' NOBYPASSRLS NOSUPERUSER;"
       - name: Apply expand and contract migrations
         env:
-          MIGRATION_DATABASE_URL: ${{ env.DEVEX_DATABASE_URL }}
+          MIGRATION_DATABASE_URL: ${{ env.CONTROL_PLANE_DATABASE_URL }}
           MIGRATION_DIRECTORY: apps/hosted_control_plane/migrations
         run: dart run apps/hosted_control_plane/bin/migrate.dart
       - name: Grant least-privilege application access
         run: |
           set -euo pipefail
-          psql "$DEVEX_DATABASE_URL" --set=ON_ERROR_STOP=1 <<'SQL'
-          GRANT USAGE ON SCHEMA devex_hosted TO devex_app;
+          psql "$CONTROL_PLANE_DATABASE_URL" --set=ON_ERROR_STOP=1 <<'SQL'
+          GRANT USAGE ON SCHEMA control_plane TO control_plane_app;
           GRANT SELECT, INSERT, UPDATE, DELETE
-            ON ALL TABLES IN SCHEMA devex_hosted TO devex_app;
+            ON ALL TABLES IN SCHEMA control_plane TO control_plane_app;
           GRANT EXECUTE ON FUNCTION
-            devex_hosted.scheduler_expired_tenants(timestamptz),
-            devex_hosted.scheduler_queued_tenants(),
-            devex_hosted.scheduler_cleanup_tenants(timestamptz)
-            TO devex_app;
+            control_plane.scheduler_expired_tenants(timestamptz),
+            control_plane.scheduler_queued_tenants(),
+            control_plane.scheduler_cleanup_tenants(timestamptz)
+            TO control_plane_app;
           SQL
-      - name: Prove RLS isolation against PostgreSQL
-        run: ./tool/hosted/verify_postgres_rls.sh
-      - name: Prove PostgreSQL remote cleanup and retry fencing
-        run: dart run tool/hosted/verify_remote_scheduler_postgres.dart
+      - name: Verify hosted PostgreSQL boundary
+        run: melos run hosted:postgres
       - name: Rehearse backup, restore, and recovery objectives
         shell: bash
         run: |
           set -euo pipefail
-          backup_directory="$RUNNER_TEMP/devex-backups"
-          result="$(DEVEX_BACKUP_DIRECTORY="$backup_directory" ./tool/hosted/backup_postgres.sh)"
+          backup_directory="$RUNNER_TEMP/workspace-backups"
+          result="$(CONTROL_PLANE_BACKUP_DIRECTORY="$backup_directory" ./tools/hosted/backup_postgres.sh)"
           printf '%s\n' "$result"
           backup="$(printf '%s\n' "$result" | sed -n 's/^backup=//p')"
           test -n "$backup"
-          DEVEX_BACKUP_FILE="$backup" ./tool/hosted/restore_rehearsal.sh
+          CONTROL_PLANE_BACKUP_FILE="$backup" ./tools/hosted/restore_rehearsal.sh

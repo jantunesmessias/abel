@@ -1,0 +1,7 @@
+schemaVersion: 2
+kind: ScenarioFixture
+metadata:
+  id: sample.dashboard.synthetic
+spec:
+  applicationId: sample
+  displayName: Synthetic ready dashboard

@@ -1,6 +1,0 @@
-schemaVersion: 1
-distribution: {id: helix, path: tools/helix}
-content: {root: .helix}
-workspace: {id: sample, displayName: Sample}
-applications:
-  app: {root: application, target: local}

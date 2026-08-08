@@ -1,4 +1,4 @@
-# Operação local do DevEx Studio
+# Operação local do Abel Studio
 
 Status: runbook Jaspr validado em 2026-08-11.
 
@@ -9,38 +9,37 @@ Jaspr. Não existe comando Flutter para construir ou servir o Studio.
 ## Pré-requisitos
 
 ```bash
-flutter pub get
-dart run tool/architecture_guard.dart
-cd apps/devex_studio
-jaspr build
+melos bootstrap
+dart run tools/gates/architecture_guard.dart
+melos run studio:build
 ```
 
 Flutter continua necessário no workspace para consumers e AutoPreview, não
-para `apps/devex_studio` ou `devex_ui_system`.
+para `apps/studio` ou `studio_ui`.
 
 ## Hot reload em duas origens
 
 Terminal 1, no consumer `examples/sample_flutter`:
 
 ```bash
-dart ../../apps/devex_cli/bin/devex.dart --json dev \
-  --config devex.yaml \
+dart ../../apps/workspace_cli/bin/workspace.dart --json dev \
+  --config workspace.yaml \
   --profile journey-preview \
   --host-port 39011 \
   --studio-dev-origin http://127.0.0.1:39012 \
   --no-open
 ```
 
-Terminal 2, em `apps/devex_studio`:
+Terminal 2, em `apps/studio`:
 
 ```bash
 jaspr serve --release \
   --port 39012 \
-  --dart-define=DEVEX_STUDIO_BOOTSTRAP_URL=http://127.0.0.1:39011/devex/bootstrap.json
+  --dart-define=STUDIO_BOOTSTRAP_URL=http://127.0.0.1:39011/studio/bootstrap.json
 ```
 
 Abra a rota do Studio em `http://127.0.0.1:39012`. O bootstrap correto é
-exatamente `/devex/bootstrap.json`; `/studio/bootstrap` não existe.
+exatamente `/studio/bootstrap.json`; `/studio/bootstrap` não existe.
 
 O Host autoriza somente o `Origin` declarado por `--studio-dev-origin`. Um
 `curl` sem `Origin` receber `403` é comportamento esperado. Probe manual:
@@ -48,7 +47,7 @@ O Host autoriza somente o `Origin` declarado por `--studio-dev-origin`. Um
 ```bash
 curl -i \
   -H 'Origin: http://127.0.0.1:39012' \
-  http://127.0.0.1:39011/devex/bootstrap.json
+  http://127.0.0.1:39011/studio/bootstrap.json
 ```
 
 Nunca registre o body completo: ele contém o token efêmero da sessão RPC.
@@ -59,17 +58,15 @@ Pare `jaspr serve` antes de um build release no mesmo checkout; o build daemon
 do Jaspr é exclusivo por package.
 
 ```bash
-cd apps/devex_studio
-jaspr build
+melos run studio:build
 ```
 
-O resultado fica em `apps/devex_studio/build/jaspr`. O builder de distribuição
+O resultado fica em `apps/studio/build/jaspr`. O builder de distribuição
 executa esse mesmo comando sob lock, copia apenas regular files, rejeita links e
 registra todos os digests em `distribution.json`.
 
 ```bash
-./tool/verify_modular_distribution.sh
-./tool/verify_v03_distribution.sh
+melos run distribution
 ```
 
 Profiles sem qualquer module na surface `studio` não geram diretório `studio/`,
@@ -97,7 +94,7 @@ Se o Studio cair durante recompilação:
 ```bash
 curl -sS -o /dev/null -w '%{http_code}\n' \
   -H 'Origin: http://127.0.0.1:39012' \
-  http://127.0.0.1:39011/devex/bootstrap.json
+  http://127.0.0.1:39011/studio/bootstrap.json
 ```
 
 Um `200` confirma que o Host está vivo; reinicie somente `jaspr serve`. Não é
@@ -124,7 +121,7 @@ o hash por `unsafe-inline`.
 
 | Sintoma | Causa provável | Ação |
 |---|---|---|
-| `Unexpected token '<'` | endpoint de bootstrap apontou para HTML | use `/devex/bootstrap.json` |
+| `Unexpected token '<'` | endpoint de bootstrap apontou para HTML | use `/studio/bootstrap.json` |
 | bootstrap `403` | Origin ausente ou divergente | alinhe `--studio-dev-origin` e porta Jaspr |
 | Studio vazio após rebuild | `jaspr serve` encerrou ou ainda compila | aguarde `Serving at` e recarregue |
 | CSP bloqueia script inline | hash DWDS mudou | atualizar hash exato e reexecutar Chrome gate |
@@ -138,14 +135,13 @@ O gate oficial usa Google Chrome via Chrome DevTools Protocol, sem ChromeDriver
 ou Playwright:
 
 ```bash
-./tool/verify_studio_vertical.sh
-./tool/benchmark_journey_map.sh
+./tools/verify/verify_studio_vertical.sh
+./tools/benchmarks/journey_map_benchmark.sh
 ```
 
 Ele cobre conexão, dois profiles, sete artifacts PNG, dialog nativo/foco,
 teclado, alvos mínimos de 48 px, reflow a 200%, redução de motion, AX tree,
 logs, windowing/interaction e stale→fresh. AutoPreview `flutter-test` continua
-`structural`; no Flutter
-3.44.8 o Widget Previewer interativo requer `--legacy-preview-detection`, e não
-é o exportador de PNG. Contenção portátil de rede/memória depende do sandbox do
-host.
+`structural`; no Flutter 3.47.0 o Widget Previewer apresenta uma regressão neste
+Pub Workspace e o fluxo interativo permanece bloqueado. Ele não é o exportador de PNG.
+Contenção portátil de rede/memória depende do sandbox do host.

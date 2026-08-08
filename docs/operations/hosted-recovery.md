@@ -1,6 +1,6 @@
 # Hosted recovery runbook
 
-Status: normative for V4 operations. The local rehearsal validates logical
+Status: normative for hosted control plane operations. The local rehearsal validates logical
 backup integrity, schema restoration, RLS coverage and the elapsed recovery
 window. Production RPO additionally depends on continuous PostgreSQL WAL/PITR
 and object-storage versioning; a recent `pg_dump` alone is not a PITR strategy.
@@ -25,20 +25,20 @@ it on exit.
 ## Logical rehearsal
 
 Use credentials with `pg_dump` access for the backup and database-create/drop
-authority only in the isolated rehearsal environment. `devex_app` must exist as
+authority only in the isolated rehearsal environment. `control_plane_app` must exist as
 a non-superuser `NOBYPASSRLS` role.
 
 ```bash
-export DEVEX_DATABASE_URL='postgresql://backup-user:REDACTED@db.example/devex'
-export DEVEX_BACKUP_DIRECTORY=/secure/rehearsal
-./tool/hosted/backup_postgres.sh
+export CONTROL_PLANE_DATABASE_URL='postgresql://backup-user:REDACTED@db.example/workspace'
+export CONTROL_PLANE_BACKUP_DIRECTORY=/secure/rehearsal
+./tools/hosted/backup_postgres.sh
 
 export PGHOST=rehearsal-db.example
 export PGPORT=5432
 export PGUSER=rehearsal-admin
 export PGPASSWORD='REDACTED'
-export DEVEX_BACKUP_FILE=/secure/rehearsal/devex-hosted-YYYYMMDDTHHMMSSZ.dump
-./tool/hosted/restore_rehearsal.sh
+export CONTROL_PLANE_BACKUP_FILE=/secure/rehearsal/control-plane-YYYYMMDDTHHMMSSZ.dump
+./tools/hosted/restore_rehearsal.sh
 ```
 
 The gate fails when the checksum differs, the backup is older than 900 seconds,
@@ -59,7 +59,7 @@ missing or mismatched bytes keep the service closed.
 Bring up the Helm release with digest-pinned images, ingress disabled and
 NetworkPolicy active. Run API smoke tests with two distinct OIDC principals and
 tenants, replay collaboration events from a saved cursor, and verify that the
-offline local core and `.devexbundle` verification remain independent. Enable
+offline local core and `.evidence.zip` verification remain independent. Enable
 traffic only after all checks pass and preserve the timestamped evidence outside
 the recovered system.
 

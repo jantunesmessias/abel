@@ -1,0 +1,9 @@
+name: interaction_model
+version: 0.1.0-dev
+resolution: workspace
+
+environment:
+  sdk: ^3.12.0
+
+dev_dependencies:
+  test: ^1.26.3
