@@ -1,0 +1,34 @@
+name: devex_workspace
+publish_to: none
+
+environment:
+  sdk: ^3.12.0
+
+workspace:
+  - apps/backend_gateway
+  - apps/devex_cli
+  - apps/devex_host
+  - apps/devex_studio
+  - apps/hosted_control_plane
+  - apps/remote_session_gateway
+  - apps/remote_worker
+  - examples/sample_api
+  - examples/sample_flutter
+  - packages/devex_contracts
+  - packages/devex_engine
+  - packages/devex_flutter
+  - packages/devex_preview
+  - packages/devex_runtime
+  - packages/devex_testkit
+  - packages/devex_ui_system
+  - packages/devex_ux_system
+  - test/consumers/friction_flutter
+
+dev_dependencies:
+  devex_contracts: ^0.1.0-dev
+  devex_engine: ^0.1.0-dev
+  devex_runtime: ^0.1.0-dev
+  lints: ^6.0.0
+  path: ^1.9.1
+  postgres: ^3.5.12
+  test: ^1.26.3

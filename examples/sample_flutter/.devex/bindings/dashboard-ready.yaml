@@ -1,0 +1,9 @@
+schemaVersion: 1
+kind: ScenarioExecutionBinding
+metadata:
+  id: dashboard-ready-web
+spec:
+  scenarioId: dashboard-ready
+  targetId: sample-web
+  launchProfileId: sample-web
+  gatewayPresetId: showcase-hybrid

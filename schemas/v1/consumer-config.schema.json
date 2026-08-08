@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:devex:schema:consumer-config:v1",
+  "title": "DevExKit consumer config v1",
+  "type": "object",
+  "required": ["schemaVersion", "content", "workspace", "applications"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "distribution": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {"id": {"type": "string"}, "path": {"type": "string"}},
+      "additionalProperties": false
+    },
+    "content": {
+      "type": "object",
+      "required": ["root"],
+      "properties": {"root": {"type": "string", "minLength": 1}},
+      "additionalProperties": false
+    },
+    "workspace": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {"id": {"type": "string"}, "displayName": {"type": "string"}},
+      "additionalProperties": false
+    },
+    "applications": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["root"],
+        "properties": {
+          "root": {"type": "string"},
+          "target": {"type": "string"},
+          "displayName": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

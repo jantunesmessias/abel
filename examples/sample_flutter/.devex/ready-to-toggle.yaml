@@ -1,0 +1,9 @@
+schemaVersion: 1
+kind: Transition
+metadata:
+  id: ready-to-toggle
+spec:
+  journeyId: operate-delivery-workspace
+  from: dashboard-ready
+  to: toggle-delivery-task
+  label: User completes a task

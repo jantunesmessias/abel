@@ -1,0 +1,10 @@
+schemaVersion: 1
+kind: GatewayFixture
+metadata:
+  id: runtime-configuration
+spec:
+  status: 200
+  headers:
+    content-type: application/json
+  bodyFile: fixtures/runtime-configuration.body
+  mediaType: application/json

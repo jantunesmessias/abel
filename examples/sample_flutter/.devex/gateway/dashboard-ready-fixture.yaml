@@ -1,0 +1,10 @@
+schemaVersion: 1
+kind: GatewayFixture
+metadata:
+  id: dashboard-ready
+spec:
+  status: 200
+  headers:
+    content-type: application/json
+  bodyFile: fixtures/dashboard-ready.body
+  mediaType: application/json

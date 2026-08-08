@@ -1,0 +1,12 @@
+schemaVersion: 1
+kind: Scenario
+metadata:
+  id: dashboard-ready
+spec:
+  applicationId: sample
+  title: Review the delivery dashboard
+  description: Inspect projects, progress, activity and the effective runtime configuration.
+  sourceReferences:
+    - repository: workspace
+      path: lib/app_factory.dart
+      symbol: ShowcaseDashboardPage

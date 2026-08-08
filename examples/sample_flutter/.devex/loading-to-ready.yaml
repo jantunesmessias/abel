@@ -1,0 +1,9 @@
+schemaVersion: 1
+kind: Transition
+metadata:
+  id: loading-to-ready
+spec:
+  journeyId: operate-delivery-workspace
+  from: dashboard-loading
+  to: dashboard-ready
+  label: API response arrives

@@ -1,0 +1,169 @@
+name: release-images
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      web_runtime_image:
+        description: Immutable web runtime image (name@sha256:digest)
+        required: true
+        type: string
+      android_runtime_image:
+        description: Immutable Android/KVM runtime image (name@sha256:digest)
+        required: true
+        type: string
+      android_scrcpy_server_digest:
+        description: sha256 digest of /opt/scrcpy/scrcpy-server.jar
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+  attestations: write
+
+concurrency:
+  group: release-images-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - component: hosted-control-plane
+            dockerfile: apps/hosted_control_plane/Dockerfile
+            runtime: none
+          - component: remote-worker-web
+            dockerfile: apps/remote_worker/Dockerfile
+            runtime: web
+          - component: remote-worker-android
+            dockerfile: apps/remote_worker/Dockerfile
+            runtime: android
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Resolve immutable image inputs
+        id: image
+        shell: bash
+        env:
+          INPUT_WEB_RUNTIME_IMAGE: ${{ inputs.web_runtime_image }}
+          INPUT_ANDROID_RUNTIME_IMAGE: ${{ inputs.android_runtime_image }}
+          CONFIG_WEB_RUNTIME_IMAGE: ${{ vars.DEVEX_WEB_RUNTIME_IMAGE }}
+          CONFIG_ANDROID_RUNTIME_IMAGE: ${{ vars.DEVEX_ANDROID_RUNTIME_IMAGE }}
+          INPUT_ANDROID_SCRCPY_SERVER_DIGEST: ${{ inputs.android_scrcpy_server_digest }}
+          CONFIG_ANDROID_SCRCPY_SERVER_DIGEST: ${{ vars.DEVEX_ANDROID_SCRCPY_SERVER_DIGEST }}
+          COMPONENT: ${{ matrix.component }}
+          RUNTIME_KIND: ${{ matrix.runtime }}
+        run: |
+          set -euo pipefail
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          image="ghcr.io/${owner}/flutterdevexkit-${COMPONENT}"
+          runtime_image=""
+          scrcpy_server_digest=""
+          case "$RUNTIME_KIND" in
+            none) ;;
+            web) runtime_image="${INPUT_WEB_RUNTIME_IMAGE:-$CONFIG_WEB_RUNTIME_IMAGE}" ;;
+            android)
+              runtime_image="${INPUT_ANDROID_RUNTIME_IMAGE:-$CONFIG_ANDROID_RUNTIME_IMAGE}"
+              scrcpy_server_digest="${INPUT_ANDROID_SCRCPY_SERVER_DIGEST:-$CONFIG_ANDROID_SCRCPY_SERVER_DIGEST}"
+              ;;
+            *) exit 64 ;;
+          esac
+          if [[ -n "$runtime_image" && ! "$runtime_image" =~ ^[^[:space:]@]+@sha256:[0-9a-f]{64}$ ]]; then
+            echo "Runtime image must be pinned by sha256 digest." >&2
+            exit 64
+          fi
+          if [[ "$RUNTIME_KIND" != none && -z "$runtime_image" ]]; then
+            echo "The selected worker runtime image is required." >&2
+            exit 64
+          fi
+          if [[ "$RUNTIME_KIND" == android && ! "$scrcpy_server_digest" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "The Android scrcpy server digest is required." >&2
+            exit 64
+          fi
+          {
+            printf 'name=%s\n' "$image"
+            printf 'tag=%s:sha-%s\n' "$image" "$GITHUB_SHA"
+            printf 'build_args<<DEVEX_BUILD_ARGS\n'
+            printf 'RUNTIME_IMAGE=%s\n' "$runtime_image"
+            printf 'RUNTIME_KIND=%s\n' "$RUNTIME_KIND"
+            printf 'SCRCPY_SERVER_DIGEST=%s\n' "$scrcpy_server_digest"
+            printf 'DEVEX_BUILD_ARGS\n'
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@f7ce87c1d6bead3e36075b2ce75da1f6cc28aaca # v3.9.0
+
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push immutable component
+        id: build
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.image.outputs.tag }}
+          build-args: ${{ steps.image.outputs.build_args }}
+          platforms: linux/amd64
+          provenance: mode=max
+          sbom: true
+          cache-from: type=gha,scope=${{ matrix.component }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.component }}
+
+      - name: Generate SPDX SBOM
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+        with:
+          image: ${{ steps.image.outputs.name }}@${{ steps.build.outputs.digest }}
+          format: spdx-json
+          output-file: ${{ matrix.component }}.spdx.json
+          artifact-name: ${{ matrix.component }}-sbom
+          upload-artifact-retention: 90
+
+      - name: Record GitHub build provenance
+        uses: actions/attest-build-provenance@96278af6caaf10aea03fd8d33a09a777ca52d62f # v3.2.0
+        with:
+          subject-name: ${{ steps.image.outputs.name }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+        with:
+          cosign-release: v3.0.6
+
+      - name: Sign image and attest SBOM keylessly
+        shell: bash
+        env:
+          IMAGE: ${{ steps.image.outputs.name }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+          SBOM: ${{ matrix.component }}.spdx.json
+        run: |
+          set -euo pipefail
+          reference="${IMAGE}@${DIGEST}"
+          cosign sign --yes "$reference"
+          cosign attest --yes --type spdxjson --predicate "$SBOM" "$reference"
+          cosign verify \
+            --certificate-identity-regexp "^https://github.com/${GITHUB_REPOSITORY}/.github/workflows/release-images.yml@refs/(tags|heads)/" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            "$reference"
+
+      - name: Publish immutable deployment reference
+        shell: bash
+        env:
+          IMAGE: ${{ steps.image.outputs.name }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+          COMPONENT: ${{ matrix.component }}
+        run: |
+          set -euo pipefail
+          printf "### %s\n\n\`%s@%s\`\n" "$COMPONENT" "$IMAGE" "$DIGEST" >> "$GITHUB_STEP_SUMMARY"

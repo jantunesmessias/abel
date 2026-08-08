@@ -1,0 +1,11 @@
+schemaVersion: 1
+kind: GatewayFixture
+metadata:
+  id: dashboard-unavailable
+spec:
+  status: 503
+  headers:
+    content-type: application/json
+    retry-after: "1"
+  bodyFile: fixtures/dashboard-unavailable.body
+  mediaType: application/json

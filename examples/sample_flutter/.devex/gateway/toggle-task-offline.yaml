@@ -1,0 +1,11 @@
+schemaVersion: 1
+kind: GatewayRoute
+metadata:
+  id: toggle-task-offline
+spec:
+  scopeId: showcase-api
+  method: POST
+  pathTemplate: /v1/projects/{project_id}/tasks/{task_id}/toggle
+  appliesTo: [showcase-offline]
+  policy: localOnly
+  fixtureId: task-toggled

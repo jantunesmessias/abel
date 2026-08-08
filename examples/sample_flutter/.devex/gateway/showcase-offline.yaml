@@ -1,0 +1,13 @@
+schemaVersion: 1
+kind: GatewayPreset
+metadata:
+  id: showcase-offline
+spec:
+  scopeId: showcase-api
+  description: Fully deterministic dashboard without an upstream dependency
+  backendMode: isolated
+  routeIds:
+    - dashboard-offline
+    - toggle-task-offline
+  initialState:
+    mode: offline

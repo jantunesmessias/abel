@@ -1,0 +1,24 @@
+.dart_tool/
+build/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+coverage/
+*.log
+*.lock.tmp
+devex.local.yaml
+
+# IDE and platform-local files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Android/Flutter generated state
+**/android/.gradle/
+**/android/local.properties
+**/android/key.properties
+**/ios/Flutter/ephemeral/
+**/macos/Flutter/ephemeral/
+**/linux/flutter/ephemeral/
+**/windows/flutter/ephemeral/

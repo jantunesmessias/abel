@@ -1,0 +1,361 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:devex:schema:gateway-plan:v1",
+  "title": "DevExKit Gateway documents v1",
+  "oneOf": [
+    {"$ref": "#/$defs/compiledGatewayPlan"},
+    {"$ref": "#/$defs/gatewaySession"},
+    {"$ref": "#/$defs/upstreamProfile"},
+    {"$ref": "#/$defs/routingTable"},
+    {"$ref": "#/$defs/trafficEvent"},
+    {"$ref": "#/$defs/verificationReport"}
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+    },
+    "opaqueId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"
+    },
+    "runtimeId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-][A-Za-z0-9._:-]{0,127}$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "stringMap": {
+      "type": "object",
+      "propertyNames": {"minLength": 1},
+      "additionalProperties": {"type": "string"}
+    },
+    "gatewaySession": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "ownerSessionId",
+        "planDigest",
+        "state",
+        "createdAt",
+        "updatedAt",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "GatewaySession"},
+        "id": {"$ref": "#/$defs/runtimeId"},
+        "ownerSessionId": {"$ref": "#/$defs/runtimeId"},
+        "planDigest": {"$ref": "#/$defs/digest"},
+        "state": {"enum": ["created", "running", "stopped", "failed"]},
+        "createdAt": {"type": "string", "format": "date-time"},
+        "updatedAt": {"type": "string", "format": "date-time"},
+        "activeScopeId": {"$ref": "#/$defs/id"},
+        "terminalReason": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"state": {"const": "created"}}},
+          "then": {
+            "not": {
+              "anyOf": [
+                {"required": ["activeScopeId"]},
+                {"required": ["terminalReason"]}
+              ]
+            }
+          }
+        },
+        {
+          "if": {"properties": {"state": {"const": "running"}}},
+          "then": {
+            "required": ["activeScopeId"],
+            "not": {"required": ["terminalReason"]}
+          }
+        },
+        {
+          "if": {
+            "properties": {"state": {"enum": ["stopped", "failed"]}}
+          },
+          "then": {"not": {"required": ["activeScopeId"]}}
+        },
+        {
+          "if": {"properties": {"state": {"const": "failed"}}},
+          "then": {"required": ["terminalReason"]}
+        }
+      ],
+      "additionalProperties": false
+    },
+    "upstreamProfile": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "environment",
+        "origins",
+        "updatedAt",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "UpstreamProfile"},
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "environment": {"enum": ["development", "test", "staging"]},
+        "origins": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {"$ref": "#/$defs/opaqueId"},
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^https?://[^/?#@]+/?$"
+          }
+        },
+        "updatedAt": {"type": "string", "format": "date-time"},
+        "credentialHandleId": {"$ref": "#/$defs/runtimeId"},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "additionalProperties": false
+    },
+    "faultProfile": {
+      "type": "object",
+      "required": ["fixedLatencyMilliseconds", "disconnect"],
+      "properties": {
+        "fixedLatencyMilliseconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 30000
+        },
+        "forcedStatus": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 599
+        },
+        "disconnect": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "fixture": {
+      "type": "object",
+      "required": [
+        "id",
+        "status",
+        "headers",
+        "bodyDigest",
+        "bodySize",
+        "mediaType"
+      ],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "status": {"type": "integer", "minimum": 100, "maximum": 599},
+        "headers": {"$ref": "#/$defs/stringMap"},
+        "bodyDigest": {"$ref": "#/$defs/digest"},
+        "bodySize": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 262144
+        },
+        "mediaType": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "route": {
+      "type": "object",
+      "required": [
+        "id",
+        "scopeId",
+        "method",
+        "pathTemplate",
+        "requiredQuery",
+        "appliesTo",
+        "policy"
+      ],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "scopeId": {"$ref": "#/$defs/id"},
+        "method": {
+          "enum": ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+        },
+        "pathTemplate": {"type": "string", "pattern": "^/"},
+        "requiredQuery": {"$ref": "#/$defs/stringMap"},
+        "appliesTo": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        },
+        "policy": {
+          "enum": [
+            "catalogControlled",
+            "mockWhenOverridden",
+            "localOnly",
+            "upstreamOnly"
+          ]
+        },
+        "fixtureId": {"$ref": "#/$defs/id"},
+        "upstreamProfileId": {"$ref": "#/$defs/id"},
+        "faultProfile": {"$ref": "#/$defs/faultProfile"}
+      },
+      "additionalProperties": false
+    },
+    "scope": {
+      "type": "object",
+      "required": ["id", "displayName", "routeIds"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "displayName": {"type": "string", "minLength": 1},
+        "routeIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        }
+      },
+      "additionalProperties": false
+    },
+    "preset": {
+      "type": "object",
+      "required": ["id", "scopeId", "description", "routeIds", "initialState"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "scopeId": {"$ref": "#/$defs/id"},
+        "description": {"type": "string", "minLength": 1},
+        "routeIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/id"}
+        },
+        "initialState": {"type": "object"}
+      },
+      "additionalProperties": false
+    },
+    "compiledGatewayPlan": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "scope",
+        "preset",
+        "routes",
+        "fixtures",
+        "backendMode",
+        "networkContainment",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "CompiledGatewayPlan"},
+        "scope": {"$ref": "#/$defs/scope"},
+        "preset": {"$ref": "#/$defs/preset"},
+        "routes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/route"}
+        },
+        "fixtures": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/fixture"}
+        },
+        "backendMode": {"enum": ["isolated", "hybrid"]},
+        "networkContainment": {"const": "gatewayOnly"},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "additionalProperties": false
+    },
+    "routingTable": {
+      "type": "object",
+      "required": ["scopeId", "presetId", "entries"],
+      "properties": {
+        "scopeId": {"$ref": "#/$defs/id"},
+        "presetId": {"$ref": "#/$defs/id"},
+        "entries": {
+          "type": "object",
+          "propertyNames": {"$ref": "#/$defs/id"},
+          "additionalProperties": {"enum": ["mock", "passthrough", "deny"]}
+        }
+      },
+      "additionalProperties": false
+    },
+    "gatewayResponse": {
+      "type": "object",
+      "required": [
+        "status",
+        "headers",
+        "bodyDigest",
+        "bodySize",
+        "outcome"
+      ],
+      "properties": {
+        "status": {"type": "integer", "minimum": 100, "maximum": 599},
+        "headers": {"$ref": "#/$defs/stringMap"},
+        "bodyDigest": {"$ref": "#/$defs/digest"},
+        "bodySize": {"type": "integer", "minimum": 0},
+        "outcome": {
+          "enum": ["mock", "passthrough", "denied", "unmatched", "error"]
+        },
+        "routeId": {"$ref": "#/$defs/id"},
+        "presetId": {"$ref": "#/$defs/id"},
+        "disconnected": {"const": true}
+      },
+      "additionalProperties": false
+    },
+    "verificationReport": {
+      "type": "object",
+      "required": ["planDigest", "request", "response"],
+      "properties": {
+        "planDigest": {"$ref": "#/$defs/digest"},
+        "request": {
+          "type": "object",
+          "required": ["method", "path"],
+          "properties": {
+            "method": {"type": "string", "minLength": 1},
+            "path": {"type": "string", "pattern": "^/"}
+          },
+          "additionalProperties": false
+        },
+        "response": {"$ref": "#/$defs/gatewayResponse"}
+      },
+      "additionalProperties": false
+    },
+    "trafficEvent": {
+      "type": "object",
+      "required": [
+        "sequence",
+        "gatewaySessionId",
+        "monotonicMicroseconds",
+        "method",
+        "routeTemplate",
+        "outcome",
+        "status",
+        "durationMicroseconds",
+        "requestSize",
+        "responseSize",
+        "redactionSummary"
+      ],
+      "properties": {
+        "sequence": {"type": "integer", "minimum": 1},
+        "gatewaySessionId": {"type": "string", "minLength": 1},
+        "monotonicMicroseconds": {"type": "integer", "minimum": 0},
+        "method": {"type": "string", "minLength": 1},
+        "routeTemplate": {"type": "string", "minLength": 1},
+        "routeId": {"$ref": "#/$defs/id"},
+        "outcome": {
+          "enum": ["mock", "passthrough", "denied", "unmatched", "error"]
+        },
+        "status": {"type": "integer", "minimum": 100, "maximum": 599},
+        "durationMicroseconds": {"type": "integer", "minimum": 0},
+        "requestSize": {"type": "integer", "minimum": 0},
+        "responseSize": {"type": "integer", "minimum": 0},
+        "errorCode": {"type": "string", "minLength": 1},
+        "redactionSummary": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    }
+  }
+}

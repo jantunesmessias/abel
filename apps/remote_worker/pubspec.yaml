@@ -1,0 +1,16 @@
+name: devex_remote_worker
+version: 0.1.0-dev
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  devex_contracts: ^0.1.0-dev
+  devex_engine: ^0.1.0-dev
+  devex_runtime: ^0.1.0-dev
+  jose: ^0.3.5+2
+
+dev_dependencies:
+  test: ^1.26.3

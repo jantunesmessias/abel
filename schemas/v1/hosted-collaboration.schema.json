@@ -1,0 +1,205 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devex.example/schemas/v1/hosted-collaboration.schema.json",
+  "title": "DevExKit Hosted Collaboration v1",
+  "oneOf": [
+    {"$ref": "#/$defs/principal"},
+    {"$ref": "#/$defs/organization"},
+    {"$ref": "#/$defs/membership"},
+    {"$ref": "#/$defs/workspaceLink"},
+    {"$ref": "#/$defs/revision"},
+    {"$ref": "#/$defs/changeSet"},
+    {"$ref": "#/$defs/conflict"},
+    {"$ref": "#/$defs/event"},
+    {"$ref": "#/$defs/presence"},
+    {"$ref": "#/$defs/commentThread"},
+    {"$ref": "#/$defs/audit"},
+    {"$ref": "#/$defs/idempotency"},
+    {"$ref": "#/$defs/blob"}
+  ],
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"},
+    "utc": {"type": "string", "pattern": "Z$"},
+    "tenant": {"$ref": "#/$defs/id"},
+    "principal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "issuer", "subject", "displayName"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "issuer": {"type": "string", "minLength": 1, "maxLength": 2048},
+        "subject": {"type": "string", "minLength": 1, "maxLength": 512},
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 256}
+      }
+    },
+    "organization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "slug", "displayName", "createdAt"],
+      "properties": {
+        "tenantId": {"$ref": "#/$defs/tenant"},
+        "slug": {"type": "string", "pattern": "^[a-z][a-z0-9-]{2,62}$"},
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 256},
+        "createdAt": {"$ref": "#/$defs/utc"}
+      }
+    },
+    "membership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "principalId", "role", "createdAt"],
+      "properties": {
+        "tenantId": {"$ref": "#/$defs/tenant"},
+        "principalId": {"$ref": "#/$defs/id"},
+        "role": {"enum": ["owner", "admin", "editor", "reviewer", "viewer"]},
+        "createdAt": {"$ref": "#/$defs/utc"}
+      }
+    },
+    "workspaceLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "workspaceId", "localWorkspaceId", "linkedAt", "linkedBy"],
+      "properties": {
+        "tenantId": {"$ref": "#/$defs/tenant"},
+        "workspaceId": {"$ref": "#/$defs/id"},
+        "localWorkspaceId": {"$ref": "#/$defs/id"},
+        "linkedAt": {"$ref": "#/$defs/utc"},
+        "linkedBy": {"$ref": "#/$defs/id"}
+      }
+    },
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "workspaceId", "id", "contentDigest", "changeSetDigest", "createdAt", "createdBy"],
+      "properties": {
+        "tenantId": {"$ref": "#/$defs/tenant"},
+        "workspaceId": {"$ref": "#/$defs/id"},
+        "id": {"$ref": "#/$defs/id"},
+        "contentDigest": {"$ref": "#/$defs/digest"},
+        "changeSetDigest": {"$ref": "#/$defs/digest"},
+        "parentDigest": {"$ref": "#/$defs/digest"},
+        "createdAt": {"$ref": "#/$defs/utc"},
+        "createdBy": {"$ref": "#/$defs/id"}
+      }
+    },
+    "changeSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "workspaceId", "baseDigest", "expectedDigest", "proposedDigest", "principalId", "idempotencyKey", "metadata"],
+      "properties": {
+        "tenantId": {"$ref": "#/$defs/tenant"},
+        "workspaceId": {"$ref": "#/$defs/id"},
+        "baseDigest": {"$ref": "#/$defs/digest"},
+        "expectedDigest": {"$ref": "#/$defs/digest"},
+        "proposedDigest": {"$ref": "#/$defs/digest"},
+        "principalId": {"$ref": "#/$defs/id"},
+        "idempotencyKey": {"$ref": "#/$defs/id"},
+        "metadata": {"type": "object"}
+      }
+    },
+    "conflict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "workspaceId", "baseDigest", "currentDigest", "proposedDigest"],
+      "properties": {
+        "tenantId": {"$ref": "#/$defs/tenant"},
+        "workspaceId": {"$ref": "#/$defs/id"},
+        "baseDigest": {"$ref": "#/$defs/digest"},
+        "currentDigest": {"$ref": "#/$defs/digest"},
+        "proposedDigest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "workspaceId", "sequence", "kind", "subjectDigest", "principalId", "occurredAt", "payload"],
+      "properties": {
+        "tenantId": {"$ref": "#/$defs/tenant"},
+        "workspaceId": {"$ref": "#/$defs/id"},
+        "sequence": {"type": "integer", "minimum": 1},
+        "kind": {"enum": ["workspacePushed", "commentAdded", "approvalRecorded", "presenceChanged", "releasePublished"]},
+        "subjectDigest": {"$ref": "#/$defs/digest"},
+        "principalId": {"$ref": "#/$defs/id"},
+        "occurredAt": {"$ref": "#/$defs/utc"},
+        "payload": {"type": "object"}
+      }
+    },
+    "presence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "workspaceId", "principalId", "sessionId", "expiresAt"],
+      "properties": {
+        "tenantId": {"$ref": "#/$defs/tenant"},
+        "workspaceId": {"$ref": "#/$defs/id"},
+        "principalId": {"$ref": "#/$defs/id"},
+        "sessionId": {"$ref": "#/$defs/id"},
+        "expiresAt": {"$ref": "#/$defs/utc"}
+      }
+    },
+    "commentEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "principalId", "body", "createdAt"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "principalId": {"$ref": "#/$defs/id"},
+        "body": {"type": "string", "minLength": 1, "maxLength": 16000},
+        "createdAt": {"$ref": "#/$defs/utc"}
+      }
+    },
+    "commentThread": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "workspaceId", "id", "subjectDigest", "comments", "resolved"],
+      "properties": {
+        "tenantId": {"$ref": "#/$defs/tenant"},
+        "workspaceId": {"$ref": "#/$defs/id"},
+        "id": {"$ref": "#/$defs/id"},
+        "subjectDigest": {"$ref": "#/$defs/digest"},
+        "comments": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/commentEntry"}},
+        "resolved": {"type": "boolean"}
+      }
+    },
+    "audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "id", "principalId", "action", "subjectDigest", "occurredAt", "context"],
+      "properties": {
+        "tenantId": {"$ref": "#/$defs/tenant"},
+        "id": {"$ref": "#/$defs/id"},
+        "principalId": {"$ref": "#/$defs/id"},
+        "action": {"type": "string", "pattern": "^[a-z][a-z0-9.-]{2,127}$"},
+        "subjectDigest": {"$ref": "#/$defs/digest"},
+        "occurredAt": {"$ref": "#/$defs/utc"},
+        "context": {"type": "object"}
+      }
+    },
+    "idempotency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "principalId", "key", "requestDigest", "responseDigest", "createdAt", "expiresAt"],
+      "properties": {
+        "tenantId": {"$ref": "#/$defs/tenant"},
+        "principalId": {"$ref": "#/$defs/id"},
+        "key": {"$ref": "#/$defs/id"},
+        "requestDigest": {"$ref": "#/$defs/digest"},
+        "responseDigest": {"$ref": "#/$defs/digest"},
+        "createdAt": {"$ref": "#/$defs/utc"},
+        "expiresAt": {"$ref": "#/$defs/utc"}
+      }
+    },
+    "blob": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "digest", "size", "mediaType", "classification", "objectKey"],
+      "properties": {
+        "tenantId": {"$ref": "#/$defs/tenant"},
+        "digest": {"$ref": "#/$defs/digest"},
+        "size": {"type": "integer", "minimum": 0, "maximum": 1073741824},
+        "mediaType": {"type": "string", "minLength": 1, "maxLength": 255},
+        "classification": {"enum": ["public", "internal", "sensitive"]},
+        "objectKey": {"type": "string", "pattern": "^tenants/[A-Za-z0-9][A-Za-z0-9._:-]{2,127}/blobs/sha256/[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+name: sample_flutter
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  devex_flutter: ^0.1.0-dev
+  devex_preview: ^0.1.0-dev
+  flutter:
+    sdk: flutter
+  http: ^1.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  path: ^1.9.1
+
+flutter:
+  uses-material-design: true

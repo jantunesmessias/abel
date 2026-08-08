@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "id": "direct-modification",
+      "base": {"lib/a.dart": "old", "lib/b.dart": "same"},
+      "current": {"lib/a.dart": "new", "lib/b.dart": "same"},
+      "bindings": [
+        {"id": "a", "subject": "scenario-a", "repositoryId": "repo", "pathGlobs": ["lib/a.dart"], "dependsOn": []},
+        {"id": "b", "subject": "scenario-b", "repositoryId": "repo", "pathGlobs": ["lib/b.dart"], "dependsOn": []}
+      ],
+      "expectedImpacted": ["a"]
+    },
+    {
+      "id": "transitive-dependent",
+      "base": {"lib/domain/a.dart": "old", "lib/ui/a.dart": "same"},
+      "current": {"lib/domain/a.dart": "new", "lib/ui/a.dart": "same"},
+      "bindings": [
+        {"id": "domain", "subject": "scenario-domain", "repositoryId": "repo", "pathGlobs": ["lib/domain/**"], "dependsOn": []},
+        {"id": "ui", "subject": "scenario-ui", "repositoryId": "repo", "pathGlobs": ["lib/ui/**"], "dependsOn": ["domain"]}
+      ],
+      "expectedImpacted": ["domain", "ui"]
+    },
+    {
+      "id": "unrelated-change",
+      "base": {"lib/a.dart": "same", "docs/readme.md": "old"},
+      "current": {"lib/a.dart": "same", "docs/readme.md": "new"},
+      "bindings": [
+        {"id": "a", "subject": "scenario-a", "repositoryId": "repo", "pathGlobs": ["lib/**"], "dependsOn": []}
+      ],
+      "expectedImpacted": []
+    },
+    {
+      "id": "added-file-double-star",
+      "base": {"lib/a.dart": "same"},
+      "current": {"lib/a.dart": "same", "lib/feature/new.dart": "new"},
+      "bindings": [
+        {"id": "feature", "subject": "scenario-feature", "repositoryId": "repo", "pathGlobs": ["lib/feature/**"], "dependsOn": []}
+      ],
+      "expectedImpacted": ["feature"]
+    },
+    {
+      "id": "deleted-file",
+      "base": {"assets/config.json": "present"},
+      "current": {},
+      "bindings": [
+        {"id": "assets", "subject": "scenario-assets", "repositoryId": "repo", "pathGlobs": ["assets/*.json"], "dependsOn": []}
+      ],
+      "expectedImpacted": ["assets"]
+    },
+    {
+      "id": "no-change",
+      "base": {"lib/a.dart": "same"},
+      "current": {"lib/a.dart": "same"},
+      "bindings": [
+        {"id": "a", "subject": "scenario-a", "repositoryId": "repo", "pathGlobs": ["lib/**"], "dependsOn": []}
+      ],
+      "expectedImpacted": []
+    },
+    {
+      "id": "partial-current-invalidates-all",
+      "base": {"lib/a.dart": "same", "lib/b.dart": "same"},
+      "current": {"lib/a.dart": "same"},
+      "currentComplete": false,
+      "bindings": [
+        {"id": "a", "subject": "scenario-a", "repositoryId": "repo", "pathGlobs": ["lib/a.dart"], "dependsOn": []},
+        {"id": "b", "subject": "scenario-b", "repositoryId": "repo", "pathGlobs": ["lib/b.dart"], "dependsOn": []}
+      ],
+      "expectedImpacted": ["a", "b"]
+    },
+    {
+      "id": "partial-base-invalidates-all",
+      "base": {"lib/a.dart": "same"},
+      "baseComplete": false,
+      "current": {"lib/a.dart": "same"},
+      "bindings": [
+        {"id": "a", "subject": "scenario-a", "repositoryId": "repo", "pathGlobs": ["lib/a.dart"], "dependsOn": []}
+      ],
+      "expectedImpacted": ["a"]
+    },
+    {
+      "id": "unknown-dependency-invalidates-all",
+      "base": {"lib/a.dart": "same", "lib/b.dart": "same"},
+      "current": {"lib/a.dart": "same", "lib/b.dart": "same"},
+      "bindings": [
+        {"id": "a", "subject": "scenario-a", "repositoryId": "repo", "pathGlobs": ["lib/a.dart"], "dependsOn": ["missing"]},
+        {"id": "b", "subject": "scenario-b", "repositoryId": "repo", "pathGlobs": ["lib/b.dart"], "dependsOn": []}
+      ],
+      "expectedImpacted": ["a", "b"]
+    },
+    {
+      "id": "unknown-repository-invalidates-all",
+      "base": {"lib/a.dart": "same"},
+      "current": {"lib/a.dart": "same"},
+      "bindings": [
+        {"id": "a", "subject": "scenario-a", "repositoryId": "other", "pathGlobs": ["lib/a.dart"], "dependsOn": []}
+      ],
+      "expectedImpacted": ["a"]
+    }
+  ]
+}

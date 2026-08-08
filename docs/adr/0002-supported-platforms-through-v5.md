@@ -1,0 +1,22 @@
+# ADR-0002: Plataformas suportadas ate V5
+
+- Status: aceita
+- Data: 2026-08-09
+- Decisoes afetadas: D-G08, Q-14, gate 27.2
+
+## Contexto
+
+O plano de implementacao escolheu web e Android, sem infraestrutura macOS/iOS.
+A arquitetura anterior incluia iOS Simulator no significado amplo de V1.
+
+## Decisao
+
+- V1 significa paridade operacional na matriz Flutter web e Android emulator.
+- V2-V5 preservam essa matriz; o farm remoto oferece web e Android emulator.
+- iOS e dispositivos Android fisicos permanecem fora do escopo ate nova ADR.
+- Nenhuma release afirma paridade iOS ou substituicao multiplataforma.
+
+## Consequencias
+
+Q-14 continua adiada. Evidencia e machine output declaram a matriz efetiva. O
+gate de substituicao so pode ser afirmado como `web/Android`.

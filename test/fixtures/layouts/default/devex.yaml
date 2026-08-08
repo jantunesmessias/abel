@@ -1,0 +1,5 @@
+schemaVersion: 1
+content: {root: .devex}
+workspace: {id: sample, displayName: Sample}
+applications:
+  app: {root: ., target: local}

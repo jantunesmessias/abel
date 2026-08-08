@@ -1,0 +1,13 @@
+schemaVersion: 1
+kind: Journey
+metadata:
+  id: operate-delivery-workspace
+spec:
+  applicationId: sample
+  title: Operate a delivery workspace
+  scenarioIds:
+    - dashboard-loading
+    - dashboard-ready
+    - toggle-delivery-task
+    - dashboard-failed
+    - inspect-gateway-traffic

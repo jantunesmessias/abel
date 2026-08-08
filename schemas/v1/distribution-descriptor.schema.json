@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:devex:schema:distribution-descriptor:v1",
+  "type": "object",
+  "required": ["schemaVersion", "id", "displayName", "coreCompatibility", "defaultLayout"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"},
+    "displayName": {"type": "string", "minLength": 1},
+    "coreCompatibility": {"type": "string", "pattern": "^\\^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "defaultLayout": {"$ref": "#/$defs/layout"},
+    "commandAliases": {"type": "array", "items": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{0,63}$"}, "uniqueItems": true}
+  },
+  "$defs": {
+    "layout": {
+      "type": "object",
+      "required": ["configFile", "configEnvironmentVariable", "contentRoot", "localConfigFile", "toolingEntrypoint", "commandAliases"],
+      "properties": {
+        "configFile": {"$ref": "#/$defs/relativePath"},
+        "configEnvironmentVariable": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,127}$"},
+        "contentRoot": {"$ref": "#/$defs/relativePath"},
+        "localConfigFile": {"$ref": "#/$defs/relativePath"},
+        "toolingEntrypoint": {"$ref": "#/$defs/relativePath"},
+        "commandAliases": {"type": "array", "items": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{0,63}$"}, "uniqueItems": true}
+      },
+      "additionalProperties": false
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    }
+  },
+  "additionalProperties": false
+}

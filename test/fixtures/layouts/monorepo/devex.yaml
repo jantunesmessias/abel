@@ -1,0 +1,6 @@
+schemaVersion: 1
+content: {root: experiences}
+workspace: {id: sample-suite, displayName: Sample Suite}
+applications:
+  primary: {root: apps/primary, target: local}
+  companion: {root: apps/companion, target: local}

@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:devex:schema:evidence-release:v1",
+  "title": "DevExKit Evidence and Release documents v1",
+  "oneOf": [
+    {"$ref": "#/$defs/executionFingerprint"},
+    {"$ref": "#/$defs/evidence"},
+    {"$ref": "#/$defs/release"},
+    {"$ref": "#/$defs/releaseBundle"},
+    {"$ref": "#/$defs/publicationView"}
+  ],
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "utcTimestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.]+Z$"
+    },
+    "stringMap": {
+      "type": "object",
+      "propertyNames": {"minLength": 1},
+      "additionalProperties": {"type": "string", "minLength": 1}
+    },
+    "digestMap": {
+      "type": "object",
+      "propertyNames": {"minLength": 1},
+      "additionalProperties": {"$ref": "#/$defs/digest"}
+    },
+    "artifact": {
+      "type": "object",
+      "required": ["digest", "size", "mediaType", "classification", "role"],
+      "properties": {
+        "digest": {"$ref": "#/$defs/digest"},
+        "size": {"type": "integer", "minimum": 0},
+        "mediaType": {"type": "string", "minLength": 1},
+        "classification": {"enum": ["public", "internal", "sensitive"]},
+        "role": {"type": "string", "minLength": 1},
+        "pixelDigest": {"$ref": "#/$defs/digest"},
+        "width": {"type": "integer", "minimum": 1},
+        "height": {"type": "integer", "minimum": 1}
+      },
+      "dependentRequired": {
+        "pixelDigest": ["width", "height"],
+        "width": ["pixelDigest", "height"],
+        "height": ["pixelDigest", "width"]
+      },
+      "allOf": [
+        {
+          "if": {"required": ["pixelDigest"]},
+          "then": {"properties": {"mediaType": {"const": "image/png"}}}
+        }
+      ],
+      "additionalProperties": false
+    },
+    "executionFingerprint": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "catalogDigest",
+        "launchProfileId",
+        "targetId",
+        "platform",
+        "renderer",
+        "runtimeFidelity",
+        "backendMode",
+        "networkContainment",
+        "bootstrapAssessment",
+        "toolchain",
+        "capabilities",
+        "inputDigests",
+        "policies",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ExecutionFingerprint"},
+        "catalogDigest": {"$ref": "#/$defs/digest"},
+        "launchProfileId": {"type": "string", "minLength": 1},
+        "targetId": {"type": "string", "minLength": 1},
+        "platform": {"type": "string", "minLength": 1},
+        "renderer": {"type": "string", "minLength": 1},
+        "runtimeFidelity": {
+          "enum": ["structural", "simulated", "hostNative", "deviceAttested"]
+        },
+        "backendMode": {"enum": ["none", "isolated", "hybrid"]},
+        "networkContainment": {
+          "enum": ["unconstrained", "gatewayOnly", "targetEnforced"]
+        },
+        "bootstrapAssessment": {
+          "enum": ["unassessed", "declared", "controlled", "failed"]
+        },
+        "toolchain": {"$ref": "#/$defs/stringMap", "minProperties": 1},
+        "capabilities": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "inputDigests": {"$ref": "#/$defs/digestMap"},
+        "policies": {"$ref": "#/$defs/stringMap"},
+        "sourceRevision": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "subjectDigest",
+        "fingerprint",
+        "observedAt",
+        "policyId",
+        "artifacts",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "Evidence"},
+        "id": {"type": "string", "minLength": 1},
+        "subjectDigest": {"$ref": "#/$defs/digest"},
+        "fingerprint": {"$ref": "#/$defs/executionFingerprint"},
+        "observedAt": {"$ref": "#/$defs/utcTimestamp"},
+        "policyId": {"type": "string", "minLength": 1},
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/artifact"},
+          "uniqueItems": true
+        },
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "additionalProperties": false
+    },
+    "release": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "id",
+        "subjectDigest",
+        "distributionDigest",
+        "coreVersion",
+        "createdAt",
+        "policies",
+        "evidence"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "Release"},
+        "id": {"type": "string", "minLength": 1},
+        "subjectDigest": {"$ref": "#/$defs/digest"},
+        "distributionDigest": {"$ref": "#/$defs/digest"},
+        "coreVersion": {"type": "string", "minLength": 1},
+        "createdAt": {"$ref": "#/$defs/utcTimestamp"},
+        "policies": {"$ref": "#/$defs/stringMap", "minProperties": 1},
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/evidence"},
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "releaseBundle": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "releaseDigest",
+        "release",
+        "artifacts",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "ReleaseBundle"},
+        "releaseDigest": {"$ref": "#/$defs/digest"},
+        "release": {"$ref": "#/$defs/release"},
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/artifact"},
+          "uniqueItems": true
+        },
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "additionalProperties": false
+    },
+    "approval": {
+      "type": "object",
+      "required": ["id", "subjectDigest", "principalId", "decidedAt", "approved"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "subjectDigest": {"$ref": "#/$defs/digest"},
+        "principalId": {"type": "string", "minLength": 1},
+        "decidedAt": {"$ref": "#/$defs/utcTimestamp"},
+        "approved": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "finding": {
+      "type": "object",
+      "required": ["id", "subjectDigest", "severity", "message"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "subjectDigest": {"$ref": "#/$defs/digest"},
+        "severity": {"type": "string", "minLength": 1},
+        "message": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "publicationEvidence": {
+      "type": "object",
+      "required": ["id", "digest", "freshness", "artifacts"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"},
+        "freshness": {"const": "fresh"},
+        "artifacts": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/artifact"},
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "publicationView": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "releaseId",
+        "releaseDigest",
+        "subjectDigest",
+        "evidence",
+        "approvals",
+        "findings"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "PublicationView"},
+        "releaseId": {"type": "string", "minLength": 1},
+        "releaseDigest": {"$ref": "#/$defs/digest"},
+        "subjectDigest": {"$ref": "#/$defs/digest"},
+        "evidence": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/publicationEvidence"},
+          "uniqueItems": true
+        },
+        "approvals": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/approval"},
+          "uniqueItems": true
+        },
+        "findings": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/finding"},
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:devex:schema:catalog-manifest:v1",
+  "title": "DevExKit CatalogManifest v1",
+  "$ref": "#/$defs/catalogManifest",
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "boundedString": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "consumerLayout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "configFile",
+        "configEnvironmentVariable",
+        "contentRoot",
+        "localConfigFile",
+        "toolingEntrypoint",
+        "commandAliases"
+      ],
+      "properties": {
+        "configFile": {"$ref": "#/$defs/boundedString"},
+        "configEnvironmentVariable": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]{2,127}$"
+        },
+        "contentRoot": {"$ref": "#/$defs/boundedString"},
+        "localConfigFile": {"$ref": "#/$defs/boundedString"},
+        "toolingEntrypoint": {"$ref": "#/$defs/boundedString"},
+        "commandAliases": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 256,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+          }
+        }
+      }
+    },
+    "distribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "id",
+        "displayName",
+        "coreCompatibility",
+        "defaultLayout",
+        "commandAliases"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 512},
+        "coreCompatibility": {
+          "type": "string",
+          "pattern": "^\\^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "defaultLayout": {"$ref": "#/$defs/consumerLayout"},
+        "commandAliases": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 256,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+          }
+        }
+      }
+    },
+    "workspace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "displayName"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 512}
+      }
+    },
+    "application": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "workspaceId", "displayName", "root", "target"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "workspaceId": {"$ref": "#/$defs/opaqueId"},
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 512},
+        "root": {"$ref": "#/$defs/boundedString"},
+        "target": {"type": "string", "minLength": 1, "maxLength": 256}
+      }
+    },
+    "journey": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "applicationId", "title", "scenarioIds"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "applicationId": {"$ref": "#/$defs/opaqueId"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 2048},
+        "scenarioIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 100000,
+          "items": {"$ref": "#/$defs/opaqueId"}
+        }
+      }
+    },
+    "sourceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "path"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1, "maxLength": 512},
+        "path": {"$ref": "#/$defs/boundedString"},
+        "symbol": {"type": "string", "minLength": 1, "maxLength": 1024}
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "applicationId", "title", "sourceReferences"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "applicationId": {"$ref": "#/$defs/opaqueId"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 2048},
+        "description": {"type": "string", "minLength": 1, "maxLength": 16384},
+        "sourceReferences": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {"$ref": "#/$defs/sourceReference"}
+        }
+      }
+    },
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "journeyId", "from", "to"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "journeyId": {"$ref": "#/$defs/opaqueId"},
+        "from": {"$ref": "#/$defs/opaqueId"},
+        "to": {"$ref": "#/$defs/opaqueId"},
+        "label": {"type": "string", "minLength": 1, "maxLength": 2048}
+      }
+    },
+    "executionBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "scenarioId", "targetId"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "targetId": {"type": "string", "minLength": 1, "maxLength": 256},
+        "launchProfileId": {"$ref": "#/$defs/opaqueId"},
+        "checkpointId": {"$ref": "#/$defs/opaqueId"},
+        "gatewayPresetId": {"$ref": "#/$defs/opaqueId"}
+      },
+      "oneOf": [
+        {
+          "required": ["launchProfileId"],
+          "not": {"required": ["checkpointId"]}
+        },
+        {
+          "required": ["checkpointId"],
+          "not": {"required": ["launchProfileId"]}
+        }
+      ]
+    },
+    "reviewGuideStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "instruction",
+        "observationCriteria",
+        "scenarioId",
+        "bindingId"
+      ],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "instruction": {"type": "string", "minLength": 1, "maxLength": 4096},
+        "observationCriteria": {"type": "string", "minLength": 1, "maxLength": 4096},
+        "scenarioId": {"$ref": "#/$defs/opaqueId"},
+        "bindingId": {"$ref": "#/$defs/opaqueId"}
+      }
+    },
+    "reviewGuide": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "applicationId", "title", "steps"],
+      "properties": {
+        "id": {"$ref": "#/$defs/opaqueId"},
+        "applicationId": {"$ref": "#/$defs/opaqueId"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 2048},
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10000,
+          "items": {"$ref": "#/$defs/reviewGuideStep"}
+        }
+      }
+    },
+    "catalogManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "distribution",
+        "layout",
+        "workspace",
+        "applications",
+        "journeys",
+        "scenarios",
+        "transitions",
+        "executionBindings",
+        "reviewGuides",
+        "digest"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "kind": {"const": "CatalogManifest"},
+        "distribution": {"$ref": "#/$defs/distribution"},
+        "layout": {"$ref": "#/$defs/consumerLayout"},
+        "workspace": {"$ref": "#/$defs/workspace"},
+        "applications": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": {"$ref": "#/$defs/application"}
+        },
+        "journeys": {
+          "type": "array",
+          "maxItems": 50000,
+          "items": {"$ref": "#/$defs/journey"}
+        },
+        "scenarios": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": {"$ref": "#/$defs/scenario"}
+        },
+        "transitions": {
+          "type": "array",
+          "maxItems": 500000,
+          "items": {"$ref": "#/$defs/transition"}
+        },
+        "executionBindings": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": {"$ref": "#/$defs/executionBinding"}
+        },
+        "reviewGuides": {
+          "type": "array",
+          "maxItems": 20000,
+          "items": {"$ref": "#/$defs/reviewGuide"}
+        },
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    }
+  }
+}

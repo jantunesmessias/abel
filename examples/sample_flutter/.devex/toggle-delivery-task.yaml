@@ -1,0 +1,12 @@
+schemaVersion: 1
+kind: Scenario
+metadata:
+  id: toggle-delivery-task
+spec:
+  applicationId: sample
+  title: Complete a delivery task
+  description: Mutate API state and refresh the dashboard through the same production client.
+  sourceReferences:
+    - repository: workspace
+      path: lib/showcase_api.dart
+      symbol: HttpShowcaseApi.toggleTask

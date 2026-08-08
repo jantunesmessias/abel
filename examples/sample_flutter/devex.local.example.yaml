@@ -1,0 +1,12 @@
+# Copy to devex.local.yaml when running the hybrid Gateway preset manually.
+# The generated showcase launcher creates the same local-only file if absent.
+schemaVersion: 1
+gateway:
+  upstreams:
+    showcase-api:
+      baseUrl: http://127.0.0.1:8181
+      allowedHost: 127.0.0.1
+      environment: development
+      allowPrivateAddresses: true
+      maxResponseBytes: 1048576
+      timeoutMilliseconds: 8000

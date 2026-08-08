@@ -1,0 +1,33 @@
+:focus-visible {
+  outline: 2px solid var(--dx-accent);
+  outline-offset: 2px;
+  box-shadow: var(--dx-focus);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .dx-status-pill,
+  .scenario-card,
+  .dx-panel,
+  .dx-metric,
+  .dx-button,
+  .dx-input,
+  .dx-select {
+    border-color: CanvasText;
+  }
+
+  .scenario-card.is-selected,
+  .studio-nav__item.is-active {
+    outline: 2px solid Highlight;
+  }
+}

@@ -1,0 +1,22 @@
+name: devex_remote_session_gateway
+description: Per-run authenticated relay for remote interactive sessions.
+version: 0.1.0-dev
+publish_to: none
+
+environment:
+  sdk: ^3.12.0
+
+resolution: workspace
+
+dependencies:
+  devex_contracts: ^0.1.0-dev
+  devex_engine: ^0.1.0-dev
+  devex_runtime: ^0.1.0-dev
+  jose: ^0.3.5
+  shelf: ^1.4.2
+  shelf_router: ^1.1.4
+  shelf_web_socket: ^3.0.0
+  web_socket_channel: ^3.0.3
+
+dev_dependencies:
+  test: ^1.26.3

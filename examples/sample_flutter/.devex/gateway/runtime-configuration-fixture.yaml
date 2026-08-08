@@ -1,0 +1,13 @@
+schemaVersion: 1
+kind: GatewayRoute
+metadata:
+  id: runtime-configuration-fixture
+spec:
+  scopeId: showcase-api
+  method: GET
+  pathTemplate: /v1/runtime/configuration
+  requiredQuery:
+    view: tooling
+  appliesTo: [showcase-hybrid]
+  policy: localOnly
+  fixtureId: runtime-configuration

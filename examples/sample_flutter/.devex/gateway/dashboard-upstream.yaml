@@ -1,0 +1,11 @@
+schemaVersion: 1
+kind: GatewayRoute
+metadata:
+  id: dashboard-upstream
+spec:
+  scopeId: showcase-api
+  method: GET
+  pathTemplate: /v1/dashboard
+  appliesTo: [showcase-hybrid]
+  policy: upstreamOnly
+  upstreamProfileId: showcase-api

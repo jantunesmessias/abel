@@ -1,0 +1,14 @@
+.dart_tool/
+.git/
+.github/
+**/build/
+**/.flutter-plugins*
+**/.packages
+**/*.jks
+**/*.keystore
+**/*.p12
+**/*.pem
+**/*.key
+coverage/
+docs/
+tool/

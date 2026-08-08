@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:devex:schema:authoring-document:v1",
+  "title": "DevExKit authoring document v1",
+  "type": "object",
+  "required": ["schemaVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "kind": {
+      "enum": [
+        "Workspace",
+        "Application",
+        "Journey",
+        "Scenario",
+        "Transition",
+        "GatewayScope",
+        "GatewayPreset",
+        "GatewayRoute",
+        "GatewayFixture",
+        "ScenarioExecutionBinding",
+        "ReviewGuide"
+      ]
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$"}
+      },
+      "additionalProperties": false
+    },
+    "spec": {"type": "object"}
+  },
+  "additionalProperties": false
+}

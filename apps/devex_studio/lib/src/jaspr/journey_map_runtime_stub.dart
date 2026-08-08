@@ -1,0 +1,1 @@
+void revealJourneyScenario(String elementId) {}

@@ -1,0 +1,14 @@
+schemaVersion: 1
+kind: GatewayPreset
+metadata:
+  id: showcase-hybrid
+spec:
+  scopeId: showcase-api
+  description: Real dashboard API with one deterministic runtime fixture
+  backendMode: hybrid
+  routeIds:
+    - dashboard-upstream
+    - toggle-task-upstream
+    - runtime-configuration-fixture
+  initialState:
+    mode: hybrid

@@ -1,0 +1,9 @@
+schemaVersion: 1
+kind: Transition
+metadata:
+  id: ready-to-gateway
+spec:
+  journeyId: operate-delivery-workspace
+  from: dashboard-ready
+  to: inspect-gateway-traffic
+  label: Reviewer opens Gateway traffic

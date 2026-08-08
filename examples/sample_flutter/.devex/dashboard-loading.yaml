@@ -1,0 +1,12 @@
+schemaVersion: 1
+kind: Scenario
+metadata:
+  id: dashboard-loading
+spec:
+  applicationId: sample
+  title: Load the delivery dashboard
+  description: Observe the bounded loading state while the API request is pending.
+  sourceReferences:
+    - repository: workspace
+      path: lib/app_factory.dart
+      symbol: ShowcaseDashboardPage
